@@ -1,0 +1,74 @@
+﻿@using System.Data;
+@inject Icons icons;
+@model ResponseResult
+@{
+    List<Column> columns = Model.cols;
+    var pk = columns.FirstOrDefault(pk => pk.FieldType == fieldType.PK).CellValue;
+}
+@if (Model.isSuccessful)
+{
+    <tr id="@pk" data-isinaction="false">
+        @foreach (Column col in columns)
+        {
+            if (col.ColumnName == "Controls")
+            {
+            <th data-col="Controls" data-fieldtype="@fieldType.Control" class="normalView">
+                <div>
+                    <button type="button" onclick="msg@(pk).classList.remove('hideMsg')">
+                        @Html.Raw(icons.DeleteSVG)
+                    </button>
+                    <button type="button" onclick="toggleView(@pk)">
+                        @Html.Raw(icons.EditSVG)
+                    </button>
+                </div>
+                <div id="msg@(pk)" class="message hideMsg">
+                    <div>
+                        <button type="button" onclick="onDelete(@pk, '#deleteAction')"><span class="svg-center">@Html.Raw(icons.DoItSVG)</span></button>
+                        <button type="button" onclick="msg@(pk).classList.add('hideMsg')">
+                            <span class="svg-center">@Html.Raw(icons.CancelSVG)</span>
+                        </button>
+                    </div>
+                    <div style="padding-top: 7px;">هل انت متاكد من الحذف</div>
+                </div>
+                <div>
+                    <button type="button" onclick="onSave('@pk', '#onSaveAction')">@Html.Raw(icons.DoItSVG)</button>
+                    <button type="button" onclick="toggleView(@pk)">
+                        @Html.Raw(icons.CancelSVG)
+                    </button>
+                </div>
+            </th>
+            }
+            else
+            {
+            <td data-col="@col.ColumnName" data-fieldtype="@col.FieldType" class="normalView"
+        style="@(col.ColumnWidth + "px"); @(col.IsVisable? "" : "display: none"); ">
+                <div> @Html.Raw(col.CellValue != null ? col.CellValue : "") </div>
+                <div>
+                    <label for="@col.ColumnName">@col.ColumnDisplayName</label>
+                    @if (@col.FieldType != fieldType.PK)
+                    {
+                        <input type="@col.InputType" name="@col.ColumnName" value="@(col.CellValue != null ? col.CellValue : " ")" />
+                    }
+                    else
+                    {
+                        <input type="hidden" name="@col.ColumnName" value="@col.ColumnName.ToString()" />
+                    }
+                </div>
+            </td>
+            }
+        }
+    </tr>
+}
+else
+{
+    <tr>
+        <td colspan="@(columns.Count+1)">
+            <div>
+                @Model.error
+            </div>
+        </td>
+    </tr>
+}
+
+
+

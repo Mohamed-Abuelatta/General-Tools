@@ -1,0 +1,67 @@
+﻿@using System.Data;
+@model Grid
+
+@{
+    ViewData["Title"] = "make grid view";
+    List<DataRow> DR = Model.DataRows;
+    Icons Ico = Model.Icons;
+    GridSetting gridSetting = Model.gridSetting;
+    //List<PagerButton> Pbtn = Model.pagerButtons;
+    //List<Column>
+}
+
+@foreach (DataRow row in DR)
+{
+    <tr id="@row["RowKey"]" data-isinaction="false">
+        @foreach (var Col in Model.Columns)
+        {
+            if (Col.ColumnName == "Controls")
+            {
+                <th data-col="Controls" data-fieldtype="@fieldType.Control" class="normalView">
+                    <div>
+                        <button type="button" onclick="msg@(row["RowKey"]).classList.remove('hideMsg')">
+                            @Html.Raw(Ico.DeleteSVG)
+                        </button>
+                        <button type="button" onclick="toggleView(@row["RowKey"])">
+                            @Html.Raw(Ico.EditSVG)
+                        </button>
+                    </div>
+                    <div id="msg@(row["RowKey"])" class="message hideMsg">
+                        <div>
+                            <button type="button" onclick="onDelete(@row["RowKey"], '@gridSetting.OnDeleteAction')"><span class="svg-center">@Html.Raw(Model.Icons.DoItSVG)</span></button>
+                            <button type="button" onclick="msg@(row["RowKey"]).classList.add('hideMsg')">
+                                <span class="svg-center">@Html.Raw(Ico.CancelSVG)</span>
+                            </button>
+                        </div>
+                        <div style="padding-top: 7px;">هل انت متاكد من الحذف</div>
+                    </div>
+                    <div>
+                        <button type="button" onclick="onSave('@row["RowKey"]')">@Html.Raw(Ico.DoItSVG)</button>
+                        <button type="button" onclick="toggleView(@row["RowKey"])">
+                            @Html.Raw(Ico.CancelSVG)
+                        </button>
+                    </div>
+                </th>
+            }
+            else
+            {
+                <td data-col="@Col.ColumnName" data-fieldtype="@Col.FieldType" class="normalView"
+        style="@(Col.ColumnWidth + "px"); @(Col.IsVisable? "" : "display: none"); ">
+                    <div> @Html.Raw(row[Col.ColumnName].ToString()) </div>
+                    <div>
+                        <label for="@Col.ColumnName">@Col.ColumnDisplayName</label>
+                        @if (@Col.FieldType != fieldType.PK)
+                        {
+                            <input type="@Col.InputType" name="@Col.ColumnName" value="@row[Col.ColumnName].ToString()" />
+                        }
+                        else
+                        {
+                            <input type="hidden" name="@Col.ColumnName" value="@row[Col.ColumnName].ToString()" />
+                        }
+                    </div>
+                </td>
+            }
+        }
+    </tr>
+}
+
