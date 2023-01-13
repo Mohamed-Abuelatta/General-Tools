@@ -568,3 +568,14 @@ D:\Tools - V001\Tools\obj\Debug\net6.0\scopedcss\projectbundle\Tools.bundle.scp.
 D:\Tools - V001\Tools\obj\Debug\net6.0\Tools.csproj.CopyComplete
 D:\Tools - V001\Tools\obj\Debug\net6.0\Tools.genruntimeconfig.cache
 D:\Tools - V001\Tools\obj\Debug\net6.0\ref\Tools.dll
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.csproj.AssemblyReference.cache
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.GeneratedMSBuildEditorConfig.editorconfig
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.AssemblyInfoInputs.cache
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.AssemblyInfo.cs
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.csproj.CoreCompileInputs.cache
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.MvcApplicationPartsAssemblyInfo.cache
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.RazorAssemblyInfo.cache
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.RazorAssemblyInfo.cs
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.dll
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\refint\Tools.dll
+D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.pdb

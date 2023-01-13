@@ -13,19 +13,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
-using Tools.Service;
 using Tools.Tools.Grid;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static Tools.Service.ResponseResult;
 using Column = Tools.Tools.Grid.Column;
 using InputType = Tools.Tools.Grid.inputType;
-using Tools.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using System;
-using static NuGet.Client.ManagedCodeConventions;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Tools.Tools.CustomAttributes;
 
@@ -101,13 +91,9 @@ namespace Services.DataServices.Repository
             return model;
         }
 
-        public async Task<ResponseResult> AddAsync(TEntityDTO entity)
+        public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
             TEntityDTO result = null;
-            List<Column> getRow = columnsList();
-            ContentResult contentResult = new ContentResult();
-            contentResult.ContentType = "text/html";
-
             try
             {
                 var model = _mapper.Map<TEntity>(entity);
@@ -116,20 +102,13 @@ namespace Services.DataServices.Repository
                 result =_mapper.Map<TEntityDTO>(model);
 
                 Dictionary<string, object> dicJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToJson());
-                //foreach (var item in getRow)
-                //{
-                //    if (dicJson.ContainsKey(item.ColumnName))
-                //    {
-                //        item.CellValue = dicJson[item.ColumnName];
-                //    }
-                //}
             }
             catch (Exception ex)
             {
-                return new ResponseResult(ex.InnerException.Message);
+                return result;
             }
 
-            return new ResponseResult(getRow);
+            return result;
         }
 
         public async Task<IEnumerable<TEntityDTO>> AddRangeAsync(IEnumerable<TEntityDTO> entities)
@@ -142,24 +121,20 @@ namespace Services.DataServices.Repository
 
         }
 
-        public ResponseResult Update(TEntityDTO entity)
+        public TEntityDTO Update(TEntityDTO entity)
         {
-            List<Column> getRow = columnsList();
             try
             {
                 TEntity result = _mapper.Map<TEntity>(entity);
                 _dbSet.Update(result);
                 _context.SaveChangesAsync();
-                //_context.Entry(result).State = EntityState.Modified;
                 entity = _mapper.Map<TEntityDTO>(result);
             }
             catch (Exception ex)
             {
-                //row = JsonConvert.DeserializeObject<DataRow>(entity.ToJson());
-                return new ResponseResult(err: ex.Message);
+                return entity;
             }
-            //row = JsonConvert.DeserializeObject<DataRow>(entity.ToJson());
-            return new ResponseResult(getRow);
+            return entity;
         }
 
         public EntityEntry<TEntityDTO> Remove(object id)
@@ -174,35 +149,14 @@ namespace Services.DataServices.Repository
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
-
             string JsonTable = _dbSet.Skip((page==0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
-            //string JsonTable = _dbSet.Skip(0).Take(gridSetting._ItemsPerPage).ToList().ToJson();
-            DataTable DT = JsonConvert.DeserializeObject<DataTable>(JsonTable);
-            GridSetting grid = new GridSetting(gridSetting, _dbSet.EntityType.DisplayName(), DT);
-
-            List<DataRow> resultDT = DT.AsEnumerable().ToList();
-            //.Skip(page).Take(gridSetting._ItemsPerPage).ToList();
-            
-            List<Column> cols = columnsList();
-            
+            List<Column> cols = getColumns();
             var pk = cols.FirstOrDefault(pk => pk.KeyType == keyType.PK).ColName;
-            resultDT.ToList().ForEach(row => row["RowKey"] = ( "row" + row[pk] ));
-
-            //grid.DataRows = resultDT;
-            return grid;
+            //resultDT.ToList().ForEach(row => row["RowKey"] = ( "row" + row[pk] ));
+            return gridSetting;
         }
 
-        private GridSetting GetPropertyGridStting(PropertyInfo propertyInfo)
-        {
-            GridSetting gridStting = (GridSetting)Attribute.GetCustomAttribute(propertyInfo, typeof(GridSetting));
-            if (gridStting != null)
-            {
-                return gridStting;
-            }
-            return null;
-        }
-
-        private List<Column> columnsList()
+        private List<Column> getColumns()
         {
             List<Column> columns = new List<Column>();
 

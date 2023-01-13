@@ -5,21 +5,19 @@
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class GridSetting : Attribute
     {
-        public GridSetting(string gridTitle, string onSaveAction, string onDeleteAction, string onPagingAction,
-            GridTypeEnum gridType = GridTypeEnum.InlineGrid, PaginationTypeEnum paginationType = PaginationTypeEnum.GetPageByPage,
-            int defaultColumnWidth = 200, int defaultCtrlColumnWidth = 100, int itemsPerPage = 10, int pagerSize = 5)
+        public GridSetting(GridSetting gridSetting)
         {
-            GridTitle = gridTitle;
-            ItemsPerPage = itemsPerPage;
-            PagerSize = pagerSize;
-            DefaultColumnWidth = defaultColumnWidth;
-            DefaultCtrlColumnWidth = defaultCtrlColumnWidth;
-            GridType = gridType;
-            PaginationType = paginationType;
+            GridTitle = gridSetting.GridTitle;
+            ItemsPerPage = gridSetting.ItemsPerPage;
+            PagerSize = gridSetting.PagerSize;
+            DefaultColumnWidth = gridSetting.DefaultColumnWidth;
+            DefaultCtrlColumnWidth = gridSetting.DefaultCtrlColumnWidth;
+            GridType = gridSetting.GridType;
+            PaginationType = gridSetting.PaginationType;
 
-            OnSaveAction = onSaveAction;
-            OnDeleteAction = onDeleteAction;
-            OnPagingAction = onPagingAction;
+            OnSaveAction = gridSetting.OnSaveAction;
+            OnDeleteAction = gridSetting.OnDeleteAction;
+            OnPagingAction = gridSetting.OnPagingAction;
         }
 
         public string GridTitle { get; set; }
