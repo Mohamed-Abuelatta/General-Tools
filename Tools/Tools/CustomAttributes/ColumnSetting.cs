@@ -16,6 +16,7 @@ namespace Tools.Tools.CustomAttributes
             this.IsVisable = IsVisable;
             this.InputType = InputType;
             this.KeyType = KeyType;
+            this.ColWidth = ColWidth;
         }
 
         public string ColName { get; set; }
