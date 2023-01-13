@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Data.Contexts;
 using Services.DataServices.Repository;
-using Services.DataServices.UnitOfWork;
 using Tools.Models;
 
 namespace Tools.Service.ServiceData

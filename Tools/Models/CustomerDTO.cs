@@ -3,9 +3,10 @@ using Tools.Tools.CustomAttributes;
 
 namespace Tools.Models
 {
-    [GridSetting("جدول العملاء", "Home/Manage", "Home/Delete", "Home/Pager")]
+    //[GridSetting("جدول العملاء", "Home/Manage", "Home/Delete", "Home/Pager")]
     public class CustomerDTO
-    {    
+    {
+
         public int Id { get; set; }
         [Display(Name = "اسم العميل", Order = 0)]
         public string CustName { get; set; }

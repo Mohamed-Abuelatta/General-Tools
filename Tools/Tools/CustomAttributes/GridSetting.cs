@@ -1,25 +1,27 @@
-﻿namespace Tools.Tools.CustomAttributes
+﻿using static Tools.Tools.CustomAttributes.AttrEnum;
+
+namespace Tools.Tools.CustomAttributes
 {
     // https://www.pluralsight.com/guides/how-to-create-custom-attributes-csharp
 
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class GridSetting : Attribute
     {
-        public GridSetting(string gridTitle, string onSaveAction, string onDeleteAction, string onPagingAction,
-            GridTypeEnum gridType = GridTypeEnum.InlineGrid, PaginationTypeEnum paginationType = PaginationTypeEnum.GetPageByPage,
-            int defaultColumnWidth = 200, int defaultCtrlColumnWidth = 100, int itemsPerPage = 10, int pagerSize = 5)
-        {
-            GridTitle = gridTitle;
-            ItemsPerPage = itemsPerPage;
-            PagerSize = pagerSize;
-            DefaultColumnWidth = defaultColumnWidth;
-            DefaultCtrlColumnWidth = defaultCtrlColumnWidth;
-            GridType = gridType;
-            PaginationType = paginationType;
 
-            OnSaveAction = onSaveAction;
-            OnDeleteAction = onDeleteAction;
-            OnPagingAction = onPagingAction;
+        public GridSetting(string GridTitle, string OnSaveAction, string OnDeleteAction, string OnPagingAction, 
+            int DefaultColumnWidth, int DefaultCtrlColumnWidth, int PagerSize, int ItemsPerPage, 
+            PaginationTypeEnum PaginationType, GridTypeEnum GridType)
+        {
+            this.GridTitle = GridTitle;
+            this.OnSaveAction = OnSaveAction;
+            this.OnDeleteAction = OnDeleteAction;
+            this.OnPagingAction = OnPagingAction;
+            this.DefaultColumnWidth = DefaultColumnWidth;
+            this.DefaultCtrlColumnWidth = DefaultCtrlColumnWidth;
+            this.PagerSize = PagerSize;
+            this.ItemsPerPage = ItemsPerPage;
+            this.PaginationType = PaginationType;
+            this.GridType = GridType;
         }
 
         public string GridTitle { get; set; }
@@ -30,25 +32,9 @@
         public GridTypeEnum GridType { get; set; }
         public PaginationTypeEnum PaginationType { get; set; }
 
-        public bool AllowAdd { get; set; }
-        public bool AllowEdit { get; set; }
-        public bool AllowDelete { get; set; }
-
         public string OnSaveAction { get; set; }
         public string OnDeleteAction { get; set; }
         public string OnPagingAction { get; set; }
-
-        public enum GridTypeEnum
-        {
-            InlineGrid,
-            PopUpGrid,
-            FormAndList
-        }
-        public enum PaginationTypeEnum
-        {
-            GetPageByPage,
-            GetAll
-        }
 
     }
 }
