@@ -19,7 +19,6 @@ namespace Academy.Extensions
         {
             services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 
-            services.AddTransient<Icons>(); // important to inject icons in any view
             services.AddScoped<ICustomerService, CustomerService>();
         }
         //----------------------------------------------------------------------

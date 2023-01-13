@@ -2,22 +2,17 @@
 
 using AutoMapper;
 using Data.Contexts;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
 using NuGet.Protocol;
-using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
-using Tools.Tools.Grid;
-using Column = Tools.Tools.Grid.Column;
-using InputType = Tools.Tools.Grid.inputType;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Tools.Tools.CustomAttributes;
+using static Tools.Tools.CustomAttributes.AttrEnum;
+using Tools.Tools.Grid;
 
 namespace Services.DataServices.Repository
 {
@@ -130,7 +125,7 @@ namespace Services.DataServices.Repository
                 _context.SaveChangesAsync();
                 entity = _mapper.Map<TEntityDTO>(result);
             }
-            catch (Exception ex)
+            catch
             {
                 return entity;
             }
@@ -146,60 +141,50 @@ namespace Services.DataServices.Repository
 
         public GridSetting GetGrid(int page = 0)
         {
+            Grıd grid = new Grıd();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
-            string JsonTable = _dbSet.Skip((page==0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
-            List<Column> cols = getColumns();
-            var pk = cols.FirstOrDefault(pk => pk.KeyType == keyType.PK).ColName;
-            //resultDT.ToList().ForEach(row => row["RowKey"] = ( "row" + row[pk] ));
+
+            grid.grid = gridSetting;
+            grid.columns = getColumns();
+            grid.rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
+
             return gridSetting;
         }
 
-        private List<Column> getColumns()
+        private List<ColumnSetting> getColumns()
         {
-            List<Column> columns = new List<Column>();
+            List<ColumnSetting> columns = new List<ColumnSetting>();
+            IEnumerable<IProperty> tableProperties = _dbSet.EntityType.GetProperties();
 
-            var tableProperties = _dbSet.EntityType.GetProperties();
             foreach (var item in tableProperties)
             {
-                var propInfo = item.PropertyInfo; InputType inputType;
+                PropertyInfo propInfo = item.PropertyInfo; 
+                ColumnSetting column = (ColumnSetting)propInfo.GetCustomAttribute(typeof(ColumnSetting));
+                column.ColName = propInfo.Name;
+                column.KeyType = item.IsPrimaryKey() ? keyType.PK : item.IsForeignKey() ? keyType.FK : keyType.Normal;
                 switch (propInfo.PropertyType.Name)
                 {
                     case "string":
-                        inputType = InputType.text;
+                        column.InputType = inputType.text;
                         break;
                     case "Int32":
                     case "Decimal":
                     case "Float":
-                        inputType = InputType.number;
+                        column.InputType = inputType.number;
                         break;
                     case "DateTime":
-                        inputType = InputType.date;
+                        column.InputType = inputType.date;
                         break;
                     case "Boolean":
-                        inputType = InputType.checkbox;
+                        column.InputType = inputType.checkbox;
                         break;
                     default:
-                        inputType = InputType.text;
+                        column.InputType = inputType.text;
                         break;
                 }
-                string DisplayName = string.Empty;
-                var attribute = propInfo.GetCustomAttribute<DisplayAttribute>();
-                if (attribute != null) DisplayName = attribute.Name;
-
-                columns.Add(
-                    new Column
-                    {
-                        ColDName = DisplayName,
-                        ColName = item.Name,
-                        ColIndex = item.GetIndex(),
-                        ColWidth = 200,
-                        IsVisable = true,
-                        InputType = inputType,
-                        KeyType = item.IsPrimaryKey() ? keyType.PK : item.IsForeignKey() ? keyType.FK : keyType.Normal
-                    });
-
+                columns.Add(column);
             }
             return columns;
         }

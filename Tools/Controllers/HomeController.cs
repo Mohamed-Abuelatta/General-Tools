@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using System.Diagnostics;
 using Tools.Models;
-using Tools.Service;
 using Tools.Service.ServiceData;
-using Tools.Tools.Grid;
-using static Tools.Service.ResponseResult;
 
 namespace Tools.Controllers
 {
@@ -33,41 +28,27 @@ namespace Tools.Controllers
                 {
                     if (model.Id == 0)
                     {
-                        return PartialView("_GridRow", await _customerService.AddAsync(model));
+                        return Json("_GridRow", await _customerService.AddAsync(model));
                         //return Json(await _customerService.AddAsync(model));
                     }
                     else
                     {
-                        return PartialView("_GridRow", _customerService.Update(model));
+                        return Json("_GridRow", _customerService.Update(model));
                         //return Json(_customerService.Update(model));
                     }
                 }
-                catch (Exception ex)
+                catch 
                 {
-                    return PartialView("_GridRow", new ResponseResult(err: ex.Message));
+                    return Json("_GridRow");
                 }
             }
-            return PartialView("_GridRow", new ResponseResult(err: "فشلت العملية"));
+            return Json("_GridRow");
         }
         
         public IActionResult Delete(int id)
         {
             _customerService.Remove(id);
             return View();
-        }
-
-        public IActionResult Paging(int pagerStart, string pageAction)
-        {
-            if (string.IsNullOrEmpty(pageAction) || pageAction == "undefined")
-            {
-                Grid result =  _customerService.GetGrid(pagerStart);
-                return PartialView("_GridRowList", result);
-            }
-            else
-            {
-                List<PagerButton> result = _customerService.GetPager(pagerStart, pageAction);
-                return PartialView("_GridPagination", result);
-            }
         }
  
 
