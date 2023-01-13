@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Tools.Migrations
 {
-    public partial class fr1 : Migration
+    public partial class initDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -61,8 +61,7 @@ namespace Tools.Migrations
                     CustName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustJobTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CustAge = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsManager = table.Column<bool>(type: "bit", nullable: false)
+                    CustAge = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

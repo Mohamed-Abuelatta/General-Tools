@@ -36,7 +36,5 @@ namespace Tools.Tools.CustomAttributes
         public string OnDeleteAction { get; set; }
         public string OnPagingAction { get; set; }
 
-
-
     }
 }

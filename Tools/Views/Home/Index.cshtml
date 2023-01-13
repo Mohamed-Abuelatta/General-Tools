@@ -1,2 +1,178 @@
-﻿
+﻿@using Tools.Tools.Grid;
+@model Grid
 
+<style type="text/css">
+    table{width:100%;}
+    td{width:200px}
+    td, th{padding: 15px 10px;border: 1px solid #999;text-align: right;}
+    .th,.th a{background: gray;color:#fff; border: 1px solid #fff; border-radius: 4px; padding: 2px 5px; margin: 0 5px;}
+    .tr,.tr a{background: LightGray;color:#000; border: 1px solid #999; border-radius: 4px; padding: 2px 5px; margin: 0 5px;}
+    tfoot>tr>td>button{color:#000; width:33px; height:33px; border: 1px solid #999; border-radius: 4px; padding: 1px 5px 2px 5px; margin: 0 5px;}
+
+    /* to toggle between (view and edit modes) of control box*/
+    .ctrlView>div:first-child{
+      display: block;
+    }
+    .ctrlView>div:last-child{
+      display: none;
+    }
+
+    .ctrlEdit>div:first-child{
+      display: none;
+    }
+    .ctrlEdit>div:last-child{
+      display: block;
+    }
+    .hide{display:none;}
+
+    /*
+    table tr td:nth-child(2) {
+      display:none;
+    }*/
+</style>
+
+<div class='container mt-5 p-3'>
+    <table id="tbl">
+        @*<partial name="_InitGrid" model="@Model" />*@
+    </table>
+</div>
+
+<script type="text/javascript">
+
+//console.log(@Model.columns);
+//console.log(@Model.grid);
+//console.log(@Model.rows);
+
+
+const columns = 
+      [{name:'name', dName:'الاسم', isVisable:true}, 
+       {name:'email', dName:'ايميل', isVisable:true}, 
+       {name:'tel', dName:'تلفون', isVisable:true}];
+const columnsCount = columns.length;
+const rows = 
+      [{name:'ali',email:'ali.cm',tel:'123'}, 
+       {name:'medoo',email:'medoo.com',tel:'456'}, 
+       {name:'keto',email:'keto.com',tel:'789'}];
+
+let grid = {tableName:'tbl',formName:'frm', footer:{entitySize:100, pageSize:10, footerStart:76, footerRange:5}};
+let footer = grid.footer;
+var table = document.getElementById(grid.tableName);   
+
+// ---------------------------------------------------------------------------- table start
+HTMLTableElement.prototype.addRow = addRow;
+function addRow(data, rowType){
+  let row;
+  switch(rowType){
+    case 'header':
+        let THead;
+        if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
+        row = THead.insertRow(0); 
+        row.id = 'headerRow';
+        row.className = 'th';
+        data.push({name:'ctrl', dName:'', isVisable:true});
+        data.map((item) => { row.addHeaderCell(item.name, item.dName, item.isVisable);  }); 
+      break;
+      
+    case 'row': 
+        let rowId = Math.floor((Math.random() * 100000) + 1);
+        let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
+        row = TBody.insertRow(-1); 
+        row.id = rowId;
+        row.className = 'tr';
+        Object.entries(data).map(([key, value]) => {  row.addCell(key, value) });
+        row.addCell('msg', '<b>هل انت متاكد من الحذف !</b>');
+        row.addCell('ctrl', rowId);
+      break;
+      
+    case 'footer':
+      let colspan = columns.length;
+      let TFoot;
+      
+      if (this.tFoot === undefined || this.tFoot === null){ TFoot = this.createTFoot(); }else{ return; }
+      row = TFoot.insertRow(0);
+      row.id = 'footerRow';
+      let newCell = row.insertCell();
+      newCell.colSpan = colspan+1;
+      newCell.style = 'text-align:center;';
+      let fStart = footer.footerStart==1?'disabled':'';
+      let pager = `<button class="bi bi-chevron-left" ${fStart}></button>`;
+      for (let i = 0; i < footer.footerRange; i++) {
+        pager += `<button onclick="alert('pager${i+footer.footerStart}')">${i+footer.footerStart}</button>`;
+      }
+      let fEnd = footer.entitySize==((footer.footerStart+footer.footerRange)-1)?'disabled':'';
+      pager += `<button class="bi bi-chevron-right" ${fEnd}></button>`;
+      newCell.innerHTML = pager; 
+      break;
+  } 
+}
+HTMLTableRowElement.prototype.addCell = addCell;
+function addCell(key, val){
+  if(key == 'ctrl') {val = controlBox(val);}
+  let newCell = this.insertCell();
+  let col = columns[newCell.cellIndex];
+  newCell.dataset.col = key;
+  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.dName, val): val;
+  newCell.className = (key=='msg'?'hide':'ctrlView');
+  newCell.colSpan = (key=='msg'?columnsCount:0);
+}
+HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
+function addHeaderCell(name, dName, isVisable){
+  let newCell = this.insertCell(); 
+  newCell.setAttribute("style", (isVisable === true? '': 'display:none;'));
+  newCell.className = 'ctrlView'; 
+  newCell.dataset.col = name; 
+  newCell.innerHTML = (name=="ctrl") ? controlBox('headerRow') : cellContent('text', name, dName, '', true);
+}
+function cellContent(type, name, dname, val, isHeader = false){
+  return (isHeader === true) ?
+  `<div>${dname}</div><div>${dname}<input type='${type}' name='${name}' value='${val}'></div>`: // for header true
+  `<div>${val}</div><div>${dname}<input type='${type}' name='${name}' value='${val}'></div>`; // for normal row false default 
+}
+const controlBox = (rowId) => {
+  if (rowId == "headerRow"){
+        return  `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`; 
+  } else {
+        return `<div><a href='#' class='bi bi-pencil-square' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-trash3' onclick="toggleConfirm('${rowId}')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-check' onclick="alert('edit or delete ${rowId}')"></a></div>`;
+  }
+}
+// ---------------------------------------------------------------------------- table end
+
+// ---------------------------------------------------------------------------- table Action start
+window.onload =  populateTable();
+function populateTable(){
+    table.addRow(columns,'header');
+    rows.map(row => { table.addRow(row, 'row'); });
+    table.addRow(footer, 'footer');
+}
+function onSave(rowId){
+    let row = document.getElementById(rowId); 
+    let jsonRow = {};
+    [...row.cells].map(cell => { 
+      if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
+      //else { jsonRow[cell.dataset.col] = controlBox(rowId); }
+    });
+    table.addRow(jsonRow,'row'); 
+}
+function onDelete(rowId){
+  alert('delete ' + rowId)
+}
+function toggleConfirm(rowId){
+    let row = document.getElementById(rowId); 
+    document.getElementById(`toggle${rowId}`).onclick = function() { toggleConfirm(rowId); };
+    [...row.cells].map(cell => {  
+      if (cell.dataset.col != 'ctrl') {cell.classList.toggle('hide');}
+      else {cell.classList.toggle('ctrlView');cell.classList.toggle('ctrlEdit');}
+    });
+}
+function toggleRow(rowId){
+  let row = document.getElementById(rowId);
+  document.getElementById(`toggle${rowId}`).onclick = function() { toggleRow(rowId); };
+  [...row.cells].map(cell => {
+    cell.classList.toggle('ctrlEdit');
+    cell.classList.toggle('ctrlView');
+  })
+}
+// ---------------------------------------------------------------------------- table Action end
+
+    
+</script>

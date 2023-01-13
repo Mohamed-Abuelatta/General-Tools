@@ -141,16 +141,38 @@ namespace Services.DataServices.Repository
 
         public GridSetting GetGrid(int page = 0)
         {
-            Grıd grid = new Grıd();
+            Grid grid = new Grid();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
-
-            grid.grid = gridSetting;
-            grid.columns = getColumns();
-            grid.rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
-
             return gridSetting;
+        }
+
+        public Grid InitGrid()
+        {
+            Grid grid = new Grid();
+            grid.grid = GetGrid();
+            grid.columns = getColumns();
+            grid.rows = getRows();
+            grid.Footer = getFooter();
+
+            return grid;
+        }
+
+        public DataTable getRows(int page = 0)
+        {
+            Grid grid = new Grid();
+            IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
+            Type t = entityType.ClrType;
+            GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
+            string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
+
+            DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(jsonObj);
+            return dataTable;
+        }
+        public string getFooter()
+        {
+            return "";
         }
 
         private List<ColumnSetting> getColumns()

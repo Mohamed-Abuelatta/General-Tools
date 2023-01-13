@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Data;
 using System.Linq.Expressions;
 using Tools.Service;
 using Tools.Tools.CustomAttributes;
@@ -20,7 +21,14 @@ namespace Services.DataServices.Repository
         Task<TEntityDTO> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         TEntityDTO Update(TEntityDTO entity);
         IQueryable<TEntityDTO> Where(Expression<Func<TEntity, bool>> expression);
-        GridSetting GetGrid(int page = 0);
 
+
+        // -------------------------------------------------------------------------------
+
+
+        GridSetting GetGrid(int page = 0);
+        Grid InitGrid(); 
+        string getFooter();
+        DataTable getRows(int page);
     }
 }

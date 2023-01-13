@@ -1,0 +1,32 @@
+﻿@using System.Data;
+@using Tools.Tools.Grid;
+@model Grid
+
+@{
+    string footer = Model.Footer;
+    DataTable rows = Model.rows;
+    List<ColumnSetting> columns = Model.columns;
+    GridSetting grid = Model.grid;
+}
+
+@foreach (DataRow item in rows.Rows){
+    if (rows.Rows.IndexOf(item) == 0)
+    {
+        <thead>
+            <tr id="headerRow" class="th">
+                @foreach (var td in item.ItemArray)
+                {
+                    <td style="" class="ctrlView" data-col="name"><div>الاسم</div><div>الاسم<input type="text" name="name" value=""></div></td>
+                }
+    @*            <td style="" class="ctrlView" data-col="name"><div>الاسم</div><div>الاسم<input type="text" name="name" value=""></div></td>
+                <td style="" class="ctrlView" data-col="email"><div>ايميل</div><div>ايميل<input type="text" name="email" value=""></div></td>
+                <td style="" class="ctrlView" data-col="tel"><div>تلفون</div><div>تلفون<input type="text" name="tel" value=""></div></td>*@
+                <td style="" class="ctrlView" data-col="ctrl">
+                    <div><a href="#" class="bi bi-plus" onclick="toggleRow('headerRow')"></a><a href="#" class="bi bi-caret-down" onclick="alert('DDL')"></a></div>
+                    <div><a href="#" class="bi bi-x" id="toggleheaderRow" onclick="toggleRow('headerRow')"></a><a href="#" class="bi bi-check" onclick="onSave('headerRow')"></a></div>
+                </td>
+            </tr>
+        </thead>
+    }
+}
+

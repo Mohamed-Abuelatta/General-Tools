@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Tools.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221218062032_fr1")]
-    partial class fr1
+    [Migration("20230113133850_initDB")]
+    partial class initDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -253,9 +253,6 @@ namespace Tools.Migrations
 
                     b.Property<string>("CustName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsManager")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

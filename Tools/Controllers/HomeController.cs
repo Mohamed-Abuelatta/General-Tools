@@ -16,8 +16,8 @@ namespace Tools.Controllers
 
         public IActionResult Index()
         {
-            var result = _customerService.GetGrid();
-            return View(result);
+            var result = _customerService.InitGrid();
+            return View("Index", result);
         }
 
         public async Task<IActionResult> ManageAsync(CustomerDTO model)
