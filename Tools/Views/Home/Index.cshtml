@@ -2,33 +2,82 @@
 @model Grid
 
 <style type="text/css">
-    table{width:100%;}
-    td{width:200px}
-    td, th{padding: 15px 10px;border: 1px solid #999;text-align: right;}
-    .th,.th a{background: gray;color:#fff; border: 1px solid #fff; border-radius: 4px; padding: 2px 5px; margin: 0 5px;}
-    .tr,.tr a{background: LightGray;color:#000; border: 1px solid #999; border-radius: 4px; padding: 2px 5px; margin: 0 5px;}
-    tfoot>tr>td>button{color:#000; width:33px; height:33px; border: 1px solid #999; border-radius: 4px; padding: 1px 5px 2px 5px; margin: 0 5px;}
+
+    table {
+        width: 100%;
+    }
+
+    td {
+        width: 200px;
+        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==) repeat;
+    }
+
+    td, th {
+        padding: 15px 10px;
+        border: 1px solid #999;
+        text-align: right;
+    }
+
+    .th, .th a {
+        background: gray;
+        color: #fff;
+        border: 1px solid #fff;
+        border-radius: 4px;
+        padding: 2px 5px;
+        margin: 0 5px;
+    }
+
+    .tr, .tr a {
+        background: LightGray;
+        color: #000;
+        border: 1px solid #999;
+        border-radius: 4px;
+        padding: 2px 5px;
+        margin: 0 5px;
+    }
+
+    tfoot > tr > td > button {
+        color: #000;
+        width: 33px;
+        height: 33px;
+        border: 1px solid #999;
+        border-radius: 4px;
+        padding: 1px 5px 2px 5px;
+        margin: 0 5px;
+    }
 
     /* to toggle between (view and edit modes) of control box*/
-    .ctrlView>div:first-child{
-      display: block;
-    }
-    .ctrlView>div:last-child{
-      display: none;
+    .ctrlView > div:first-child {
+        display: block;
     }
 
-    .ctrlEdit>div:first-child{
-      display: none;
+    .ctrlView > div:last-child {
+        display: none;
     }
-    .ctrlEdit>div:last-child{
-      display: block;
+
+    .ctrlEdit > div:first-child {
+        display: none;
     }
-    .hide{display:none;}
+
+    .ctrlEdit > div:last-child {
+        display: block;
+    }
+
+    .hide {
+        display: none;
+    }
 
     /*
     table tr td:nth-child(2) {
       display:none;
     }*/
+
+
+    [disabled] {
+        background-color: #cccccc;
+        color: #666666;
+        cursor: no-drop;
+    }
 </style>
 
 <div class='container mt-5 p-3'>
@@ -49,8 +98,8 @@ const rows =
        {name:'medoo',email:'medoo.com',tel:'456'}, 
        {name:'keto',email:'keto.com',tel:'789'}];
 
-let grid = {tableName:'tbl',formName:'frm', footer:{entitySize:100, pageSize:10, footerStart:76, footerRange:5}};
-let footer = grid.footer;
+let grid = {tableName:'tbl',formName:'frm'};
+let footer = {isPrevDisabled: false, isNextDisabled: true, fRange: ['prev',1,2,3,4,5,'next']}
 var table = document.getElementById(grid.tableName);   
 
 // ---------------------------------------------------------------------------- table start
@@ -89,14 +138,13 @@ function addRow(data, rowType){
       let newCell = row.insertCell();
       newCell.colSpan = colspan+1;
       newCell.style = 'text-align:center;';
-      let fStart = footer.footerStart==1?'disabled':'';
-      let pager = `<button class="bi bi-chevron-left" ${fStart}></button>`;
-      for (let i = 0; i < footer.footerRange; i++) {
-        pager += `<button onclick="alert('pager${i+footer.footerStart}')">${i+footer.footerStart}</button>`;
-      }
-      let fEnd = footer.entitySize==((footer.footerStart+footer.footerRange)-1)?'disabled':'';
-      pager += `<button class="bi bi-chevron-right" ${fEnd}></button>`;
-      newCell.innerHTML = pager; 
+      footer.fRange.map((fBtn) => { 
+          let btnClass = fBtn=='prev'?'bi bi-chevron-left':fBtn=='next'?'bi bi-chevron-right':'';
+          let btnVal = fBtn=='prev'||fBtn=='next'?'':fBtn;
+          let isPrevDisabled = fBtn == 'prev' && footer.isPrevDisabled === true ? 'disabled':'';
+          let isNextDisabled = fBtn == 'next' && footer.isNextDisabled === true ? 'disabled':'';
+          newCell.innerHTML += `<button class='${btnClass}' ${isPrevDisabled} ${isNextDisabled} onclick="alert('pager${fBtn}')">${btnVal}</button>`;
+      }); 
       break;
   } 
 }

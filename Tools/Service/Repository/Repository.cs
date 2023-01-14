@@ -170,8 +170,19 @@ namespace Services.DataServices.Repository
             DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(jsonObj);
             return dataTable;
         }
-        public string getFooter()
+        public string getFooter(int page = 0)
         {
+            IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
+            Type t = entityType.ClrType;
+            GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
+
+            int entitySize = _dbSet.Count();
+            int pageSize = gridSetting.ItemsPerPage;
+            int footerStart = page;
+            int footerRange = gridSetting.PagerSize;
+
+            // entitySize:100, pageSize:10, footerStart:76, footerRange:5
+            // let footer = {isPrevDisabled: false, isNextDisabled: true, fRange: ['prev',1,2,3,4,5,'next']}
             return "";
         }
 
