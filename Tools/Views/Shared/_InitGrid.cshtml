@@ -8,25 +8,60 @@
     List<ColumnSetting> columns = Model.columns;
     GridSetting grid = Model.grid;
 }
+<thead>
+    <tr id="headerRow" class="th">
+        @foreach (var col in columns)
+        {
+            <td style="@($"width:{col.ColWidth}px")" class="ctrlView" data-col="@col.ColName">
+                <div>@col.ColTitle</div>
+                <div>@col.ColTitle<input type="@col.InputType" name="@col.ColName" /></div>
+            </td>
+        }
 
-@foreach (DataRow item in rows.Rows){
-    if (rows.Rows.IndexOf(item) == 0)
-    {
-        <thead>
-            <tr id="headerRow" class="th">
-                @foreach (var td in item.ItemArray)
-                {
-                    <td style="" class="ctrlView" data-col="name"><div>الاسم</div><div>الاسم<input type="text" name="name" value=""></div></td>
-                }
-    @*            <td style="" class="ctrlView" data-col="name"><div>الاسم</div><div>الاسم<input type="text" name="name" value=""></div></td>
-                <td style="" class="ctrlView" data-col="email"><div>ايميل</div><div>ايميل<input type="text" name="email" value=""></div></td>
-                <td style="" class="ctrlView" data-col="tel"><div>تلفون</div><div>تلفون<input type="text" name="tel" value=""></div></td>*@
-                <td style="" class="ctrlView" data-col="ctrl">
-                    <div><a href="#" class="bi bi-plus" onclick="toggleRow('headerRow')"></a><a href="#" class="bi bi-caret-down" onclick="alert('DDL')"></a></div>
-                    <div><a href="#" class="bi bi-x" id="toggleheaderRow" onclick="toggleRow('headerRow')"></a><a href="#" class="bi bi-check" onclick="onSave('headerRow')"></a></div>
-                </td>
-            </tr>
-        </thead>
+        <td style="" class="ctrlView" data-col="ctrl">
+            <div><a href="#" class="bi bi-plus" onclick="toggleRow('headerRow')"></a><a href="#" class="bi bi-caret-down" onclick="alert('DDL')"></a></div>
+            <div><a href="#" class="bi bi-x" id="toggleheaderRow" onclick="toggleRow('headerRow')"></a><a href="#" class="bi bi-check" onclick="onSave('headerRow')"></a></div>
+        </td>
+    </tr>
+</thead>
+
+<tbody>
+    @foreach (DataRow item in rows.Rows){
+        Random rnd = new Random();
+        int rndId = rnd.Next(100000, 999999);
+
+    <tr id="@rndId" class="tr">
+        @foreach (var col in columns)
+        {
+            <td data-col="@col.ColName" class="ctrlView">
+                <div>@item[col.ColName]</div>
+                <div>@col.ColTitle<input type="@col.InputType" name="@col.ColName" value="@item[col.ColName]"></div>
+            </td>
+        }
+        <td data-col="msg" class="hide" colspan="@columns.Count()"><b>هل انت متاكد من الحذف !</b></td>
+        <td data-col="ctrl" class="ctrlView">
+            <div>
+                <a href="#" class="bi bi-pencil-square" onclick="toggleRow('@rndId')"></a>
+                <a href="#" class="bi bi-trash3" onclick="toggleConfirm('@rndId')"></a>
+            </div>
+            <div>
+                <a href="#" class="bi bi-x" id="toggle@(rndId)" onclick="toggleRow('@rndId')"></a>
+                <a href="#" class="bi bi-check" onclick="alert('edit or delete @rndId')"></a>
+            </div>
+        </td>
+    </tr>
     }
-}
+</tbody>
 
+<tfoot>
+    <tr id="footerRow">
+        <td colspan="@(columns.Count()+1)" style="text-align: center;">
+            <button onclick="alert('Prev')" class="bi bi-chevron-left"></button>
+            @for (int i = 0; i < grid.PagerSize; i++)
+            {
+                <button onclick="alert(@(i+1))">@(i + 1)</button>
+            }
+            <button onclick="alert('Next')" class="bi bi-chevron-right"></button>
+        </td>
+    </tr>
+</tfoot>

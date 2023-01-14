@@ -33,16 +33,11 @@
 
 <div class='container mt-5 p-3'>
     <table id="tbl">
-        @*<partial name="_InitGrid" model="@Model" />*@
+        <partial name="_InitGrid" model="@Model" />
     </table>
 </div>
 
 <script type="text/javascript">
-
-//console.log(@Model.columns);
-//console.log(@Model.grid);
-//console.log(@Model.rows);
-
 
 const columns = 
       [{name:'name', dName:'الاسم', isVisable:true}, 
@@ -138,7 +133,7 @@ const controlBox = (rowId) => {
 // ---------------------------------------------------------------------------- table end
 
 // ---------------------------------------------------------------------------- table Action start
-window.onload =  populateTable();
+//window.onload =  populateTable();
 function populateTable(){
     table.addRow(columns,'header');
     rows.map(row => { table.addRow(row, 'row'); });
