@@ -26,9 +26,9 @@ namespace Services.DataServices.Repository
         // -------------------------------------------------------------------------------
 
 
-        GridSetting GetGrid(int page = 0);
+        GridSetting GetGrid(int page);
         Grid InitGrid(); 
-        string getFooter();
+        string getFooter(int page);
         DataTable getRows(int page);
     }
 }

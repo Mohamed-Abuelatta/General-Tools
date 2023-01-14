@@ -170,16 +170,32 @@ namespace Services.DataServices.Repository
             DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(jsonObj);
             return dataTable;
         }
-        public string getFooter(int page = 0)
+        public string getFooter(string nav, int page = 0)
         {
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
 
-            int entitySize = _dbSet.Count();
-            int pageSize = gridSetting.ItemsPerPage;
-            int footerStart = page;
-            int footerRange = gridSetting.PagerSize;
+            if (nav == "prev")
+            {
+
+            }
+            else if (nav == "next")
+            {
+
+            }
+            else 
+            {
+                string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
+            }
+            //string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
+
+            //int entitySize = _dbSet.Count();
+            //int pageSize = gridSetting.ItemsPerPage;
+            //int footerStart = page;
+            //int footerRange = gridSetting.PagerSize;
+
+            //Enumerable.Range(footerStart, footerRange).ToArray();
 
             // entitySize:100, pageSize:10, footerStart:76, footerRange:5
             // let footer = {isPrevDisabled: false, isNextDisabled: true, fRange: ['prev',1,2,3,4,5,'next']}
