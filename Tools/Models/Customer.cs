@@ -7,7 +7,7 @@ namespace Tools.Models
 {
 
     [GridSetting(
-        "جدول العملاء", 
+        "جدول العملاء", "Customer", 
         "Home/Manage", "Home/Delete", "Home/Paging", 
         200, 100, 5, 10, 
         PaginationTypeEnum.GetPageByPage, GridTypeEnum.InlineGrid)]

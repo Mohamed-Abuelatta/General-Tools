@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Data.Contexts;
+using Newtonsoft.Json.Serialization;
 using NuGet.Protocol.Core.Types;
 using Services.DataServices.Repository;
 using System.Drawing;
@@ -23,8 +24,9 @@ namespace Academy.Extensions
         }
         //----------------------------------------------------------------------
 
-        public static void AddMyServices(this IServiceCollection services)
+        public static void AddMyMapper(this IServiceCollection services)
         {
+            //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new MappingProfile());
@@ -33,6 +35,19 @@ namespace Academy.Extensions
             var mapper = config.CreateMapper();
             services.AddSingleton(mapper);
         }
+        //---------------------------------------------------------------------------
+        
+        //public static void AddMyJsonResolver(this IServiceCollection services)
+        //{
+        //    services.AddMvc().AddJsonOptions(opt =>
+        //    {
+        //        if (opt.SerializerSettings.ContractResolver != null)
+        //        {
+        //            var resolver = opt.SerializerSettings.ContractResolver as DefaultContractResolver;
+        //            resolver.NamingStrategy = null;
+        //        }
+        //    });
+        //}
         //---------------------------------------------------------------------------
 
 

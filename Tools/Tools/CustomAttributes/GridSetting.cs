@@ -8,11 +8,12 @@ namespace Tools.Tools.CustomAttributes
     public class GridSetting : Attribute
     {
 
-        public GridSetting(string GridTitle, string OnSaveAction, string OnDeleteAction, string OnPagingAction, 
+        public GridSetting(string GridTitle, string GridName, string OnSaveAction, string OnDeleteAction, string OnPagingAction, 
             int DefaultColumnWidth, int DefaultCtrlColumnWidth, int PagerSize, int ItemsPerPage, 
             PaginationTypeEnum PaginationType, GridTypeEnum GridType)
         {
             this.GridTitle = GridTitle;
+            this.GridName = GridName;
             this.OnSaveAction = OnSaveAction;
             this.OnDeleteAction = OnDeleteAction;
             this.OnPagingAction = OnPagingAction;
@@ -25,6 +26,7 @@ namespace Tools.Tools.CustomAttributes
         }
 
         public string GridTitle { get; set; }
+        public string GridName { get; set; }
         public int ItemsPerPage { get; set; }
         public int PagerSize { get; set; }
         public int DefaultColumnWidth { get; set; }

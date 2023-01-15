@@ -1,4 +1,7 @@
-﻿@using Tools.Tools.Grid;
+﻿@using System.Data;
+@using Newtonsoft.Json;
+@using System.Web;
+@using Tools.Tools.Grid;
 @model Grid
 
 <style type="text/css">
@@ -46,6 +49,8 @@
         margin: 0 5px;
     }
 
+    .activePager{background: white;}
+
     /* to toggle between (view and edit modes) of control box*/
     .ctrlView > div:first-child {
         display: block;
@@ -81,26 +86,31 @@
 </style>
 
 <div class='container mt-5 p-3'>
-    <table id="tbl">
+    <table id="@Model.grid.GridName">
         <partial name="_InitGrid" model="@Model" />
     </table>
 </div>
 
+@{
+    string grid = JsonConvert.SerializeObject(Model.grid);
+    string columns = JsonConvert.SerializeObject(Model.columns);
+    string rows =  JsonConvert.SerializeObject(Model.rows);
+    string footer = JsonConvert.SerializeObject(Model.Footer);
+}
+
 <script type="text/javascript">
 
-const columns = 
-      [{name:'name', dName:'الاسم', isVisable:true}, 
-       {name:'email', dName:'ايميل', isVisable:true}, 
-       {name:'tel', dName:'تلفون', isVisable:true}];
-const columnsCount = columns.length;
-const rows = 
-      [{name:'ali',email:'ali.cm',tel:'123'}, 
-       {name:'medoo',email:'medoo.com',tel:'456'}, 
-       {name:'keto',email:'keto.com',tel:'789'}];
+const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
+console.log(columns);
 
-let grid = {tableName:'tbl',formName:'frm'};
-let footer = {isPrevDisabled: false, isNextDisabled: true, fRange: ['prev',1,2,3,4,5,'next']}
-var table = document.getElementById(grid.tableName);   
+const columnsCount = columns.length;
+const rows = '@rows';
+
+let grid = '@grid';
+//let grid = {tableName:'tbl', formName:'frm'};
+let footer = '@footer';
+//let footer = { isPrevDisabled: 'disabled', isNextDisabled: '', activeBtn: 4, fRange: [1, 2, 3, 4, 5] }
+var table = document.getElementById("@Model.grid.GridName");   
 
 // ---------------------------------------------------------------------------- table start
 HTMLTableElement.prototype.addRow = addRow;
@@ -115,7 +125,7 @@ function addRow(data, rowType){
         row.className = 'th';
         data.push({name:'ctrl', dName:'', isVisable:true});
         data.map((item) => { row.addHeaderCell(item.name, item.dName, item.isVisable);  }); 
-      break;
+    break;
       
     case 'row': 
         let rowId = Math.floor((Math.random() * 100000) + 1);
@@ -131,20 +141,21 @@ function addRow(data, rowType){
     case 'footer':
       let colspan = columns.length;
       let TFoot;
-      
-      if (this.tFoot === undefined || this.tFoot === null){ TFoot = this.createTFoot(); }else{ return; }
+      if (this.tFoot === undefined || this.tFoot === null){ TFoot = this.createTFoot(); }
+      else{ this.deleteTFoot();this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
       let newCell = row.insertCell();
       newCell.colSpan = colspan+1;
       newCell.style = 'text-align:center;';
-      footer.fRange.map((fBtn) => { 
-          let btnClass = fBtn=='prev'?'bi bi-chevron-left':fBtn=='next'?'bi bi-chevron-right':'';
-          let btnVal = fBtn=='prev'||fBtn=='next'?'':fBtn;
-          let isPrevDisabled = fBtn == 'prev' && footer.isPrevDisabled === true ? 'disabled':'';
-          let isNextDisabled = fBtn == 'next' && footer.isNextDisabled === true ? 'disabled':'';
-          newCell.innerHTML += `<button class='${btnClass}' ${isPrevDisabled} ${isNextDisabled} onclick="alert('pager${fBtn}')">${btnVal}</button>`;
-      }); 
+        let rangeMin = data.fRange[0];
+        newCell.innerHTML = `<button onclick="onPaging('prev', '${rangeMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+      data.fRange.map((fBtn) => {
+          let IsActive = fBtn == data.activeBtn ? 'activePager' : ''; 
+          newCell.innerHTML += `<button class='${IsActive}' onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
+      });
+        let rangeMax = data.fRange[data.fRange.length - 1];
+        newCell.innerHTML += `<button onclick="onPaging('next', '${rangeMax}')" ${data.isNextDisabled} class="bi bi-chevron-right"></button>`; 
       break;
   } 
 }
@@ -154,9 +165,9 @@ function addCell(key, val){
   let newCell = this.insertCell();
   let col = columns[newCell.cellIndex];
   newCell.dataset.col = key;
-  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.dName, val): val;
-  newCell.className = (key=='msg'?'hide':'ctrlView');
-  newCell.colSpan = (key=='msg'?columnsCount:0);
+  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.ColTitle, val): val;
+  newCell.className = (key == 'msg'?'hide':'ctrlView');
+  newCell.colSpan = (key == 'msg'?columnsCount:0);
 }
 HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
 function addHeaderCell(name, dName, isVisable){
@@ -165,6 +176,11 @@ function addHeaderCell(name, dName, isVisable){
   newCell.className = 'ctrlView'; 
   newCell.dataset.col = name; 
   newCell.innerHTML = (name=="ctrl") ? controlBox('headerRow') : cellContent('text', name, dName, '', true);
+}
+HTMLTableElement.prototype.emptyBody = emptyBody;
+function emptyBody(){
+        this.tBodies[0].remove();
+        this.createTBody();
 }
 function cellContent(type, name, dname, val, isHeader = false){
   return (isHeader === true) ?
@@ -199,6 +215,21 @@ function onSave(rowId){
 function onDelete(rowId){
   alert('delete ' + rowId)
 }
+function onPaging(nav, fotId) {
+
+    sbmt(`@Model.grid.OnPagingAction?nav=${nav}&fotId=${fotId}`, 'get', 
+        (data)=> {
+            let jsonObj = JSON.parse(JSON.parse(data));
+            console.log(jsonObj);
+                if (nav == 'page') { table.emptyBody(); jsonObj.map(row => { table.addRow(row, 'row'); }); }
+            else {
+                data.map(row => { table.addRow(row, 'row'); });
+                table.addRow(footer, 'footer');
+            }
+        } , 
+        (err)=>{ alert('err'); console.log(err);} );
+
+}
 function toggleConfirm(rowId){
     let row = document.getElementById(rowId); 
     document.getElementById(`toggle${rowId}`).onclick = function() { toggleConfirm(rowId); };
@@ -217,5 +248,15 @@ function toggleRow(rowId){
 }
 // ---------------------------------------------------------------------------- table Action end
 
+function sbmt(url, method, callbackOk, callbackErr){
+    fetch(url, { method: method })
+    .then(response => response.text())
+    .then((data) => {
+        callbackOk(data);
+    })
+    .catch(err => { 
+        callbackErr(err);
+    });
+}
     
 </script>
