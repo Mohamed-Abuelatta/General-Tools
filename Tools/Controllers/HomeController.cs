@@ -44,7 +44,17 @@ namespace Tools.Controllers
             }
             return Json("_GridRow");
         }
-        
+
+        // https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
+        public JsonResult Paging(string nav, int fotId)
+        {
+            if (nav == "page")
+            {
+                return Json( _customerService.getRows(fotId));
+            }
+            return Json(new { body = _customerService.getRows(fotId), footer = _customerService.getFooter(fotId, nav) });
+        }
+ 
         public IActionResult Delete(int id)
         {
             _customerService.Remove(id);

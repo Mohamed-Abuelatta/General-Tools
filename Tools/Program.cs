@@ -1,18 +1,29 @@
 
 using Academy.Extensions;
-
+using Microsoft.AspNetCore.Http.Json;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddMyContexts();
-builder.Services.AddMyServices();
+builder.Services.AddMyMapper();
 builder.Services.AddMyModels();
-//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//https://learn.microsoft.com/en-us/aspnet/core/web-api/advanced/formatting?view=aspnetcore-7.0&viewFallbackFrom=aspnetcore-3.0#add-newtonsoftjson-based-json-format-support
+//https://khalidabuhakmeh.com/aspnet-core-6-mvc-upgrade-systemtextjson-serialization-issues
+builder.Services.Configure<JsonOptions>(options => { 
+
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+    options.SerializerOptions.AllowTrailingCommas = true;
+    //options.SerializerOptions.Converters;
+});
+
 
 //builder.Services.AddControllers()
 //.AddJsonOptions(options =>
 //{
+//    options.JsonSerializerOptions.Converters();
+
 
 //});
 // =============================================================================================================

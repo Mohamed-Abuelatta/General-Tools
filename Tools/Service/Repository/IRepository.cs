@@ -22,13 +22,12 @@ namespace Services.DataServices.Repository
         TEntityDTO Update(TEntityDTO entity);
         IQueryable<TEntityDTO> Where(Expression<Func<TEntity, bool>> expression);
 
-
         // -------------------------------------------------------------------------------
 
 
-        GridSetting GetGrid(int page);
-        Grid InitGrid(); 
-        string getFooter(string nav, int page);
-        DataTable getRows(int page);
+        GridSetting GetGrid();
+        Grid InitGrid();
+        Footer getFooter(int PagerStart, string PageAction);
+        string getRows(int page);
     }
 }

@@ -1,13 +1,14 @@
 ﻿@using System.Data;
+@using Newtonsoft.Json;
 @using Tools.Tools.CustomAttributes;
 @using Tools.Tools.Grid;
 @model Grid
 
 @{
-    string footer = Model.Footer;
-    DataTable rows = Model.rows;
+    DataTable rows = JsonConvert.DeserializeObject<DataTable>(Model.rows); ;
     List<ColumnSetting> columns = Model.columns;
     GridSetting grid = Model.grid;
+    Footer footer = Model.Footer;
 }
 <thead>
     <tr id="headerRow" class="th">
@@ -57,12 +58,17 @@
 <tfoot>
     <tr id="footerRow">
         <td colspan="@(columns.Count()+1)" style="text-align: center;">
-            <button onclick="alert('Prev')" class="bi bi-chevron-left"></button>
-            @for (int i = 0; i < grid.PagerSize; i++)
+            <button onclick="onPaging('prev', @footer.fRange.Min())" @footer.isPrevDisabled
+                    class="bi bi-chevron-left"></button>
+
+            @foreach (int fBtn in footer.fRange)
             {
-                <button onclick="alert(@(i+1))">@(i + 1)</button>
+                string isActive = fBtn == footer.activeBtn ? "activePager" : "";
+                <button class="@isActive" onclick="onPaging('page', @fBtn)">@fBtn</button>
             }
-            <button onclick="alert('Next')" class="bi bi-chevron-right"></button>
+
+            <button onclick="onPaging('next', @footer.fRange.Max())" @footer.isNextDisabled
+                    class="bi bi-chevron-right"></button>
         </td>
     </tr>
 </tfoot>

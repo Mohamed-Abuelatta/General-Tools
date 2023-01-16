@@ -139,7 +139,7 @@ namespace Services.DataServices.Repository
             return result;
         }
 
-        public GridSetting GetGrid(int page = 0)
+        public GridSetting GetGrid()
         {
             Grid grid = new Grid();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
@@ -159,7 +159,7 @@ namespace Services.DataServices.Repository
             return grid;
         }
 
-        public DataTable getRows(int page = 0)
+        public string getRows(int page = 0)
         {
             Grid grid = new Grid();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
@@ -167,39 +167,38 @@ namespace Services.DataServices.Repository
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
             string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
 
-            DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(jsonObj);
-            return dataTable;
+            
+            return jsonObj;
         }
-        public string getFooter(string nav = "", int page = 0)
+
+        public Footer getFooter(int PagerStart = 0, string PageAction = "next")
+
         {
+
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
-
-            if (nav == "prev")
+            int tableCount = _dbSet.Count();
+            int PagesCount = (tableCount / gridSetting.ItemsPerPage);
+            List<int> TableRange = Enumerable.Range(1, PagesCount + 1).ToList();
+            List<int> PagerRange = new List<int>();
+            if (PageAction == "next")
             {
-
+                PagerRange = TableRange.Skip(PagerStart).Take(gridSetting.PagerSize).ToList();
             }
-            else if (nav == "next")
+            else if (PageAction == "prev")
             {
-
+                PagerRange = TableRange.Skip(PagerStart - gridSetting.ItemsPerPage).Take(gridSetting.PagerSize).ToList();
             }
-            else 
-            {
-                string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
-            }
-            //string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
 
-            //int entitySize = _dbSet.Count();
-            //int pageSize = gridSetting.ItemsPerPage;
-            //int footerStart = page;
-            //int footerRange = gridSetting.PagerSize;
+            Footer footer = new Footer {
+                activeBtn = PagerStart+1,
+                isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
+                isPrevDisabled = PagerStart == 0 ? "disabled" : "",
+                fRange = PagerRange
+            };
 
-            //Enumerable.Range(footerStart, footerRange).ToArray();
-
-            // entitySize:100, pageSize:10, footerStart:76, footerRange:5
-            // let footer = {isPrevDisabled: false, isNextDisabled: true, fRange: ['prev',1,2,3,4,5,'next']}
-            return "";
+            return footer;
         }
 
         private List<ColumnSetting> getColumns()

@@ -2,9 +2,10 @@
 {
     public class Footer
     {
-        public int entitySize { get; set; }
-        public int pageSize { get; set; } = 10;
-        public int footerStart { get; set; } = 0;
-        public int footerRange { get; set; } = 5;
+        public string isPrevDisabled { get; set; }
+        public string isNextDisabled { get; set; } 
+        public int activeBtn { get; set; } 
+        public List<int> fRange { get; set; }
+
     }
 }
