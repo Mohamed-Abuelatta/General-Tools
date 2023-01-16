@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Tools.Models;
 using Tools.Service.ServiceData;
 
@@ -34,7 +35,6 @@ namespace Tools.Controllers
                     else
                     {
                         return Json("_GridRow", _customerService.Update(model));
-                        //return Json(_customerService.Update(model));
                     }
                 }
                 catch 
@@ -52,7 +52,8 @@ namespace Tools.Controllers
             {
                 return Json( _customerService.getRows(fotId));
             }
-            return Json(new { body = _customerService.getRows(fotId), footer = _customerService.getFooter(fotId, nav) });
+            string JSONresult = JsonConvert.SerializeObject(new { body = _customerService.getRows(fotId), footer = _customerService.getFooter(fotId, nav) }, Formatting.Indented);
+            return Json(JSONresult);
         }
  
         public IActionResult Delete(int id)

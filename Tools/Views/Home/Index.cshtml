@@ -87,7 +87,7 @@
 
 <div class='container mt-5 p-3'>
     <table id="@Model.grid.GridName">
-        <partial name="_InitGrid" model="@Model" />
+        @*<partial name="_InitGrid" model="@Model" />*@
     </table>
 </div>
 
@@ -115,7 +115,7 @@ const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
     //{ name: 'keto', email: 'keto@@email.com', tel: '789', city: 'USA' }];
 let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 //{isPrevDisabled: false, isNextDisabled: true, activeBtn: 4, fRange: [1,2,3,4,5]}
-var table = document.getElementById(grid.gridName);   
+var table = document.getElementById('@Model.grid.GridName');
 
 // ---------------------------------------------------------------------------- table start
 HTMLTableElement.prototype.addRow = addRow;
@@ -146,20 +146,20 @@ function addRow(data, rowType){
     case 'footer':
       let TFoot;
       if (this.tFoot === undefined || this.tFoot === null){ TFoot = this.createTFoot(); }
-      else{ this.deleteTFoot();this.createTFoot(); }
+                else { this.deleteTFoot(); TFoot = this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
       let newCell = row.insertCell();
       newCell.colSpan = colsLength+1;
       newCell.style = 'text-align:center;';
         let rangeMin = data.fRange[0];
-        newCell.innerHTML = `<button onclick="onPaging('prev', '${rangeMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+        newCell.innerHTML = `<button data-pager='prev-${rangeMin}' onclick="onPaging('prev', '${rangeMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
       data.fRange.map((fBtn) => {
-          let IsActive = fBtn == data.activeBtn ? 'activePager' : ''; 
-          newCell.innerHTML += `<button class='${IsActive}' onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
+          var IsActive = (fBtn == data.activeBtn ? "class='activePager'" : ""); 
+          newCell.innerHTML += `<button data-pager='${fBtn}' ${IsActive} onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
       });
         let rangeMax = data.fRange[data.fRange.length - 1];
-        newCell.innerHTML += `<button onclick="onPaging('next', '${rangeMax}')" ${data.isNextDisabled} class="bi bi-chevron-right"></button>`; 
+        newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${data.isNextDisabled} class="bi bi-chevron-right"></button>`; 
       break;
   } 
 }
@@ -201,7 +201,7 @@ const controlBox = (rowId) => {
 // ---------------------------------------------------------------------------- table end
 
 // ---------------------------------------------------------------------------- table Action start
-//window.onload =  populateTable();
+window.onload =  populateTable();
 function populateTable(){
     table.addRow(columns,'header');
     rows.map(row => { table.addRow(row, 'row'); });
@@ -222,12 +222,18 @@ function onDelete(rowId){
 function onPaging(nav, fotId) {
     sbmt(`@Model.grid.OnPagingAction?nav=${nav}&fotId=${fotId}`, 'get', 
     (data)=> {
-        let jsonObj = JSON.parse(JSON.parse(data));
-        
-            if (nav == 'page') { table.emptyBody(); jsonObj.map(row => { table.addRow(row, 'row'); }); }
-        else {
-            data.map(row => { table.addRow(row, 'row'); });
-            table.addRow(footer, 'footer');
+        let rowsObj = JSON.parse(JSON.parse(data));
+        if (nav == 'page') {
+            document.querySelector('.activePager').classList.remove('activePager');
+            document.querySelector(`[data-pager='${fotId}']`).classList.add('activePager');
+            table.emptyBody();  
+            rowsObj.map(row => { table.addRow(row, 'row'); }); 
+        } else {
+            const newBody = JSON.parse(rowsObj.body);
+            const newfooter = rowsObj.footer;
+            table.emptyBody();
+            newBody.map(row => { table.addRow(row, 'row'); });
+            table.addRow(newfooter, 'footer');
         }
     } , 
     (err)=>{ alert('err'); console.log(err);} );

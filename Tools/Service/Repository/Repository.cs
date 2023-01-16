@@ -167,12 +167,13 @@ namespace Services.DataServices.Repository
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
             string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
 
-            
+
+            //string RowsFooter = JsonConvert.SerializeObject(new { body = getRows(fotId), footer = getFooter(fotId, nav) }, Formatting.Indented);
+
             return jsonObj;
         }
 
         public Footer getFooter(int PagerStart = 0, string PageAction = "next")
-
         {
 
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
@@ -192,7 +193,7 @@ namespace Services.DataServices.Repository
             }
 
             Footer footer = new Footer {
-                activeBtn = PagerStart+1,
+                activeBtn = (PageAction == "next" ? PagerStart+1 : PagerStart - gridSetting.PagerSize),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerStart == 0 ? "disabled" : "",
                 fRange = PagerRange
