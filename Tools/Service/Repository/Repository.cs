@@ -170,7 +170,7 @@ namespace Services.DataServices.Repository
             DataTable dataTable = JsonConvert.DeserializeObject<DataTable>(jsonObj);
             return dataTable;
         }
-        public string getFooter(string nav, int page = 0)
+        public string getFooter(string nav = "", int page = 0)
         {
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
