@@ -94,23 +94,28 @@
 @{
     string grid = JsonConvert.SerializeObject(Model.grid);
     string columns = JsonConvert.SerializeObject(Model.columns);
-    string rows =  JsonConvert.SerializeObject(Model.rows);
+    string rows =  Model.rows;
     string footer = JsonConvert.SerializeObject(Model.Footer);
 }
 
 <script type="text/javascript">
 
+// DefaultColumnWidth, DefaultCtrlColumnWidth, GridName, GridTitle, GridType, ItemsPerPage, OnDeleteAction, OnPagingAction, OnSaveAction, PagerSize, PaginationType
+const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
+// {colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'}
 const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
-console.log(columns);
-
-const columnsCount = columns.length;
-const rows = '@rows';
-
-let grid = '@grid';
-//let grid = {tableName:'tbl', formName:'frm'};
-let footer = '@footer';
-//let footer = { isPrevDisabled: 'disabled', isNextDisabled: '', activeBtn: 4, fRange: [1, 2, 3, 4, 5] }
-var table = document.getElementById("@Model.grid.GridName");   
+               //[{colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'},
+               //{colIndex:1, colName:'email', colTitle:'ايميل', isVisable:true, colWidth: 200, inputType: 'text', keyType:'normal'},
+               //{colIndex:2, colName:'tel', colTitle:'تلفون', isVisable:true, colWidth: 200, inputType: 'text', keyType:'normal'},
+               //{colIndex:3, colName:'city', colTitle:'مدينة', isVisable:true, colWidth: 200, inputType: 'list', keyType:'fk'}]
+const colsLength = columns.length;
+const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
+    //  [{name:'ali',email:'ali@@email.com',tel:'123',city:'egypt'},
+    //{ name: 'medoo', email: 'medoo@@email.com', tel: '456', city: 'UK' },
+    //{ name: 'keto', email: 'keto@@email.com', tel: '789', city: 'USA' }];
+let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
+//{isPrevDisabled: false, isNextDisabled: true, activeBtn: 4, fRange: [1,2,3,4,5]}
+var table = document.getElementById(grid.gridName);   
 
 // ---------------------------------------------------------------------------- table start
 HTMLTableElement.prototype.addRow = addRow;
@@ -123,8 +128,8 @@ function addRow(data, rowType){
         row = THead.insertRow(0); 
         row.id = 'headerRow';
         row.className = 'th';
-        data.push({name:'ctrl', dName:'', isVisable:true});
-        data.map((item) => { row.addHeaderCell(item.name, item.dName, item.isVisable);  }); 
+        data.push({colName:'ctrl', colTitle:'', isVisable:true});
+        data.map((item) => { row.addHeaderCell(item.colName, item.colTitle, item.isVisable);  }); 
     break;
       
     case 'row': 
@@ -139,14 +144,13 @@ function addRow(data, rowType){
       break;
       
     case 'footer':
-      let colspan = columns.length;
       let TFoot;
       if (this.tFoot === undefined || this.tFoot === null){ TFoot = this.createTFoot(); }
       else{ this.deleteTFoot();this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
       let newCell = row.insertCell();
-      newCell.colSpan = colspan+1;
+      newCell.colSpan = colsLength+1;
       newCell.style = 'text-align:center;';
         let rangeMin = data.fRange[0];
         newCell.innerHTML = `<button onclick="onPaging('prev', '${rangeMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
@@ -165,9 +169,9 @@ function addCell(key, val){
   let newCell = this.insertCell();
   let col = columns[newCell.cellIndex];
   newCell.dataset.col = key;
-  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.ColTitle, val): val;
+  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.colTitle, val): val;
   newCell.className = (key == 'msg'?'hide':'ctrlView');
-  newCell.colSpan = (key == 'msg'?columnsCount:0);
+  newCell.colSpan = (key == 'msg'?colsLength:0);
 }
 HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
 function addHeaderCell(name, dName, isVisable){
@@ -216,19 +220,17 @@ function onDelete(rowId){
   alert('delete ' + rowId)
 }
 function onPaging(nav, fotId) {
-
     sbmt(`@Model.grid.OnPagingAction?nav=${nav}&fotId=${fotId}`, 'get', 
-        (data)=> {
-            let jsonObj = JSON.parse(JSON.parse(data));
-            console.log(jsonObj);
-                if (nav == 'page') { table.emptyBody(); jsonObj.map(row => { table.addRow(row, 'row'); }); }
-            else {
-                data.map(row => { table.addRow(row, 'row'); });
-                table.addRow(footer, 'footer');
-            }
-        } , 
-        (err)=>{ alert('err'); console.log(err);} );
-
+    (data)=> {
+        let jsonObj = JSON.parse(JSON.parse(data));
+        
+            if (nav == 'page') { table.emptyBody(); jsonObj.map(row => { table.addRow(row, 'row'); }); }
+        else {
+            data.map(row => { table.addRow(row, 'row'); });
+            table.addRow(footer, 'footer');
+        }
+    } , 
+    (err)=>{ alert('err'); console.log(err);} );
 }
 function toggleConfirm(rowId){
     let row = document.getElementById(rowId); 
@@ -247,6 +249,7 @@ function toggleRow(rowId){
   })
 }
 // ---------------------------------------------------------------------------- table Action end
+
 
 function sbmt(url, method, callbackOk, callbackErr){
     fetch(url, { method: method })
