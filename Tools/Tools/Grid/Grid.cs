@@ -7,7 +7,7 @@ namespace Tools.Tools.Grid
     {
         public GridSetting grid { get; set; }
         public List<ColumnSetting> columns { get; set; }
-        public string rows { get; set; }
-        public Footer Footer { get; set; }
+        public string rowsNfooter { get; set; }
+        //public Footer Footer { get; set; }
     }
 }

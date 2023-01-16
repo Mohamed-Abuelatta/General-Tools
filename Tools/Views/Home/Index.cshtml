@@ -94,8 +94,8 @@
 @{
     string grid = JsonConvert.SerializeObject(Model.grid);
     string columns = JsonConvert.SerializeObject(Model.columns);
-    string rows =  Model.rows;
-    string footer = JsonConvert.SerializeObject(Model.Footer);
+    string rowsNfooter = JsonConvert.SerializeObject(Model.rowsNfooter);
+    //string footer = JsonConvert.SerializeObject(Model.Footer);
 }
 
 <script type="text/javascript">
@@ -109,11 +109,13 @@ const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
                //{colIndex:2, colName:'tel', colTitle:'تلفون', isVisable:true, colWidth: 200, inputType: 'text', keyType:'normal'},
                //{colIndex:3, colName:'city', colTitle:'مدينة', isVisable:true, colWidth: 200, inputType: 'list', keyType:'fk'}]
 const colsLength = columns.length;
-const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
+    const rows = JSON.parse(JSON.stringify('@Html.Raw(rowsNfooter)'));
+    console.log(rows)
+
     //[{name:'ali',email:'ali@@email.com',tel:'123',city:'egypt'},
     //{ name: 'medoo', email: 'medoo@@email.com', tel: '456', city: 'UK' },
     //{ name: 'keto', email: 'keto@@email.com', tel: '789', city: 'USA' }];
-let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
+
 //{isPrevDisabled: false, isNextDisabled: true, activeBtn: 4, fRange: [1,2,3,4,5]}
 var table = document.getElementById('@Model.grid.GridName');
 
@@ -128,8 +130,9 @@ function addRow(data, rowType){
         row = THead.insertRow(0); 
         row.id = 'headerRow';
         row.className = 'th';
-        data.push({colName:'ctrl', colTitle:'', isVisable:true});
-        data.map((item) => { row.addHeaderCell(item.colName, item.colTitle, item.isVisable);  }); 
+        // {colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'}
+        data.push({ColName:'ctrl', ColTitle:'', IsVisable:true});
+        data.map((item) => { row.addHeaderCell(item.ColName, item.ColTitle, item.IsVisable);  }); 
     break;
       
     case 'row': 
@@ -169,7 +172,7 @@ function addCell(key, val){
   let newCell = this.insertCell();
   let col = columns[newCell.cellIndex];
   newCell.dataset.col = key;
-  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.colTitle, val): val;
+  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.ColTitle, val): val;
   newCell.className = (key == 'msg'?'hide':'ctrlView');
   newCell.colSpan = (key == 'msg'?colsLength:0);
 }
@@ -201,7 +204,7 @@ const controlBox = (rowId) => {
 // ---------------------------------------------------------------------------- table end
 
 // ---------------------------------------------------------------------------- table Action start
-window.onload =  populateTable();
+//window.onload =  populateTable();
 function populateTable(){
     table.addRow(columns,'header');
     rows.map(row => { table.addRow(row, 'row'); });

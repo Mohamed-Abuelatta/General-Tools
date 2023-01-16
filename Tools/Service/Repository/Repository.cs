@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Tools.Tools.CustomAttributes;
 using static Tools.Tools.CustomAttributes.AttrEnum;
 using Tools.Tools.Grid;
+using System.Text.Json;
 
 namespace Services.DataServices.Repository
 {
@@ -153,13 +154,13 @@ namespace Services.DataServices.Repository
             Grid grid = new Grid();
             grid.grid = GetGrid();
             grid.columns = getColumns();
-            grid.rows = getRows();
-            grid.Footer = getFooter();
+            grid.rowsNfooter = getRowsNfooter();
+            //grid.Footer = getFooter();
 
             return grid;
         }
 
-        public string getRows(int page = 0)
+        public string getRowsNfooter(int page = 0, string PageAction = "next")
         {
             Grid grid = new Grid();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
@@ -167,13 +168,21 @@ namespace Services.DataServices.Repository
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
             string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
 
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                AllowTrailingCommas = true,
+                Converters = {}
+            };
 
-            //string RowsFooter = JsonConvert.SerializeObject(new { body = getRows(fotId), footer = getFooter(fotId, nav) }, Formatting.Indented);
+            //string RowsNfooter = System.Text.Json.JsonSerializer.Serialize( new { body = jsonObj, footer = getFooter(page, PageAction) }, options);
 
-            return jsonObj;
+            string RowsNfooter = JsonConvert.SerializeObject(new { body = jsonObj, footer = getFooter(page, PageAction) }, Formatting.Indented);
+
+            return RowsNfooter;
         }
 
-        public Footer getFooter(int PagerStart = 0, string PageAction = "next")
+        private string getFooter(int PagerStart = 0, string PageAction = "next")
         {
 
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
@@ -199,7 +208,7 @@ namespace Services.DataServices.Repository
                 fRange = PagerRange
             };
 
-            return footer;
+            return JsonConvert.SerializeObject(footer, Formatting.Indented);
         }
 
         private List<ColumnSetting> getColumns()

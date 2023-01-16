@@ -48,12 +48,7 @@ namespace Tools.Controllers
         // https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
         public JsonResult Paging(string nav, int fotId)
         {
-            if (nav == "page")
-            {
-                return Json( _customerService.getRows(fotId));
-            }
-            string JSONresult = JsonConvert.SerializeObject(new { body = _customerService.getRows(fotId), footer = _customerService.getFooter(fotId, nav) }, Formatting.Indented);
-            return Json(JSONresult);
+           return Json( _customerService.getRowsNfooter(fotId, nav));
         }
  
         public IActionResult Delete(int id)
