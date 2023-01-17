@@ -13,6 +13,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Tools.Tools.CustomAttributes;
 using static Tools.Tools.CustomAttributes.AttrEnum;
 using Tools.Tools.Grid;
+using System.Text.Json;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Newtonsoft.Json.Linq;
 
 namespace Services.DataServices.Repository
 {
@@ -153,46 +156,43 @@ namespace Services.DataServices.Repository
             Grid grid = new Grid();
             grid.grid = GetGrid();
             grid.columns = getColumns();
-            grid.rows = getRows();
+            grid.rows = JsonConvert.DeserializeObject((string)getRows());
             grid.Footer = getFooter();
-
             return grid;
         }
 
-        public string getRows(int page = 0)
+        public object getRows(int page = 0)
         {
             Grid grid = new Grid();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
             string jsonObj = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList().ToJson();
-
-            
             return jsonObj;
         }
-        public Footer getFooter(int PagerStart = 0, string PageAction = "next")
-        {
 
+        public Footer getFooter(int currentBtn = 1, string PageAction = "next")
+        {
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
             int tableCount = _dbSet.Count();
-            int PagesCount = (tableCount / gridSetting.ItemsPerPage);
-            List<int> TableRange = Enumerable.Range(1, PagesCount + 1).ToList();
+            decimal PagesCount = Math.Ceiling((decimal)((float)tableCount / gridSetting.ItemsPerPage));
+            List<int> TableRange = Enumerable.Range(1, (int)PagesCount).ToList();
             List<int> PagerRange = new List<int>();
             if (PageAction == "next")
             {
-                PagerRange = TableRange.Skip(PagerStart).Take(gridSetting.PagerSize).ToList();
+                PagerRange = TableRange.Skip(currentBtn-1).Take(gridSetting.PagerSize).ToList();
             }
             else if (PageAction == "prev")
             {
-                PagerRange = TableRange.Skip(PagerStart - gridSetting.ItemsPerPage).Take(gridSetting.PagerSize).ToList();
+                PagerRange = TableRange.Skip(currentBtn - gridSetting.ItemsPerPage - 1).Take(gridSetting.PagerSize).ToList();
             }
 
             Footer footer = new Footer {
-                activeBtn = PagerStart+1,
+                activeBtn = (PageAction == "next" ? PagerRange.Min() : currentBtn),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
-                isPrevDisabled = PagerStart == 0 ? "disabled" : "",
+                isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
                 fRange = PagerRange
             };
 

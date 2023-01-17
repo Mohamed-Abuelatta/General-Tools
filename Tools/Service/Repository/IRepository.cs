@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Data;
 using System.Linq.Expressions;
 using Tools.Service;
 using Tools.Tools.CustomAttributes;
@@ -24,9 +23,10 @@ namespace Services.DataServices.Repository
 
         // -------------------------------------------------------------------------------
 
+
         GridSetting GetGrid();
         Grid InitGrid();
         Footer getFooter(int PagerStart, string PageAction);
-        string getRows(int page);
+        object getRows(int page);
     }
 }
