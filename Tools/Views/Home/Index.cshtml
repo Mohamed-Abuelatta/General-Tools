@@ -2,7 +2,7 @@
 @using Newtonsoft.Json;
 @using System.Web;
 @using Tools.Tools.Grid;
-@model Grid
+@model InitGrid
 
 <style type="text/css">
 
@@ -140,6 +140,11 @@ function addRow(data, rowType){
       else { this.deleteTFoot(); TFoot = this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
+
+      row.dataset.lastPagerCount = data.lastPagerCount;
+      row.dataset.isLastFooterRange = data.isLastFooterRange;
+      row.dataset.lastPageRowsCount = data.lastPageRowsCount;
+
       let newCell = row.insertCell();
       newCell.colSpan = colsLength+1;
       newCell.style = 'text-align:center;';
@@ -217,16 +222,15 @@ function onPaging(nav, fotId) {
         
         callAction(`@Model.grid.OnPagingAction`, jsonObj,
             (data)=> {
+            data = JSON.parse(data); 
 
         if (nav == 'page') {
             document.querySelector('.activePager').classList.remove('activePager');
             document.querySelector(`[data-pager='${fotId}']`).classList.add('activePager');
-            table.emptyBody();
-            console.log(data);
-            data = JSON.parse(data);  
+            table.emptyBody(); 
             data.map(row => { table.addRow(row, 'row'); }); 
         } else {
-            const getRows = JSON.parse(data.rows);
+            const getRows = data.rows;
             const getFooter = data.footer;
             table.emptyBody();
             getRows.map(row => { table.addRow(row, 'row'); });

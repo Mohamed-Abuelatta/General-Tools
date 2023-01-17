@@ -53,11 +53,13 @@ namespace Tools.Controllers
             {
                 return Json(_customerService.getRows(fotId));
             }
-            VMrefreshGrid refresh = new VMrefreshGrid
-            {
-                rows = _customerService.getRows(fotId),
-                footer = _customerService.getFooter(fotId, nav)
-            };
+            string refresh = JsonConvert.SerializeObject(
+               new
+               {
+                   rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
+                   footer = _customerService.getFooter(fotId, nav)
+               }
+            );
             return Json(refresh);
         }
  

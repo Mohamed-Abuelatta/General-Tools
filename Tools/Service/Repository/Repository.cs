@@ -144,16 +144,16 @@ namespace Services.DataServices.Repository
 
         public GridSetting GetGrid()
         {
-            Grid grid = new Grid();
+            InitGrid grid = new InitGrid();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
             return gridSetting;
         }
 
-        public Grid InitGrid()
+        public InitGrid InitGrid()
         {
-            Grid grid = new Grid();
+            InitGrid grid = new InitGrid();
             grid.grid = GetGrid();
             grid.columns = getColumns();
             grid.rows = JsonConvert.DeserializeObject((string)getRows());
@@ -161,9 +161,9 @@ namespace Services.DataServices.Repository
             return grid;
         }
 
-        public object getRows(int page = 0)
+        public string getRows(int page = 0)
         {
-            Grid grid = new Grid();
+            InitGrid grid = new InitGrid();
             IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
             Type t = entityType.ClrType;
             GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
@@ -186,14 +186,21 @@ namespace Services.DataServices.Repository
             }
             else if (PageAction == "prev")
             {
-                PagerRange = TableRange.Skip(currentBtn - gridSetting.ItemsPerPage - 1).Take(gridSetting.PagerSize).ToList();
+                PagerRange = TableRange.Skip(currentBtn - gridSetting.PagerSize).Take(gridSetting.PagerSize).ToList();
             }
 
+            int activeBtn = (PageAction == "next" ? PagerRange.Min() : currentBtn);
+            bool isLastFooterRange = TableRange.Max() == PagerRange.Max();
+            int lastPageRowsCount = isLastFooterRange ? _dbSet.Skip((PagerRange.Max()-1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).Count() : gridSetting.ItemsPerPage;
+
             Footer footer = new Footer {
-                activeBtn = (PageAction == "next" ? PagerRange.Min() : currentBtn),
+                activeBtn = activeBtn,
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
-                fRange = PagerRange
+                fRange = PagerRange,
+                lastPagerCount = PagerRange.Count(),
+                isLastFooterRange = isLastFooterRange,
+                lastPageRowsCount = lastPageRowsCount
             };
 
             return footer;
