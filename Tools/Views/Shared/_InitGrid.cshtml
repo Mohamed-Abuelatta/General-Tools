@@ -1,14 +1,14 @@
-﻿@using System.Data;
+﻿@*@using System.Data;
 @using Newtonsoft.Json;
 @using Tools.Tools.CustomAttributes;
 @using Tools.Tools.Grid;
 @model Grid
 
 @{
-    DataTable rows = JsonConvert.DeserializeObject<DataTable>(Model.rowsNfooter); ;
+    DataTable rows = JsonConvert.DeserializeObject<DataTable>(Model.rows); ;
     List<ColumnSetting> columns = Model.columns;
     GridSetting grid = Model.grid;
-    //Footer footer = Model.Footer;
+    Footer footer = Model.Footer;
 }
 
 <thead>
@@ -56,7 +56,7 @@
     }
 </tbody>
 
-@*<tfoot>
+<tfoot>
     <tr id="footerRow">
         <td colspan="@(columns.Count()+1)" style="text-align: center;">
             <button onclick="onPaging('prev', @footer.fRange.Min())" @footer.isPrevDisabled

@@ -94,29 +94,17 @@
 @{
     string grid = JsonConvert.SerializeObject(Model.grid);
     string columns = JsonConvert.SerializeObject(Model.columns);
-    string rowsNfooter = JsonConvert.SerializeObject(Model.rowsNfooter);
-    //string footer = JsonConvert.SerializeObject(Model.Footer);
+    object rows = JsonConvert.SerializeObject(Model.rows);
+    string footer = JsonConvert.SerializeObject(Model.Footer);
 }
 
 <script type="text/javascript">
 
-// DefaultColumnWidth, DefaultCtrlColumnWidth, GridName, GridTitle, GridType, ItemsPerPage, OnDeleteAction, OnPagingAction, OnSaveAction, PagerSize, PaginationType
 const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
-// {colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'}
 const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
-               //[{colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'},
-               //{colIndex:1, colName:'email', colTitle:'ايميل', isVisable:true, colWidth: 200, inputType: 'text', keyType:'normal'},
-               //{colIndex:2, colName:'tel', colTitle:'تلفون', isVisable:true, colWidth: 200, inputType: 'text', keyType:'normal'},
-               //{colIndex:3, colName:'city', colTitle:'مدينة', isVisable:true, colWidth: 200, inputType: 'list', keyType:'fk'}]
 const colsLength = columns.length;
-    const rows = JSON.parse(JSON.stringify('@Html.Raw(rowsNfooter)'));
-    console.log(rows)
-
-    //[{name:'ali',email:'ali@@email.com',tel:'123',city:'egypt'},
-    //{ name: 'medoo', email: 'medoo@@email.com', tel: '456', city: 'UK' },
-    //{ name: 'keto', email: 'keto@@email.com', tel: '789', city: 'USA' }];
-
-//{isPrevDisabled: false, isNextDisabled: true, activeBtn: 4, fRange: [1,2,3,4,5]}
+const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
+const footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 var table = document.getElementById('@Model.grid.GridName');
 
 // ---------------------------------------------------------------------------- table start
@@ -149,19 +137,19 @@ function addRow(data, rowType){
     case 'footer':
       let TFoot;
       if (this.tFoot === undefined || this.tFoot === null){ TFoot = this.createTFoot(); }
-                else { this.deleteTFoot(); TFoot = this.createTFoot(); }
+      else { this.deleteTFoot(); TFoot = this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
       let newCell = row.insertCell();
       newCell.colSpan = colsLength+1;
       newCell.style = 'text-align:center;';
-        let rangeMin = data.fRange[0];
-        newCell.innerHTML = `<button data-pager='prev-${rangeMin}' onclick="onPaging('prev', '${rangeMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+        let prevMin = data.fRange[0] - 1;
+        newCell.innerHTML = `<button data-pager='prev-${prevMin}' onclick="onPaging('prev', '${prevMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
       data.fRange.map((fBtn) => {
           var IsActive = (fBtn == data.activeBtn ? "class='activePager'" : ""); 
           newCell.innerHTML += `<button data-pager='${fBtn}' ${IsActive} onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
       });
-        let rangeMax = data.fRange[data.fRange.length - 1];
+        let rangeMax = data.fRange[data.fRange.length - 1]+1;
         newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${data.isNextDisabled} class="bi bi-chevron-right"></button>`; 
       break;
   } 
@@ -191,8 +179,8 @@ function emptyBody(){
 }
 function cellContent(type, name, dname, val, isHeader = false){
   return (isHeader === true) ?
-  `<div>${dname}</div><div>${dname}<input type='${type}' name='${name}' value='${val}'></div>`: // for header true
-  `<div>${val}</div><div>${dname}<input type='${type}' name='${name}' value='${val}'></div>`; // for normal row false default 
+  `<div>${dname}</div><div>${dname}<input data-hinput='${name}' type='${type}' name='${name}' value='${val}'></div>`: // for header true
+  `<div>${val}</div><div>${dname}<input data-rinput='${name}' type='${type}' name='${name}' value='${val}'></div>`; // for normal row false default
 }
 const controlBox = (rowId) => {
   if (rowId == "headerRow"){
@@ -204,7 +192,7 @@ const controlBox = (rowId) => {
 // ---------------------------------------------------------------------------- table end
 
 // ---------------------------------------------------------------------------- table Action start
-//window.onload =  populateTable();
+window.onload =  populateTable();
 function populateTable(){
     table.addRow(columns,'header');
     rows.map(row => { table.addRow(row, 'row'); });
@@ -213,30 +201,36 @@ function populateTable(){
 function onSave(rowId){
     let row = document.getElementById(rowId); 
     let jsonRow = {};
-    [...row.cells].map(cell => { 
+    [...row.cells].map(cell => {
+
       if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
-      //else { jsonRow[cell.dataset.col] = controlBox(rowId); }
+
     });
     table.addRow(jsonRow,'row'); 
 }
 function onDelete(rowId){
   alert('delete ' + rowId)
 }
+
 function onPaging(nav, fotId) {
-    sbmt(`@Model.grid.OnPagingAction?nav=${nav}&fotId=${fotId}`, 'get', 
-    (data)=> {
-        let rowsObj = JSON.parse(JSON.parse(data));
+        var jsonObj = { nav: nav, fotId: fotId };
+        
+        callAction(`@Model.grid.OnPagingAction`, jsonObj,
+            (data)=> {
+
         if (nav == 'page') {
             document.querySelector('.activePager').classList.remove('activePager');
             document.querySelector(`[data-pager='${fotId}']`).classList.add('activePager');
-            table.emptyBody();  
-            rowsObj.map(row => { table.addRow(row, 'row'); }); 
-        } else {
-            const newBody = JSON.parse(rowsObj.body);
-            const newfooter = rowsObj.footer;
             table.emptyBody();
-            newBody.map(row => { table.addRow(row, 'row'); });
-            table.addRow(newfooter, 'footer');
+            console.log(data);
+            data = JSON.parse(data);  
+            data.map(row => { table.addRow(row, 'row'); }); 
+        } else {
+            const getRows = JSON.parse(data.rows);
+            const getFooter = data.footer;
+            table.emptyBody();
+            getRows.map(row => { table.addRow(row, 'row'); });
+            table.addRow(getFooter, 'footer');
         }
     } , 
     (err)=>{ alert('err'); console.log(err);} );
@@ -259,16 +253,22 @@ function toggleRow(rowId){
 }
 // ---------------------------------------------------------------------------- table Action end
 
+function callAction(url, dataJson, callbackOk, callbackErr){
 
-function sbmt(url, method, callbackOk, callbackErr){
-    fetch(url, { method: method })
-    .then(response => response.text())
-    .then((data) => {
-        callbackOk(data);
-    })
-    .catch(err => { 
-        callbackErr(err);
-    });
+    const params = new URLSearchParams();
+    Object.entries(dataJson).map(([key, val]) => { params.append(key, val); });
+
+    var requestOptions = {
+      method: 'POST',
+      body: params
+    };
+
+    fetch(url, requestOptions)
+    .then(response => response.json())
+    .then(result => callbackOk(result))
+    .catch(err => callbackErr(err));
+
 }
-    
+ 
+
 </script>

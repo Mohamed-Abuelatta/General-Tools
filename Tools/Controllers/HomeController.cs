@@ -46,9 +46,19 @@ namespace Tools.Controllers
         }
 
         // https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
-        public JsonResult Paging(string nav, int fotId)
+        [HttpPost]
+        public JsonResult Paging(string nav,int fotId)
         {
-           return Json( _customerService.getRowsNfooter(fotId, nav));
+            if (nav == "page")
+            {
+                return Json(_customerService.getRows(fotId));
+            }
+            VMrefreshGrid refresh = new VMrefreshGrid
+            {
+                rows = _customerService.getRows(fotId),
+                footer = _customerService.getFooter(fotId, nav)
+            };
+            return Json(refresh);
         }
  
         public IActionResult Delete(int id)
