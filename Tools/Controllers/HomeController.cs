@@ -65,8 +65,8 @@ namespace Tools.Controllers
  
         public IActionResult Delete(int id)
         {
-            _customerService.Remove(id);
-            return View();
+            //_customerService.Remove(id);
+            return Ok();
         }
  
 

@@ -8,7 +8,6 @@
         public List<int> fRange { get; set; }
 
         public int lastPagerBtn { get; set; }
-        public int addOptimistic { get; set; } = -1;
-        public int deleteOptimistic { get; set; } = -1;
+        public int pageRowsCount { get; set; } 
     }
 }

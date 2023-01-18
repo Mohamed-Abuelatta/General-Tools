@@ -140,6 +140,10 @@ function addRow(data, rowType){
       else { this.deleteTFoot(); TFoot = this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
+      row.dataset.lastpagerbtn = data.lastPagerBtn;
+      row.dataset.pagerowscount = data.pageRowsCount;
+      row.dataset.addmode = "none";
+      row.dataset.deletemode = "none";
 
       let newCell = row.insertCell();
       newCell.colSpan = colsLength+1;
@@ -210,7 +214,10 @@ function onSave(rowId){
     table.addRow(jsonRow,'row'); 
 }
 function onDelete(rowId){
-  alert('delete ' + rowId)
+        //alert('delete ' + rowId);
+        callAction(`@Model.grid.OnDeleteAction`, new { id : rowId },
+        (data) => { alert(rowId) },
+        (err) => { alert('err'); console.log(err); });
 }
 
 function onPaging(nav, fotId) {
@@ -219,12 +226,18 @@ function onPaging(nav, fotId) {
         callAction(`@Model.grid.OnPagingAction`, jsonObj,
          (data)=> {
             data = JSON.parse(data);
-            console.log(data)
-
         if (nav == 'page') {
             document.querySelector('.activePager').classList.remove('activePager');
             document.querySelector(`[data-pager='${fotId}']`).classList.add('activePager');
             table.emptyBody(); 
+            let footerRow = table.tFoot.rows[0];
+            if (footerRow.dataset.lastpagerbtn == fotId) {
+                footerRow.dataset.addmode = ((table.tBodies[0].rows.length == @Model.grid.ItemsPerPage) ? "pessimistic" : "optimistic");
+                footerRow.dataset.deletemode = ((table.tBodies[0].rows.length == 1) ? "pessimistic" : "optimistic");
+            }else{
+                footerRow.dataset.addmode = "none";
+                footerRow.dataset.deletemode = "none";
+            }
             data.map(row => { table.addRow(row, 'row'); }); 
         } else {
             const getRows = data.rows;
