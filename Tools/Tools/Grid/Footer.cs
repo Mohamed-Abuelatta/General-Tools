@@ -7,8 +7,8 @@
         public int activeBtn { get; set; } 
         public List<int> fRange { get; set; }
 
-        public bool isLastFooterRange { get; set; } 
-        public int lastPagerCount { get; set; } 
-        public int lastPageRowsCount { get; set; } 
+        public int lastPagerBtn { get; set; }
+        public int addOptimistic { get; set; } = -1;
+        public int deleteOptimistic { get; set; } = -1;
     }
 }

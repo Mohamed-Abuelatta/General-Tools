@@ -95,7 +95,7 @@
     string grid = JsonConvert.SerializeObject(Model.grid);
     string columns = JsonConvert.SerializeObject(Model.columns);
     object rows = JsonConvert.SerializeObject(Model.rows);
-    string footer = JsonConvert.SerializeObject(Model.Footer);
+    string footer = JsonConvert.SerializeObject(Model.footer);
 }
 
 <script type="text/javascript">
@@ -140,10 +140,6 @@ function addRow(data, rowType){
       else { this.deleteTFoot(); TFoot = this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
-
-      row.dataset.lastPagerCount = data.lastPagerCount;
-      row.dataset.isLastFooterRange = data.isLastFooterRange;
-      row.dataset.lastPageRowsCount = data.lastPageRowsCount;
 
       let newCell = row.insertCell();
       newCell.colSpan = colsLength+1;
@@ -218,11 +214,12 @@ function onDelete(rowId){
 }
 
 function onPaging(nav, fotId) {
-        var jsonObj = { nav: nav, fotId: fotId };
-        
+        const jsonObj = { nav: nav, fotId: fotId };
+
         callAction(`@Model.grid.OnPagingAction`, jsonObj,
-            (data)=> {
-            data = JSON.parse(data); 
+         (data)=> {
+            data = JSON.parse(data);
+            console.log(data)
 
         if (nav == 'page') {
             document.querySelector('.activePager').classList.remove('activePager');
