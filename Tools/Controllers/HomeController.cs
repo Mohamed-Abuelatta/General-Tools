@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Tools.Models;
 using Tools.Service.ServiceData;
@@ -63,10 +64,9 @@ namespace Tools.Controllers
             return Json(refresh);
         }
  
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, int page)
         {
-            //_customerService.Remove(id);
-            return Ok();
+            return Json(_customerService.Remove(id, page));
         }
  
 

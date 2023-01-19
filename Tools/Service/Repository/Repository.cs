@@ -16,6 +16,7 @@ using Tools.Tools.Grid;
 using System.Text.Json;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Newtonsoft.Json.Linq;
+using Tools.Service;
 
 namespace Services.DataServices.Repository
 {
@@ -135,11 +136,22 @@ namespace Services.DataServices.Repository
             return entity;
         }
 
-        public EntityEntry<TEntityDTO> Remove(object id)
+        public ResponseResult Remove(object id, int page)
         {
-            var model = _mapper.Map<TEntity>(GetById(id));
-            EntityEntry<TEntityDTO> result = _mapper.Map<EntityEntry<TEntityDTO>>(_dbSet.Remove(model));
-            return result;
+            ResponseResult response = new ResponseResult();
+            try
+            {
+                var model = _mapper.Map<TEntity>(GetById(id));
+                var result = _dbSet.Remove(model);
+                response.data = result != null ? getRows(page) : "#";
+                response.isOk = true;
+            }
+            catch (Exception ex)
+            {
+                response.data = ex.Message + "<br />" + ex.InnerException.Message + "<br />" + ex.InnerException.Data;
+                response.isOk = false;
+            }
+            return response;
         }
 
         public GridSetting GetGrid()
@@ -164,9 +176,7 @@ namespace Services.DataServices.Repository
         // rows + footer header
         public string getRows(int page = 0)
         {
-            IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
-            Type t = entityType.ClrType;
-            GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
+            GridSetting gridSetting = GetGrid();
             List<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList();
             string jsonRows = rows.ToJson();
             return jsonRows;
@@ -174,9 +184,7 @@ namespace Services.DataServices.Repository
 
         public Footer getFooter(int currentBtn = 1, string PageAction = "next")
         {
-            IEntityType entityType = _context.Model.FindEntityType(_dbSet.EntityType.Name);
-            Type t = entityType.ClrType;
-            GridSetting gridSetting = (GridSetting)Attribute.GetCustomAttribute(t, typeof(GridSetting));
+            GridSetting gridSetting = GetGrid();
             int tableCount = _dbSet.Count();
             decimal PagesCount = Math.Ceiling((decimal)((float)tableCount / gridSetting.ItemsPerPage));
             List<int> TableRange = Enumerable.Range(1, (int)PagesCount).ToList();
@@ -189,6 +197,11 @@ namespace Services.DataServices.Repository
             {
                 PagerRange = TableRange.Skip(currentBtn - gridSetting.PagerSize).Take(gridSetting.PagerSize).ToList();
             }
+<<<<<<< HEAD
+=======
+
+            int lastPageRowsCount = _dbSet.Skip(((int)PagesCount - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).Count();
+>>>>>>> cfd3d89ebd5737ea9e0f1470f6ba356ddfc9d392
             Footer footer = new Footer {
                 activeBtn = (PageAction == "next" ? PagerRange.Min() : currentBtn),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",

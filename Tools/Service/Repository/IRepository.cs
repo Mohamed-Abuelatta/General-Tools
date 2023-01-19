@@ -16,11 +16,11 @@ namespace Services.DataServices.Repository
         TEntityDTO GetById(object id);
         Task<TEntityDTO> GetByIdAsync(object id);
         IQueryable<TEntityDTO> Include(Expression<Func<TEntity, bool>> expression);
-        EntityEntry<TEntityDTO> Remove(object id);
         Task<TEntityDTO> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         TEntityDTO Update(TEntityDTO entity);
         IQueryable<TEntityDTO> Where(Expression<Func<TEntity, bool>> expression);
 
+        ResponseResult Remove(object id, int page);
         // -------------------------------------------------------------------------------
 
 
