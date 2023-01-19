@@ -189,16 +189,12 @@ namespace Services.DataServices.Repository
             {
                 PagerRange = TableRange.Skip(currentBtn - gridSetting.PagerSize).Take(gridSetting.PagerSize).ToList();
             }
-
             Footer footer = new Footer {
                 activeBtn = (PageAction == "next" ? PagerRange.Min() : currentBtn),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
-                fRange = PagerRange,
-                lastPagerBtn = (int)PagesCount,
-                pageRowsCount = _dbSet.Skip(((int)PagesCount-1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).Count()
+                fRange = PagerRange
             };
-
             return footer;
         }
 
