@@ -7,7 +7,5 @@
         public int activeBtn { get; set; } 
         public List<int> fRange { get; set; }
 
-        public int lastPagerBtn { get; set; }
-        public bool isFulllastPage { get; set; } 
     }
 }

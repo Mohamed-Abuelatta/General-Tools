@@ -140,10 +140,7 @@ function addRow(data, rowType){
       else { this.deleteTFoot(); TFoot = this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
-      row.dataset.lastpagerbtn = data.lastPagerBtn;
-      row.dataset.pagerowscount = data.pageRowsCount;
-      row.dataset.addmode = "none";
-      row.dataset.deletemode = "none";
+                row.dataset.currentpage = 1;
 
       let newCell = row.insertCell();
       newCell.colSpan = colsLength+1;
@@ -207,15 +204,14 @@ function onSave(rowId){
     let row = document.getElementById(rowId); 
     let jsonRow = {};
     [...row.cells].map(cell => {
-
       if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
-
     });
     table.addRow(jsonRow,'row'); 
 }
 function onDelete(rowId){
-        //alert('delete ' + rowId);
-        callAction(`@Model.grid.OnDeleteAction`, new { id : rowId },
+        let footerRow = table.tFoot.rows[0];
+        let currentPage = footerRow.dataset.currentpage;
+        callAction(`@Model.grid.OnDeleteAction`, new { id: rowId, fotId: currentPage },
         (data) => { alert(rowId) },
         (err) => { alert('err'); console.log(err); });
 }
@@ -230,14 +226,6 @@ function onPaging(nav, fotId) {
             document.querySelector('.activePager').classList.remove('activePager');
             document.querySelector(`[data-pager='${fotId}']`).classList.add('activePager');
             table.emptyBody(); 
-            let footerRow = table.tFoot.rows[0];
-            if (footerRow.dataset.lastpagerbtn == fotId) {
-                footerRow.dataset.addmode = ((table.tBodies[0].rows.length == @Model.grid.ItemsPerPage) ? "pessimistic" : "optimistic");
-                footerRow.dataset.deletemode = ((table.tBodies[0].rows.length == 1) ? "pessimistic" : "optimistic");
-            }else{
-                footerRow.dataset.addmode = "none";
-                footerRow.dataset.deletemode = "none";
-            }
             data.map(row => { table.addRow(row, 'row'); }); 
         } else {
             const getRows = data.rows;
@@ -246,6 +234,8 @@ function onPaging(nav, fotId) {
             getRows.map(row => { table.addRow(row, 'row'); });
             table.addRow(getFooter, 'footer');
         }
+        let footerRow = table.tFoot.rows[0];
+        footerRow.dataset.currentpage = fotId;
     } , 
     (err)=>{ alert('err'); console.log(err);} );
 }
