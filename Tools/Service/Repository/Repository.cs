@@ -197,7 +197,7 @@ namespace Services.DataServices.Repository
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
                 fRange = PagerRange,
                 lastPagerBtn = (int)PagesCount,
-                isFulllastPage = lastPageRowsCount == gridSetting.ItemsPerPage ? true : false;
+                isFulllastPage = lastPageRowsCount == gridSetting.ItemsPerPage ? true : false
             };
 
             return footer;
