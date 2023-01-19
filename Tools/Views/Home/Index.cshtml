@@ -77,7 +77,6 @@
       display:none;
     }*/
 
-
     [disabled] {
         background-color: #cccccc;
         color: #666666;
@@ -140,11 +139,8 @@ function addRow(data, rowType){
       else { this.deleteTFoot(); TFoot = this.createTFoot(); }
       row = TFoot.insertRow(0);
       row.id = 'footerRow';
-<<<<<<< HEAD
-=======
-                row.dataset.currentpage = 1;
+      row.dataset.currentpage = 1;
 
->>>>>>> cfd3d89ebd5737ea9e0f1470f6ba356ddfc9d392
       let newCell = row.insertCell();
       newCell.colSpan = colsLength+1;
       newCell.style = 'text-align:center;';
@@ -189,23 +185,9 @@ function cellContent(type, name, dname, val, isHeader = false){
 }
 const controlBox = (rowId) => {
   if (rowId == "headerRow"){
-        return  
-        `<div>
-        <a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a>
-        <a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a>
-        </div><div>
-        <a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a>
-        <a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a>
-        </div>`; 
+        return `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`; 
   } else {
-        return 
-        `<div>
-        <a href='#' class='bi bi-pencil-square' onclick="toggleRow('${rowId}')"></a>
-        <a href='#' class='bi bi-trash3' onclick="toggleConfirm('${rowId}')"></a>
-        </div><div>
-        <a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('${rowId}')"></a>
-        <a href='#' class='bi bi-check' id='action${rowId}' onclick="actionRow('${rowId}')"></a>
-        </div>`;
+        return `<div><a href='#' class='bi bi-pencil-square' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-trash3' onclick="toggleConfirm('${rowId}')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-check' id='action${rowId}' onclick="actionRow('${rowId}')"></a></div>`;
   }
 }
 // ---------------------------------------------------------------------------- table end
@@ -218,25 +200,21 @@ function populateTable(){
     table.addRow(footer, 'footer');
 }
 function onSave(rowId){
-    let row = document.getElementById(rowId); 
-    let jsonRow = {};
-    [...row.cells].map(cell => {
-      if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
-    });
-    table.addRow(jsonRow,'row'); 
+    alert("add or edit")
+    //let row = document.getElementById(rowId); 
+    //let jsonRow = {};
+    //[...row.cells].map(cell => {
+    //  if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
+    //});
+    //table.addRow(jsonRow,'row'); 
 }
 function onDelete(rowId){
-<<<<<<< HEAD
-    callAction(`@Model.grid.OnDeleteAction`, new { id : rowId },
-    (data) => { alert(rowId) },
-    (err) => { alert('err'); console.log(err); });
-=======
-        let footerRow = table.tFoot.rows[0];
-        let currentPage = footerRow.dataset.currentpage;
-        callAction(`@Model.grid.OnDeleteAction`, new { id: rowId, fotId: currentPage },
-        (data) => { alert(rowId) },
-        (err) => { alert('err'); console.log(err); });
->>>>>>> cfd3d89ebd5737ea9e0f1470f6ba356ddfc9d392
+    let footerRow = table.tFoot.rows[0];
+    let currentPage = footerRow.dataset.currentpage;
+    //callAction(`@Model.grid.OnDeleteAction`, new { id: rowId, fotId: currentPage },
+    //(data) => { alert(rowId) },
+    //(err) => { alert('err'); console.log(err); });
+    alert("delete")
 }
 
 function onPaging(nav, fotId) {
@@ -262,30 +240,24 @@ function onPaging(nav, fotId) {
     (err)=>{ alert('err'); console.log(err);} );
 }
 function toggleConfirm(rowId){
-    let row = document.getElementById(rowId); 
-    document.getElementById(`toggle${rowId}`).onclick = function() { toggleConfirm(rowId); };
+    let row = document.getElementById(rowId);
+        document.getElementById(`toggle${rowId}`).onclick = function () { toggleConfirm(rowId); };
+        document.getElementById(`action${rowId}`).onclick = function () { onDelete(rowId); };
     [...row.cells].map(cell => {  
       if (cell.dataset.col != 'ctrl') {cell.classList.toggle('hide');}
       else {cell.classList.toggle('ctrlView');cell.classList.toggle('ctrlEdit');}
     });
 }
-function toggleRow(rowId){
-  let row = document.getElementById(rowId);
-  document.getElementById(`toggle${rowId}`).onclick = function() { toggleRow(rowId); };
-  [...row.cells].map(cell => {
+function toggleRow(rowId) {
+    let row = document.getElementById(rowId);
+    document.getElementById(`toggle${rowId}`).onclick = function() { toggleRow(rowId); };
+    if (rowId != 'headerRow') { document.getElementById(`action${rowId}`).onclick = function () { onSave(rowId); } };
+    [...row.cells].map(cell => {
     cell.classList.toggle('ctrlEdit');
     cell.classList.toggle('ctrlView');
-  })
+    })
 }
-function actionRow(rowId){
-    alert('action' + rowId)
-  let row = document.getElementById(rowId);
-  document.getElementById(`action{rowId}`).onclick = function() { toggleRow(rowId); };
-  //[...row.cells].map(cell => {
-  //  cell.classList.toggle('ctrlEdit');
-  //  cell.classList.toggle('ctrlView');
-  //})
-}
+
 // ---------------------------------------------------------------------------- table Action end
 
 function callAction(url, dataJson, callbackOk, callbackErr){
