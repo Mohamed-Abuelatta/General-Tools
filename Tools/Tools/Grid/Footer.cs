@@ -6,6 +6,5 @@
         public string isNextDisabled { get; set; } 
         public int activeBtn { get; set; } 
         public List<int> fRange { get; set; }
-
     }
 }
