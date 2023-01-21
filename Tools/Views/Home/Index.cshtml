@@ -85,13 +85,12 @@
 </style>
 
 <div class='container mt-5 p-3'>
-    <table id="@Model.grid.GridName">
-        @*<partial name="_InitGrid" model="@Model" />*@
-    </table>
+    <table id="@Model.grid.GridName"></table>
+    <form id="form@(Model.grid.GridName)"></form>
 </div>
 
 @{
-    string grid = JsonConvert.SerializeObject(Model.grid);
+    //string grid = JsonConvert.SerializeObject(Model.grid);
     string columns = JsonConvert.SerializeObject(Model.columns);
     object rows = JsonConvert.SerializeObject(Model.rows);
     string footer = JsonConvert.SerializeObject(Model.footer);
@@ -99,12 +98,13 @@
 
 <script type="text/javascript">
 
-const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
+//const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
 const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
 const colsLength = columns.length;
 const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 const footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 var table = document.getElementById('@Model.grid.GridName');
+var form = document.getElementById('form@(Model.grid.GridName)');
 
 // ---------------------------------------------------------------------------- table start
 HTMLTableElement.prototype.addRow = addRow;
@@ -200,8 +200,17 @@ function populateTable(){
     table.addRow(footer, 'footer');
 }
 function onSave(rowId){
-    alert("add or edit")
-    //let row = document.getElementById(rowId); 
+    let row = document.getelementbyid(rowid);
+        alert(rowId)
+        console.log(row)
+    if (rowId == 'headerRow'){
+
+        alert('add')
+    }else{
+        alert('edit')
+    }
+    console.log(getFormData(row));
+
     //let jsonRow = {};
     //[...row.cells].map(cell => {
     //  if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
@@ -215,6 +224,14 @@ function onDelete(rowId){
     //(data) => { alert(rowId) },
     //(err) => { alert('err'); console.log(err); });
     alert("delete")
+}
+function getFormData(row){
+    form.innerHTML = "";
+    let clonedRow = row.cloneNode(true)
+    form.appendChild(clonedRow);
+    FormData formData = new FormData(form);
+    form.innerHTML = "";
+    return formData;
 }
 
 function onPaging(nav, fotId) {
