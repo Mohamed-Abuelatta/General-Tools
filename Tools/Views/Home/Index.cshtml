@@ -87,7 +87,7 @@
 </style>
 
 <div class='container mt-5 p-3'>
-    <table id="@Model.grid.GridName"></table>
+    <table id="table@(Model.grid.GridName)"></table>
     <form id="form@(Model.grid.GridName)"></form>
 </div>
 
@@ -102,58 +102,49 @@
 
 const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
 const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
-const colsLength = columns.length;
-const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
-const footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
-var table = document.getElementById('@Model.grid.GridName');
-var form = document.getElementById('form@(Model.grid.GridName)');
+let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
+let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 
-// ---------------------------------------------------------------------------- table start
+const colsLength = columns.length;
 let row;
+
+const table = document.getElementById(`table${grid.GridName}`);
+const form = document.getElementById(`form${grid.GridName}`);
+// ---------------------------------------------------------------------------- table start
 HTMLTableElement.prototype.addRow = addRow;
 function addRow(data){
     let rowId = Math.floor((Math.random() * 100000) + 1);
     let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
     row = TBody.insertRow(-1); 
-    row.id = rowId;
-    row.className = 'tr';
+    row.id = rowId; row.className = 'tr';
     Object.entries(data).map(([key, value], index) => { row.addCell(key, value, columns[index].IsVisable); });
     row.addCell('msg', '<b>هل انت متاكد من الحذف !</b>', true);
     row.addCell('ctrl', rowId, true);
 }
-
 HTMLTableElement.prototype.addHeader = addHeader;
-function addHeader(data) {
-    let THead;
-    if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
-    row = THead.insertRow(0); 
-    row.id = 'headerRow';
-    row.className = 'th';
-    // {colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'}
-    data.push({ColName:'ctrl', ColTitle:'', IsVisable:true});
-    data.map((item) => { row.addHeaderCell(item.ColName, item.ColTitle, item.IsVisable);  });
+function addHeader() {
+    let THead; if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
+    row = THead.insertRow(0); row.id = 'headerRow'; row.className = 'th';
+    columns.push({ColName:'ctrl', ColTitle:'', IsVisable:true});
+    columns.map((item) => { row.addHeaderCell(item);  });
 }
-
 HTMLTableElement.prototype.addFooter = addFooter;
-function addFooter(data) {
-    let TFoot;
-    if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
+function addFooter() {
+    let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
     else { this.deleteTFoot(); TFoot = this.createTFoot(); }
-    row = TFoot.insertRow(0);
-    row.id = 'footerRow';
-    row.dataset.currentpage = 1;
+    row = TFoot.insertRow(0); row.id = 'footerRow'; row.dataset.currentpage = 1;
 
     let newCell = row.insertCell();
     newCell.colSpan = colsLength + 1;
     newCell.style = 'text-align:center;';
-    let prevMin = data.fRange[0] - 1;
-    newCell.innerHTML = `<button data-pager='prev-${prevMin}' onclick="onPaging('prev', '${prevMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
-    data.fRange.map((fBtn) => {
-        var IsActive = (fBtn == data.activeBtn ? "class='activePager'" : "");
+    let prevMin = footer.fRange[0] - 1;
+    newCell.innerHTML = `<button data-pager='prev-${prevMin}' onclick="onPaging('prev', '${prevMin}')" ${footer.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+    footer.fRange.map((fBtn) => {
+        var IsActive = (fBtn == footer.activeBtn ? "class='activePager'" : "");
         newCell.innerHTML += `<button data-pager='${fBtn}' ${IsActive} onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
     });
-    let rangeMax = data.fRange[data.fRange.length - 1] + 1;
-    newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${data.isNextDisabled} class="bi bi-chevron-right"></button>`;
+    let rangeMax = footer.fRange[footer.fRange.length - 1] + 1;
+    newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
 }
 
 HTMLTableRowElement.prototype.addCell = addCell;
@@ -168,14 +159,15 @@ function addCell(key, val, isVisable) {
   newCell.colSpan = (key == 'msg'? colsLength:0);
 }
 HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
-function addHeaderCell(name, dName, isVisable){
+function addHeaderCell(item){
   let newCell = this.insertCell();
-  newCell.setAttribute("style", (isVisable === true ? '': 'display:none;'));
+  // let col = item; // item.ColName, item.ColTitle, item.IsVisable
+  newCell.setAttribute("style", (item.IsVisable === true ? '': 'display:none;'));
   newCell.className = 'ctrlView'; 
-  newCell.dataset.col = name; 
+  newCell.dataset.col = item.ColName; 
   let col = columns[newCell.cellIndex]; 
   newCell.innerHTML = col.KeyType == 0 ? "" :
-  (name=="ctrl") ? controlBox('headerRow') : cellContent('text', name, dName, '', true);
+  (item.ColName=="ctrl") ? controlBox('headerRow') : cellContent('text', item.ColName, item.ColTitle, '', true);
 }
 HTMLTableElement.prototype.emptyBody = emptyBody;
 function emptyBody(){
@@ -199,9 +191,9 @@ const controlBox = (rowId) => {
 // ---------------------------------------------------------------------------- table Action start
 window.onload =  populateTable();
 function populateTable(){
-    table.addHeader(columns);
+    table.addHeader();
     rows.map(row => { table.addRow(row); });
-    table.addFooter(footer);
+    table.addFooter();
 }
 function onSave(rowId){
     let row = document.getElementById(rowId);
@@ -209,7 +201,7 @@ function onSave(rowId){
     let currentPage = footerRow.dataset.currentpage;
     let formData = getFormData(row); console.log(formData)
     
-    fetch(`@(Model.grid.OnSaveAction)?fotId=${currentPage}` , {
+    fetch(`${grid.OnSaveAction}?fotId=${currentPage}` , {
     method: 'POST',
     body: formData
     })
@@ -225,7 +217,7 @@ function onSave(rowId){
 function onDelete(rowId){
     let footerRow = table.tFoot.rows[0];
     let currentPage = footerRow.dataset.currentpage;
-    //callAction(`@Model.grid.OnDeleteAction`, new { id: rowId, fotId: currentPage },
+    //callAction(`${grid.OnDeleteAction}`, new { id: rowId, fotId: currentPage },
     //(data) => { alert(rowId) },
     //(err) => { alert('err'); console.log(err); });
     alert("delete")
@@ -241,14 +233,14 @@ function getFormData(row){
 
 function onPaging(nav, fotId) {
     const jsonObj = { nav: nav, fotId: fotId };
-    callAction(`@Model.grid.OnPagingAction`, jsonObj,
+    callAction(`${grid.OnPagingAction}`, jsonObj,
          (data)=> {
             data = JSON.parse(data);
         if (nav == 'page') {
             document.querySelector('.activePager').classList.remove('activePager');
             document.querySelector(`[data-pager='${fotId}']`).classList.add('activePager');
             table.emptyBody(); 
-            data.map(row => { table.addRow(row, 'row'); }); 
+            data.map(row => { table.addRow(row); }); 
         } else {
             refreshGrid(data);
         }
@@ -259,10 +251,10 @@ function onPaging(nav, fotId) {
 }
 function refreshGrid(data){
         const getRows = data.rows;
-        const getFooter = data.footer;
+        footer = data.footer;
         table.emptyBody();
-        getRows.map(row => { table.addRow(row, 'row'); });
-        table.addRow(getFooter, 'footer');
+        getRows.map(row => { table.addRow(row); });
+        table.addFooter(footer);
 }
 function toggleConfirm(rowId){
     let row = document.getElementById(rowId);
