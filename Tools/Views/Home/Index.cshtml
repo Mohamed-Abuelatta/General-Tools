@@ -92,7 +92,7 @@
 </div>
 
 @{
-    //string grid = JsonConvert.SerializeObject(Model.grid);
+    string grid = JsonConvert.SerializeObject(Model.grid);
     string columns = JsonConvert.SerializeObject(Model.columns);
     object rows = JsonConvert.SerializeObject(Model.rows);
     string footer = JsonConvert.SerializeObject(Model.footer);
@@ -100,7 +100,7 @@
 
 <script type="text/javascript">
 
-const grid = JSON.parse(JSON.parse(JSON.stringify('@@Html.Raw(grid)')));
+const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
 const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
 const colsLength = columns.length;
 const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
@@ -109,54 +109,53 @@ var table = document.getElementById('@Model.grid.GridName');
 var form = document.getElementById('form@(Model.grid.GridName)');
 
 // ---------------------------------------------------------------------------- table start
+let row;
 HTMLTableElement.prototype.addRow = addRow;
-function addRow(data, rowType){
-  let row;
-  switch(rowType){
-    case 'header':
-        let THead;
-        if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
-        row = THead.insertRow(0); 
-        row.id = 'headerRow';
-        row.className = 'th';
-        // {colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'}
-        data.push({ColName:'ctrl', ColTitle:'', IsVisable:true});
-        data.map((item) => { row.addHeaderCell(item.ColName, item.ColTitle, item.IsVisable);  }); 
-    break;
-      
-    case 'row': 
-        let rowId = Math.floor((Math.random() * 100000) + 1);
-        let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
-        row = TBody.insertRow(-1); 
-        row.id = rowId;
-        row.className = 'tr';
-        Object.entries(data).map(([key, value], index) => { row.addCell(key, value, columns[index].IsVisable); });
-        row.addCell('msg', '<b>هل انت متاكد من الحذف !</b>', true);
-        row.addCell('ctrl', rowId, true);
-      break;
-      
-    case 'footer':
-      let TFoot;
-      if (this.tFoot === undefined || this.tFoot === null){ TFoot = this.createTFoot(); }
-      else { this.deleteTFoot(); TFoot = this.createTFoot(); }
-      row = TFoot.insertRow(0);
-      row.id = 'footerRow';
-      row.dataset.currentpage = 1;
-
-      let newCell = row.insertCell();
-      newCell.colSpan = colsLength+1;
-      newCell.style = 'text-align:center;';
-        let prevMin = data.fRange[0] - 1;
-        newCell.innerHTML = `<button data-pager='prev-${prevMin}' onclick="onPaging('prev', '${prevMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
-      data.fRange.map((fBtn) => {
-          var IsActive = (fBtn == data.activeBtn ? "class='activePager'" : ""); 
-          newCell.innerHTML += `<button data-pager='${fBtn}' ${IsActive} onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
-      });
-        let rangeMax = data.fRange[data.fRange.length - 1]+1;
-        newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${data.isNextDisabled} class="bi bi-chevron-right"></button>`; 
-      break;
-  } 
+function addRow(data){
+    let rowId = Math.floor((Math.random() * 100000) + 1);
+    let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
+    row = TBody.insertRow(-1); 
+    row.id = rowId;
+    row.className = 'tr';
+    Object.entries(data).map(([key, value], index) => { row.addCell(key, value, columns[index].IsVisable); });
+    row.addCell('msg', '<b>هل انت متاكد من الحذف !</b>', true);
+    row.addCell('ctrl', rowId, true);
 }
+
+HTMLTableElement.prototype.addHeader = addHeader;
+function addHeader(data) {
+    let THead;
+    if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
+    row = THead.insertRow(0); 
+    row.id = 'headerRow';
+    row.className = 'th';
+    // {colIndex:0, colName:'name', colTitle:'الاسم', isVisable:true, colWidth: 200, inputType: 'text', keyType:'pk'}
+    data.push({ColName:'ctrl', ColTitle:'', IsVisable:true});
+    data.map((item) => { row.addHeaderCell(item.ColName, item.ColTitle, item.IsVisable);  });
+}
+
+HTMLTableElement.prototype.addFooter = addFooter;
+function addFooter(data) {
+    let TFoot;
+    if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
+    else { this.deleteTFoot(); TFoot = this.createTFoot(); }
+    row = TFoot.insertRow(0);
+    row.id = 'footerRow';
+    row.dataset.currentpage = 1;
+
+    let newCell = row.insertCell();
+    newCell.colSpan = colsLength + 1;
+    newCell.style = 'text-align:center;';
+    let prevMin = data.fRange[0] - 1;
+    newCell.innerHTML = `<button data-pager='prev-${prevMin}' onclick="onPaging('prev', '${prevMin}')" ${data.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+    data.fRange.map((fBtn) => {
+        var IsActive = (fBtn == data.activeBtn ? "class='activePager'" : "");
+        newCell.innerHTML += `<button data-pager='${fBtn}' ${IsActive} onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
+    });
+    let rangeMax = data.fRange[data.fRange.length - 1] + 1;
+    newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${data.isNextDisabled} class="bi bi-chevron-right"></button>`;
+}
+
 HTMLTableRowElement.prototype.addCell = addCell;
 function addCell(key, val, isVisable) {
   if(key == 'ctrl') {val = controlBox(val);}
@@ -200,9 +199,9 @@ const controlBox = (rowId) => {
 // ---------------------------------------------------------------------------- table Action start
 window.onload =  populateTable();
 function populateTable(){
-    table.addRow(columns,'header');
-    rows.map(row => { table.addRow(row, 'row'); });
-    table.addRow(footer, 'footer');
+    table.addHeader(columns);
+    rows.map(row => { table.addRow(row); });
+    table.addFooter(footer);
 }
 function onSave(rowId){
     let row = document.getElementById(rowId);
