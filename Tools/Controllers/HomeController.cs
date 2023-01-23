@@ -22,7 +22,20 @@ namespace Tools.Controllers
             return View("Index", result);
         }
 
-        public async Task<IActionResult> ManageAsync(CustomerDTO model)
+        public JsonResult RefreshGrid(int fotId)
+        {
+            string refresh = JsonConvert.SerializeObject(
+               new
+               {
+                   rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
+                   footer = _customerService.getFooter(fotId)
+               }
+            );
+            return Json(refresh);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManageAsync(CustomerDTO model, int fotId)
         {
             if (ModelState.IsValid)
             {
@@ -30,8 +43,14 @@ namespace Tools.Controllers
                 {
                     if (model.Id == 0)
                     {
-                        return Json("_GridRow", await _customerService.AddAsync(model));
-                        //return Json(await _customerService.AddAsync(model));
+                        await _customerService.AddAsync(model);
+                        string refresh = JsonConvert.SerializeObject(
+                        new
+                        {
+                            rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
+                            footer = _customerService.getFooter(fotId)
+                        });
+                        return Json(refresh);
                     }
                     else
                     {
@@ -48,7 +67,7 @@ namespace Tools.Controllers
 
         // https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
         [HttpPost]
-        public JsonResult Paging(string nav,int fotId)
+        public IActionResult Paging(string nav,int fotId)
         {
             if (nav == "page")
             {
