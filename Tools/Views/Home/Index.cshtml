@@ -71,7 +71,9 @@
     .hide {
         display: none;
     }
-
+    .bg{
+        background-color: yellow;
+    }
     /*
     table tr td:nth-child(2) {
       display:none;
@@ -98,7 +100,7 @@
 
 <script type="text/javascript">
 
-//const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
+const grid = JSON.parse(JSON.parse(JSON.stringify('@@Html.Raw(grid)')));
 const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
 const colsLength = columns.length;
 const rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
@@ -128,9 +130,9 @@ function addRow(data, rowType){
         row = TBody.insertRow(-1); 
         row.id = rowId;
         row.className = 'tr';
-        Object.entries(data).map(([key, value]) => {  row.addCell(key, value) });
-        row.addCell('msg', '<b>هل انت متاكد من الحذف !</b>');
-        row.addCell('ctrl', rowId);
+        Object.entries(data).map(([key, value], index) => { row.addCell(key, value, columns[index].IsVisable); });
+        row.addCell('msg', '<b>هل انت متاكد من الحذف !</b>', true);
+        row.addCell('ctrl', rowId, true);
       break;
       
     case 'footer':
@@ -156,27 +158,30 @@ function addRow(data, rowType){
   } 
 }
 HTMLTableRowElement.prototype.addCell = addCell;
-function addCell(key, val){
+function addCell(key, val, isVisable) {
   if(key == 'ctrl') {val = controlBox(val);}
   let newCell = this.insertCell();
   let col = columns[newCell.cellIndex];
+  newCell.setAttribute("style", (isVisable === true ? '' : 'display:none;'));
   newCell.dataset.col = key;
   newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.ColTitle, val): val;
   newCell.className = (key == 'msg'?'hide':'ctrlView');
-  newCell.colSpan = (key == 'msg'?colsLength:0);
+  newCell.colSpan = (key == 'msg'? colsLength:0);
 }
 HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
 function addHeaderCell(name, dName, isVisable){
-  let newCell = this.insertCell(); 
-  newCell.setAttribute("style", (isVisable === true? '': 'display:none;'));
+  let newCell = this.insertCell();
+  newCell.setAttribute("style", (isVisable === true ? '': 'display:none;'));
   newCell.className = 'ctrlView'; 
   newCell.dataset.col = name; 
-  newCell.innerHTML = (name=="ctrl") ? controlBox('headerRow') : cellContent('text', name, dName, '', true);
+  let col = columns[newCell.cellIndex]; 
+  newCell.innerHTML = col.KeyType == 0 ? "" :
+  (name=="ctrl") ? controlBox('headerRow') : cellContent('text', name, dName, '', true);
 }
 HTMLTableElement.prototype.emptyBody = emptyBody;
 function emptyBody(){
-        this.tBodies[0].remove();
-        this.createTBody();
+    this.tBodies[0].remove();
+    this.createTBody();
 }
 function cellContent(type, name, dname, val, isHeader = false){
   return (isHeader === true) ?
@@ -200,17 +205,18 @@ function populateTable(){
     table.addRow(footer, 'footer');
 }
 function onSave(rowId){
-    let row = document.getelementbyid(rowid);
-        alert(rowId)
-        console.log(row)
-    if (rowId == 'headerRow'){
-
-        alert('add')
-    }else{
-        alert('edit')
-    }
-    console.log(getFormData(row));
-
+    let row = document.getElementById(rowId);
+    let footerRow = table.tFoot.rows[0];
+    let currentPage = footerRow.dataset.currentpage;
+    let formData = getFormData(row); console.log(formData)
+    
+    fetch(`@(Model.grid.OnSaveAction)?fotId=${currentPage}` , {
+    method: 'POST',
+    body: formData
+    })
+    .then(response => response.json())
+    .then(data => function(){ console.log(data); /*refreshGrid(data); */})
+    .catch(err => console.log(err));
     //let jsonRow = {};
     //[...row.cells].map(cell => {
     //  if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
@@ -229,7 +235,7 @@ function getFormData(row){
     form.innerHTML = "";
     let clonedRow = row.cloneNode(true)
     form.appendChild(clonedRow);
-    FormData formData = new FormData(form);
+    let formData = new FormData(form);
     form.innerHTML = "";
     return formData;
 }
@@ -245,16 +251,19 @@ function onPaging(nav, fotId) {
             table.emptyBody(); 
             data.map(row => { table.addRow(row, 'row'); }); 
         } else {
-            const getRows = data.rows;
-            const getFooter = data.footer;
-            table.emptyBody();
-            getRows.map(row => { table.addRow(row, 'row'); });
-            table.addRow(getFooter, 'footer');
+            refreshGrid(data);
         }
         let footerRow = table.tFoot.rows[0];
         footerRow.dataset.currentpage = fotId;
     } , 
     (err)=>{ alert('err'); console.log(err);} );
+}
+function refreshGrid(data){
+        const getRows = data.rows;
+        const getFooter = data.footer;
+        table.emptyBody();
+        getRows.map(row => { table.addRow(row, 'row'); });
+        table.addRow(getFooter, 'footer');
 }
 function toggleConfirm(rowId){
     let row = document.getElementById(rowId);
@@ -291,7 +300,6 @@ function callAction(url, dataJson, callbackOk, callbackErr){
     .then(response => response.json())
     .then(result => callbackOk(result))
     .catch(err => callbackErr(err));
-
 }
  
 

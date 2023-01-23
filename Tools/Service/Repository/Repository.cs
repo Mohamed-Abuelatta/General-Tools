@@ -93,19 +93,19 @@ namespace Services.DataServices.Repository
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
             TEntityDTO result = null;
-            try
-            {
+            //try
+            //{
                 var model = _mapper.Map<TEntity>(entity);
                 await _dbSet.AddAsync(model);
                 await _context.SaveChangesAsync();
                 result =_mapper.Map<TEntityDTO>(model);
 
-                Dictionary<string, object> dicJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToJson());
-            }
-            catch (Exception ex)
-            {
-                return result;
-            }
+                //Dictionary<string, object> dicJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToJson());
+            //}
+            //catch (Exception ex)
+            //{
+            //    return result;
+            //}
 
             return result;
         }
@@ -220,6 +220,7 @@ namespace Services.DataServices.Repository
                 ColumnSetting column = (ColumnSetting)propInfo.GetCustomAttribute(typeof(ColumnSetting));
                 column.ColName = propInfo.Name;
                 column.KeyType = item.IsPrimaryKey() ? keyType.PK : item.IsForeignKey() ? keyType.FK : keyType.Normal;
+                column.IsVisable = item.IsPrimaryKey() ? false : true;
                 switch (propInfo.PropertyType.Name)
                 {
                     case "string":
