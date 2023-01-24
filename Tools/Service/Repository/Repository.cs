@@ -219,26 +219,26 @@ namespace Services.DataServices.Repository
                 PropertyInfo propInfo = item.PropertyInfo; 
                 ColumnSetting column = (ColumnSetting)propInfo.GetCustomAttribute(typeof(ColumnSetting));
                 column.ColName = propInfo.Name;
-                column.KeyType = item.IsPrimaryKey() ? keyType.PK : item.IsForeignKey() ? keyType.FK : keyType.Normal;
+                column.KeyType = item.IsPrimaryKey() ? Enum.GetName(keyType.PK) : item.IsForeignKey() ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
                 column.IsVisable = item.IsPrimaryKey() ? false : true;
                 switch (propInfo.PropertyType.Name)
                 {
                     case "string":
-                        column.InputType = inputType.text;
+                        column.InputType = Enum.GetName(inputType.text);
                         break;
                     case "Int32":
                     case "Decimal":
                     case "Float":
-                        column.InputType = inputType.number;
+                        column.InputType = Enum.GetName(inputType.number);
                         break;
                     case "DateTime":
-                        column.InputType = inputType.date;
+                        column.InputType = Enum.GetName(inputType.date);
                         break;
                     case "Boolean":
-                        column.InputType = inputType.checkbox;
+                        column.InputType = Enum.GetName(inputType.checkbox);
                         break;
                     default:
-                        column.InputType = inputType.text;
+                        column.InputType = Enum.GetName(inputType.text);
                         break;
                 }
                 columns.Add(column);

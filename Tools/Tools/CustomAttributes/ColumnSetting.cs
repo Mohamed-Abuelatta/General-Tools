@@ -8,7 +8,7 @@ namespace Tools.Tools.CustomAttributes
     public class ColumnSetting : Attribute
     {
 
-        public ColumnSetting( int ColIndex = 0, string ColTitle = "", string ColName = "", int ColWidth = 200, bool IsVisable = true, inputType InputType = inputType.text, keyType KeyType = keyType.Normal)
+        public ColumnSetting( int ColIndex = 0, string ColTitle = "", string ColName = "", int ColWidth = 200, bool IsVisable = true, string InputType = "text", string KeyType = "Normal")
         {
             this.ColName = ColName;
             this.ColTitle = ColTitle;
@@ -25,8 +25,8 @@ namespace Tools.Tools.CustomAttributes
         public int ColWidth { get; set; } = 200;
         public bool IsVisable { get; set; } = false;
 
-        public inputType InputType { get; set; } = inputType.text;
-        public keyType KeyType { get; set; } = keyType.Normal;
+        public string InputType { get; set; } = Enum.GetName(inputType.text);
+        public string KeyType { get; set; } = Enum.GetName(keyType.Normal);
 
  
     }

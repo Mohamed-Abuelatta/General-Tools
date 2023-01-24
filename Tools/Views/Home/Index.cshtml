@@ -74,18 +74,23 @@
     .bg{
         background-color: yellow;
     }
-    /*
-    table tr td:nth-child(2) {
-      display:none;
-    }*/
-
     [disabled] {
         background-color: #cccccc;
         color: #666666;
         cursor: no-drop;
     }
-</style>
 
+/*    table tr td:nth-child(2) { display:none; }
+*/
+
+/*    @@foreach (var col in Model.columns)
+    {
+        @@(
+        $"table tr td:nth-child({col.ColIndex}) {{ display:none; }}"
+        );
+    }*/
+    
+</style>
 <div class='container mt-5 p-3'>
     <table id="table@(Model.grid.GridName)"></table>
     <form id="form@(Model.grid.GridName)"></form>
@@ -106,34 +111,24 @@ let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 
 const colsLength = columns.length;
+let controlObj;
+let messageObj;
 let row;
 
 const table = document.getElementById(`table${grid.GridName}`);
 const form = document.getElementById(`form${grid.GridName}`);
 // ---------------------------------------------------------------------------- table start
-HTMLTableElement.prototype.addRow = addRow;
-function addRow(data){
-    let rowId = Math.floor((Math.random() * 100000) + 1);
-    let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
-    row = TBody.insertRow(-1); 
-    row.id = rowId; row.className = 'tr';
-    Object.entries(data).map(([key, value], index) => { row.addCell(key, value, columns[index].IsVisable); });
-    row.addCell('msg', '<b>هل انت متاكد من الحذف !</b>', true);
-    row.addCell('ctrl', rowId, true);
-}
 HTMLTableElement.prototype.addHeader = addHeader;
 function addHeader() {
     let THead; if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
     row = THead.insertRow(0); row.id = 'headerRow'; row.className = 'th';
-    columns.push({ColName:'ctrl', ColTitle:'', IsVisable:true});
-    columns.map((item) => { row.addHeaderCell(item);  });
+    columns.map((col) => { row.addHeaderCell(col);  });
 }
 HTMLTableElement.prototype.addFooter = addFooter;
 function addFooter() {
     let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
     else { this.deleteTFoot(); TFoot = this.createTFoot(); }
     row = TFoot.insertRow(0); row.id = 'footerRow'; row.dataset.currentpage = 1;
-
     let newCell = row.insertCell();
     newCell.colSpan = colsLength + 1;
     newCell.style = 'text-align:center;';
@@ -146,28 +141,37 @@ function addFooter() {
     let rangeMax = footer.fRange[footer.fRange.length - 1] + 1;
     newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
 }
+HTMLTableElement.prototype.addRow = addRow;
+function addRow(data){
+    let rowId = Math.floor((Math.random() * 100000) + 1);
+    let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
+    row = TBody.insertRow(-1); 
+    row.id = rowId; row.className = 'tr';
+    Object.entries(data).map(([key, value], index) => { row.addCell(columns[index], value); });
+    let targetObject = columns.find(obj => obj.ColName === "ctrl");
+
+    row.addCell(messageObj, '<b>هل انت متاكد من الحذف !</b>');
+    row.addCell(controlObj, rowId);
+}
 
 HTMLTableRowElement.prototype.addCell = addCell;
-function addCell(key, val, isVisable) {
-  if(key == 'ctrl') {val = controlBox(val);}
+function addCell(col, val) {
+  console.log(val)
+  if(col.ColName == 'ctrl') {val = controlBox(val);}
   let newCell = this.insertCell();
-  let col = columns[newCell.cellIndex];
-  newCell.setAttribute("style", (isVisable === true ? '' : 'display:none;'));
-  newCell.dataset.col = key;
-  newCell.innerHTML = (key != 'ctrl' && key != 'msg') ? cellContent('text', key, col.ColTitle, val): val;
-  newCell.className = (key == 'msg'?'hide':'ctrlView');
-  newCell.colSpan = (key == 'msg'? colsLength:0);
+  newCell.setAttribute("style", (col.IsVisable === true ? '' : 'display:none;'));
+  newCell.className = (col.ColName == 'msg'?'hide':'ctrlView');
+  newCell.dataset.col = col.ColName;
+  newCell.innerHTML = (col.ColName != 'ctrl' && col.ColName != 'msg') ? cellContent(col.InputType, col.ColName, col.ColTitle, val): val;
+  newCell.colSpan = (col.ColName == 'msg'? colsLength:0);
 }
 HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
-function addHeaderCell(item){
+function addHeaderCell(col){
   let newCell = this.insertCell();
-  // let col = item; // item.ColName, item.ColTitle, item.IsVisable
-  newCell.setAttribute("style", (item.IsVisable === true ? '': 'display:none;'));
-  newCell.className = 'ctrlView'; 
-  newCell.dataset.col = item.ColName; 
-  let col = columns[newCell.cellIndex]; 
-  newCell.innerHTML = col.KeyType == 0 ? "" :
-  (item.ColName=="ctrl") ? controlBox('headerRow') : cellContent('text', item.ColName, item.ColTitle, '', true);
+  newCell.setAttribute("style", (col.IsVisable === true ? '': 'display:none;'));
+  newCell.className = (col.ColName == 'msg'?'hide':'ctrlView');
+  newCell.dataset.col = col.ColName;
+  newCell.innerHTML = col.KeyType == "PK" ? "" : (col.ColName=="ctrl") ? controlBox('headerRow') : cellContent(col.InputType, col.ColName, col.ColTitle, '', true);
 }
 HTMLTableElement.prototype.emptyBody = emptyBody;
 function emptyBody(){
@@ -191,6 +195,10 @@ const controlBox = (rowId) => {
 // ---------------------------------------------------------------------------- table Action start
 window.onload =  populateTable();
 function populateTable(){
+    controlObj = { ColName: 'ctrl', KeyType: 'Sys', ColTitle: '', IsVisable: true };
+    messageObj = { ColName: 'msg', KeyType: 'Sys', ColTitle: '', IsVisable: false };
+    columns.push(controlObj);
+    columns.push(messageObj);
     table.addHeader();
     rows.map(row => { table.addRow(row); });
     table.addFooter();
@@ -199,7 +207,7 @@ function onSave(rowId){
     let row = document.getElementById(rowId);
     let footerRow = table.tFoot.rows[0];
     let currentPage = footerRow.dataset.currentpage;
-    let formData = getFormData(row); console.log(formData)
+    let formData = getFormData(row); 
     
     fetch(`${grid.OnSaveAction}?fotId=${currentPage}` , {
     method: 'POST',
