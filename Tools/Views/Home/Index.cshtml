@@ -68,9 +68,13 @@
         display: block;
     }
 
-    .hide {
+    .hideCol {
         display: none;
     }
+    .hideMsg {
+        display: none;
+    }
+
     .bg{
         background-color: yellow;
     }
@@ -118,12 +122,6 @@ let row;
 const table = document.getElementById(`table${grid.GridName}`);
 const form = document.getElementById(`form${grid.GridName}`);
 // ---------------------------------------------------------------------------- table start
-HTMLTableElement.prototype.addHeader = addHeader;
-function addHeader() {
-    let THead; if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
-    row = THead.insertRow(0); row.id = 'headerRow'; row.className = 'th';
-    columns.map((col) => { row.addHeaderCell(col);  });
-}
 HTMLTableElement.prototype.addFooter = addFooter;
 function addFooter() {
     let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
@@ -141,6 +139,12 @@ function addFooter() {
     let rangeMax = footer.fRange[footer.fRange.length - 1] + 1;
     newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
 }
+HTMLTableElement.prototype.addHeader = addHeader;
+function addHeader() {
+    let THead; if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
+    row = THead.insertRow(0); row.id = 'headerRow'; row.className = 'th';
+    columns.map((col) => { row.addHeaderCell(col);  });
+}
 HTMLTableElement.prototype.addRow = addRow;
 function addRow(data){
     let rowId = Math.floor((Math.random() * 100000) + 1);
@@ -156,20 +160,19 @@ function addRow(data){
 
 HTMLTableRowElement.prototype.addCell = addCell;
 function addCell(col, val) {
-  console.log(val)
-  if(col.ColName == 'ctrl') {val = controlBox(val);}
   let newCell = this.insertCell();
-  newCell.setAttribute("style", (col.IsVisable === true ? '' : 'display:none;'));
-  newCell.className = (col.ColName == 'msg'?'hide':'ctrlView');
+  newCell.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
   newCell.dataset.col = col.ColName;
+  if (col.ColName == 'ctrl') { val = controlBox(val); }
   newCell.innerHTML = (col.ColName != 'ctrl' && col.ColName != 'msg') ? cellContent(col.InputType, col.ColName, col.ColTitle, val): val;
   newCell.colSpan = (col.ColName == 'msg'? colsLength:0);
+  //console.log(newCell)
 }
 HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
 function addHeaderCell(col){
   let newCell = this.insertCell();
   newCell.setAttribute("style", (col.IsVisable === true ? '': 'display:none;'));
-  newCell.className = (col.ColName == 'msg'?'hide':'ctrlView');
+  newCell.className = (col.ColName == 'msg'?'hideMsg':'ctrlView'); 
   newCell.dataset.col = col.ColName;
   newCell.innerHTML = col.KeyType == "PK" ? "" : (col.ColName=="ctrl") ? controlBox('headerRow') : cellContent(col.InputType, col.ColName, col.ColTitle, '', true);
 }
@@ -269,7 +272,7 @@ function toggleConfirm(rowId){
         document.getElementById(`toggle${rowId}`).onclick = function () { toggleConfirm(rowId); };
         document.getElementById(`action${rowId}`).onclick = function () { onDelete(rowId); };
     [...row.cells].map(cell => {  
-      if (cell.dataset.col != 'ctrl') {cell.classList.toggle('hide');}
+      if (cell.dataset.col != 'ctrl') {cell.classList.toggle('hideMsg');}
       else {cell.classList.toggle('ctrlView');cell.classList.toggle('ctrlEdit');}
     });
 }
