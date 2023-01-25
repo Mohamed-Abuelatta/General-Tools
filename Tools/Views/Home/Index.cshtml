@@ -171,22 +171,32 @@ function addCell(col, val) {
 HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
 function addHeaderCell(col){
   let newCell = this.insertCell();
-  newCell.setAttribute("style", (col.IsVisable === true ? '': 'display:none;'));
-  newCell.className = (col.ColName == 'msg'?'hideMsg':'ctrlView'); 
+  newCell.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
   newCell.dataset.col = col.ColName;
   newCell.innerHTML = col.KeyType == "PK" ? "" : (col.ColName=="ctrl") ? controlBox('headerRow') : cellContent(col.InputType, col.ColName, col.ColTitle, '', true);
 }
+
+
+HTMLTableCellElement.prototype.buildCell = buildCell;
+function buildCell(col, val) {
+  this.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
+  this.colSpan = (col.ColName == 'msg'? colsLength:0);
+  this.dataset.col = col.ColName;
+  this.innerHTML = cellContent(col, val);
+  return this;
+}
+
 HTMLTableElement.prototype.emptyBody = emptyBody;
 function emptyBody(){
     this.tBodies[0].remove();
     this.createTBody();
 }
-function cellContent(type, name, dname, val, isHeader = false){
+function cellContent(col, val){
   return (isHeader === true) ?
-  `<div>${dname}</div><div>${dname}<input data-hinput='${name}' type='${type}' name='${name}' value='${val}'></div>`: // for header true
-  `<div>${val}</div><div>${dname}<input data-rinput='${name}' type='${type}' name='${name}' value='${val}'></div>`; // for normal row false default
+    `<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>` : // for header true
+    `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`; // for normal row false default
 }
-const controlBox = (rowId) => {
+const controlBox = (val) => {
   if (rowId == "headerRow"){
         return `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`; 
   } else {
