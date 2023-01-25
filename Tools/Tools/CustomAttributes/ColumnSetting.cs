@@ -8,7 +8,8 @@ namespace Tools.Tools.CustomAttributes
     public class ColumnSetting : Attribute
     {
 
-        public ColumnSetting( int ColIndex = 0, string ColTitle = "", string ColName = "", int ColWidth = 200, bool IsVisable = true, string InputType = "text", string KeyType = "Normal")
+        public ColumnSetting( int ColIndex = 0, string ColTitle = "", string ColName = "", 
+            int ColWidth = 200, bool IsVisable = true, string InputType = "text", string KeyType = "Normal")
         {
             this.ColName = ColName;
             this.ColTitle = ColTitle;

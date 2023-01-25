@@ -114,11 +114,8 @@ const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
 let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 
-const colsLength = columns.length;
-let controlObj;
-let messageObj;
 let row;
-
+let colsLength = columns.filter(col => col.IsVisable === true).length - 1;
 const table = document.getElementById(`table${grid.GridName}`);
 const form = document.getElementById(`form${grid.GridName}`);
 // ---------------------------------------------------------------------------- table start
@@ -143,7 +140,7 @@ HTMLTableElement.prototype.addHeader = addHeader;
 function addHeader() {
     let THead; if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
     row = THead.insertRow(0); row.id = 'headerRow'; row.className = 'th';
-    columns.map((col) => { row.addHeaderCell(col);  });
+    columns.map((col) => { row.addCell(col); });
 }
 HTMLTableElement.prototype.addRow = addRow;
 function addRow(data){
@@ -151,67 +148,42 @@ function addRow(data){
     let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
     row = TBody.insertRow(-1); 
     row.id = rowId; row.className = 'tr';
-    Object.entries(data).map(([key, value], index) => { row.addCell(columns[index], value); });
-    let targetObject = columns.find(obj => obj.ColName === "ctrl");
-
-    row.addCell(messageObj, '<b>هل انت متاكد من الحذف !</b>');
-    row.addCell(controlObj, rowId);
+    let rowObj = Object.entries(data);
+        columns.map((col, i) => { 
+            let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
+            row.addCell(col, value);
+        });
 }
-
 HTMLTableRowElement.prototype.addCell = addCell;
-function addCell(col, val) {
-  let newCell = this.insertCell();
-  newCell.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
-  newCell.dataset.col = col.ColName;
-  if (col.ColName == 'ctrl') { val = controlBox(val); }
-  newCell.innerHTML = (col.ColName != 'ctrl' && col.ColName != 'msg') ? cellContent(col.InputType, col.ColName, col.ColTitle, val): val;
-  newCell.colSpan = (col.ColName == 'msg'? colsLength:0);
-  //console.log(newCell)
+function addCell(col, val = '') {
+    let newCell = this.insertCell();
+    newCell.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
+    newCell.colSpan = (col.ColName == 'msg' ? colsLength : 0);
+    newCell.dataset.col = col.ColName;
+    newCell.innerHTML = cellContent(col, val, this.id);
 }
-HTMLTableRowElement.prototype.addHeaderCell = addHeaderCell;
-function addHeaderCell(col){
-  let newCell = this.insertCell();
-  newCell.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
-  newCell.dataset.col = col.ColName;
-  newCell.innerHTML = col.KeyType == "PK" ? "" : (col.ColName=="ctrl") ? controlBox('headerRow') : cellContent(col.InputType, col.ColName, col.ColTitle, '', true);
+function cellContent(col, val, rowId){
+    if (rowId == "headerRow") {
+        return col.KeyType == 'PK' ? '' : col.ColName == 'ctrl' ? 
+        /*header ctrl*/ `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`:
+        /*header norm*/ `<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`;
+    } else {
+        return col.ColName == 'ctrl' ? 
+        /*row ctrl*/ `<div><a href='#' class='bi bi-pencil-square' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-trash3' onclick="toggleConfirm('${rowId}')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-check' id='action${rowId}' onclick="actionRow('${rowId}')"></a></div>`:
+        /*row norm*/ `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`; 
+    }
 }
-
-
-HTMLTableCellElement.prototype.buildCell = buildCell;
-function buildCell(col, val) {
-  this.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
-  this.colSpan = (col.ColName == 'msg'? colsLength:0);
-  this.dataset.col = col.ColName;
-  this.innerHTML = cellContent(col, val);
-  return this;
-}
-
 HTMLTableElement.prototype.emptyBody = emptyBody;
 function emptyBody(){
     this.tBodies[0].remove();
     this.createTBody();
-}
-function cellContent(col, val){
-  return (isHeader === true) ?
-    `<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>` : // for header true
-    `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`; // for normal row false default
-}
-const controlBox = (val) => {
-  if (rowId == "headerRow"){
-        return `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`; 
-  } else {
-        return `<div><a href='#' class='bi bi-pencil-square' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-trash3' onclick="toggleConfirm('${rowId}')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-check' id='action${rowId}' onclick="actionRow('${rowId}')"></a></div>`;
-  }
 }
 // ---------------------------------------------------------------------------- table end
 
 // ---------------------------------------------------------------------------- table Action start
 window.onload =  populateTable();
 function populateTable(){
-    controlObj = { ColName: 'ctrl', KeyType: 'Sys', ColTitle: '', IsVisable: true };
-    messageObj = { ColName: 'msg', KeyType: 'Sys', ColTitle: '', IsVisable: false };
-    columns.push(controlObj);
-    columns.push(messageObj);
+    colsLength = columns.filter(col => col.IsVisable === true).length - 1;
     table.addHeader();
     rows.map(row => { table.addRow(row); });
     table.addFooter();
@@ -222,13 +194,10 @@ function onSave(rowId){
     let currentPage = footerRow.dataset.currentpage;
     let formData = getFormData(row); 
     
-    fetch(`${grid.OnSaveAction}?fotId=${currentPage}` , {
-    method: 'POST',
-    body: formData
-    })
-    .then(response => response.json())
-    .then(data => function(){ console.log(data); /*refreshGrid(data); */})
-    .catch(err => console.log(err));
+    fetch(`${grid.OnSaveAction}?fotId=${currentPage}`, { method: 'POST', body: formData })
+    .then((response) => response.json())
+    .then((data) => { refreshGrid(JSON.parse(data)); })
+    .catch((err) => { console.log(err) });
     //let jsonRow = {};
     //[...row.cells].map(cell => {
     //  if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
@@ -274,7 +243,7 @@ function refreshGrid(data){
         const getRows = data.rows;
         footer = data.footer;
         table.emptyBody();
-        getRows.map(row => { table.addRow(row); });
+        getRows.map((row) => { table.addRow(row); });
         table.addFooter(footer);
 }
 function toggleConfirm(rowId){

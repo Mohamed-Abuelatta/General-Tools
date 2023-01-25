@@ -243,6 +243,8 @@ namespace Services.DataServices.Repository
                 }
                 columns.Add(column);
             }
+            columns.Add(new ColumnSetting { ColName= "msg", KeyType= Enum.GetName(keyType.Sys), ColTitle= "", IsVisable= false });
+            columns.Add(new ColumnSetting { ColName= "ctrl", KeyType= Enum.GetName(keyType.Sys), ColTitle= "", IsVisable= true });
             return columns;
         }
 

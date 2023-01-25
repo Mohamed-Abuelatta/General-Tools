@@ -35,7 +35,7 @@ namespace Tools.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ManageAsync(CustomerDTO model, int fotId)
+        public async Task<JsonResult> ManageAsync(CustomerDTO model, int fotId)
         {
             if (ModelState.IsValid)
             {

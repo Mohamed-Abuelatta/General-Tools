@@ -36,6 +36,7 @@
         {
             PK,
             FK,
+            Sys,
             Normal
         }
 
