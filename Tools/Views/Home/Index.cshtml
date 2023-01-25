@@ -123,7 +123,9 @@ HTMLTableElement.prototype.addFooter = addFooter;
 function addFooter() {
     let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
     else { this.deleteTFoot(); TFoot = this.createTFoot(); }
-    row = TFoot.insertRow(0); row.id = 'footerRow'; row.dataset.currentpage = 1;
+    row = TFoot.insertRow(0); 
+    row.id = 'footerRow';
+        row.dataset.currentpage = footer.activeBtn; // activeBtn
     let newCell = row.insertCell();
     newCell.colSpan = colsLength + 1;
     newCell.style = 'text-align:center;';
