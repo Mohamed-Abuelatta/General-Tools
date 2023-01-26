@@ -54,15 +54,15 @@ namespace Tools.Controllers
                     }
                     else
                     {
-                        return Json("_GridRow", _customerService.Update(model));
+                        return Json(_customerService.Update(model));
                     }
                 }
-                catch 
+                catch (Exception ex)
                 {
-                    return Json("_GridRow");
+                    return Json(ex.InnerException.Message);
                 }
             }
-            return Json("_GridRow");
+            return Json("notValed ModelState");
         }
 
         // https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
@@ -82,10 +82,18 @@ namespace Tools.Controllers
             );
             return Json(refresh);
         }
- 
-        public IActionResult Delete(int id, int page)
+
+
+        public IActionResult Delete(int id, int fotId)
         {
-            return Json(_customerService.Remove(id, page));
+            _customerService.Remove(id, fotId);
+            string refresh = JsonConvert.SerializeObject(
+            new
+            {
+                rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
+                footer = _customerService.getFooter(fotId)
+            });
+            return Json(refresh);
         }
  
 

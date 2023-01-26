@@ -145,16 +145,16 @@ function addHeader() {
     columns.map((col) => { row.addCell(col); });
 }
 HTMLTableElement.prototype.addRow = addRow;
-function addRow(data){
+function addRow(data, position = -1){
     let rowId = Math.floor((Math.random() * 100000) + 1);
     let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
-    row = TBody.insertRow(-1); 
+    row = TBody.insertRow(position); 
     row.id = rowId; row.className = 'tr';
-    let rowObj = Object.entries(data);
-        columns.map((col, i) => { 
-            let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
-            row.addCell(col, value);
-        });
+    let rowObj = Object.entries(data); 
+    columns.map((col, i) => { 
+        let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
+        row.addCell(col, value);
+    });
 }
 HTMLTableRowElement.prototype.addCell = addCell;
 function addCell(col, val = '') {
@@ -198,21 +198,29 @@ function onSave(rowId){
     
     fetch(`${grid.OnSaveAction}?fotId=${currentPage}`, { method: 'POST', body: formData })
     .then((response) => response.json())
-    .then((data) => { refreshGrid(JSON.parse(data)); })
+    .then((data) => { 
+        if(rowId == 'headerRow'){
+            refreshGrid(JSON.parse(data));
+        }else{
+            table.addRow(data, row.rowIndex);
+            table.deleteRow(row.rowIndex);
+        }
+    })
     .catch((err) => { console.log(err) });
-    //let jsonRow = {};
-    //[...row.cells].map(cell => {
-    //  if(cell.dataset.col != 'ctrl') { jsonRow[cell.dataset.col] = cell.lastChild.lastChild.value; }
-    //});
-    //table.addRow(jsonRow,'row'); 
 }
 function onDelete(rowId){
     let footerRow = table.tFoot.rows[0];
     let currentPage = footerRow.dataset.currentpage;
-    //callAction(`${grid.OnDeleteAction}`, new { id: rowId, fotId: currentPage },
-    //(data) => { alert(rowId) },
-    //(err) => { alert('err'); console.log(err); });
-    alert("delete")
+
+    const params = new URLSearchParams();
+    params.append('id', rowId);
+    params.append('fotId', currentPage);
+
+    fetch(`${grid.OnDeleteAction}`, { method: 'POST', body: params })
+    .then((response) => response.json())
+    .then((data) => { console.log(data); refreshGrid(JSON.parse(data)); })
+    .catch((err) => { console.log(err) });
+
 }
 function getFormData(row){
     form.innerHTML = "";
@@ -222,7 +230,6 @@ function getFormData(row){
     form.innerHTML = "";
     return formData;
 }
-
 function onPaging(nav, fotId) {
     const jsonObj = { nav: nav, fotId: fotId };
     callAction(`${grid.OnPagingAction}`, jsonObj,
