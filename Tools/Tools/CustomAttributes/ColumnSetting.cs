@@ -15,6 +15,7 @@ namespace Tools.Tools.CustomAttributes
             this.ColTitle = ColTitle;
             this.ColIndex = ColIndex;
             this.IsVisable = IsVisable;
+            this.HiddenClass = IsVisable == true ? Enum.GetName(hideClass.noHide) : Enum.GetName(hideClass.hide);
             this.InputType = InputType;
             this.KeyType = KeyType;
             this.ColWidth = ColWidth;
@@ -24,7 +25,8 @@ namespace Tools.Tools.CustomAttributes
         public string ColTitle { get; set; }
         public int ColIndex { get; set; }
         public int ColWidth { get; set; } = 200;
-        public bool IsVisable { get; set; } = false;
+        public string HiddenClass { get; set; }
+        public bool IsVisable { get; set; } 
 
         public string InputType { get; set; } = Enum.GetName(inputType.text);
         public string KeyType { get; set; } = Enum.GetName(keyType.Normal);

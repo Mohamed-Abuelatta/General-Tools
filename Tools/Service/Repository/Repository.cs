@@ -37,7 +37,8 @@ namespace Services.DataServices.Repository
         {
             try
             {
-                var model = _mapper.Map<TEntityDTO>(await _dbSet.FindAsync(id));
+                EntityState es = _context.Entry(await _dbSet.FindAsync(id)).State = EntityState.Detached;
+                var model = _mapper.Map<TEntityDTO>(es);
                 return model;
             }
             catch (Exception)
@@ -50,8 +51,11 @@ namespace Services.DataServices.Repository
         {
             try
             {
-                var model = _mapper.Map<TEntityDTO>(_dbSet.Find(id));
-                return model;
+
+                TEntity model = _dbSet.Find(id);
+                _context.Entry(model).State = EntityState.Detached;
+                TEntityDTO result = _mapper.Map<TEntityDTO>(model);
+                return result;
             }
             catch (Exception)
             {
@@ -93,20 +97,19 @@ namespace Services.DataServices.Repository
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
             TEntityDTO result = null;
-            //try
-            //{
+            try
+            {
                 var model = _mapper.Map<TEntity>(entity);
                 await _dbSet.AddAsync(model);
                 await _context.SaveChangesAsync();
-                result =_mapper.Map<TEntityDTO>(model);
+                result = _mapper.Map<TEntityDTO>(model);
 
                 //Dictionary<string, object> dicJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToJson());
-            //}
-            //catch (Exception ex)
-            //{
-            //    return result;
-            //}
-
+            }
+            catch 
+            {
+                return result;
+            }
             return result;
         }
 
@@ -136,22 +139,21 @@ namespace Services.DataServices.Repository
             return entity;
         }
 
-        public ResponseResult Remove(object id, int page)
+        public TEntityDTO Remove(object id, int page)
         {
-            ResponseResult response = new ResponseResult();
+            TEntityDTO result = null;
             try
             {
-                var model = _mapper.Map<TEntity>(GetById(id));
-                var result = _dbSet.Remove(model);
-                response.data = result != null ? getRows(page) : "#";
-                response.isOk = true;
+                TEntity model = _mapper.Map<TEntity>(GetById(id));
+                var entry = _dbSet.Remove(model);
+                _context.SaveChanges();
+                result = _mapper.Map<TEntityDTO>(model);
             }
-            catch (Exception ex)
+            catch
             {
-                response.data = ex.Message + "<br />" + ex.InnerException.Message + "<br />" + ex.InnerException.Data;
-                response.isOk = false;
+                return result;
             }
-            return response;
+            return result;
         }
 
         public GridSetting GetGrid()
@@ -182,8 +184,12 @@ namespace Services.DataServices.Repository
             return jsonRows;
         }
 
-        public Footer getFooter(int currentBtn = 1, string PageAction = "next")
-        {
+        // remove PageAction 
+        // remove else if (PageAction == "prev") no need for it anymore 
+        // edit js (next and prev) onClikc to set only firstBtn & activeBtn
+        // you don't need PagerRange or fRange anymore
+        public Footer getFooter(int firstBtn = 1, int activeBtn = 1, string PageAction = "next")
+        { 
             GridSetting gridSetting = GetGrid();
             int tableCount = _dbSet.Count();
             decimal PagesCount = Math.Ceiling((decimal)((float)tableCount / gridSetting.ItemsPerPage));
@@ -191,17 +197,15 @@ namespace Services.DataServices.Repository
             List<int> PagerRange = new List<int>();
             if (PageAction == "next")
             {
-                PagerRange = TableRange.Skip(currentBtn-1).Take(gridSetting.PagerSize).ToList();
+                PagerRange = TableRange.Skip(firstBtn - 1).Take(gridSetting.PagerSize).ToList();
             }
             else if (PageAction == "prev")
             {
-                PagerRange = TableRange.Skip(currentBtn - gridSetting.PagerSize).Take(gridSetting.PagerSize).ToList();
+                PagerRange = TableRange.Skip(firstBtn - gridSetting.PagerSize).Take(gridSetting.PagerSize).ToList();
             }
 
-            //int lastPageRowsCount = _dbSet.Skip(((int)PagesCount - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).Count();
-
             Footer footer = new Footer {
-                activeBtn = (PageAction == "next" ? PagerRange.Min() : currentBtn),
+                activeBtn = (PageAction == "next" ? PagerRange.Min() : activeBtn),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
                 fRange = PagerRange
@@ -220,7 +224,7 @@ namespace Services.DataServices.Repository
                 ColumnSetting column = (ColumnSetting)propInfo.GetCustomAttribute(typeof(ColumnSetting));
                 column.ColName = propInfo.Name;
                 column.KeyType = item.IsPrimaryKey() ? Enum.GetName(keyType.PK) : item.IsForeignKey() ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
-                column.IsVisable = item.IsPrimaryKey() ? false : true;
+                column.HiddenClass = item.IsPrimaryKey() ? Enum.GetName(hideClass.pk) : column.HiddenClass;
                 switch (propInfo.PropertyType.Name)
                 {
                     case "string":
@@ -243,8 +247,8 @@ namespace Services.DataServices.Repository
                 }
                 columns.Add(column);
             }
-            columns.Add(new ColumnSetting { ColName= "msg", KeyType= Enum.GetName(keyType.Sys), ColTitle= "", IsVisable= false });
-            columns.Add(new ColumnSetting { ColName= "ctrl", KeyType= Enum.GetName(keyType.Sys), ColTitle= "", IsVisable= true });
+            columns.Add(new ColumnSetting { ColName= "msg", KeyType= Enum.GetName(keyType.msg), HiddenClass = Enum.GetName(hideClass.msg) });
+            columns.Add(new ColumnSetting { ColName= "ctrl", KeyType= Enum.GetName(keyType.ctrl) });
             return columns;
         }
 

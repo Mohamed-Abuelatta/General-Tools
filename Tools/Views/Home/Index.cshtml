@@ -68,10 +68,7 @@
         display: block;
     }
 
-    .hideCol {
-        display: none;
-    }
-    .hideMsg {
+    .hide, .msg, .pk {
         display: none;
     }
 
@@ -114,8 +111,7 @@ const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
 let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 
-let row;
-let colsLength = columns.filter(col => col.IsVisable === true).length - 1;
+let row; let colsLength;
 const table = document.getElementById(`table${grid.GridName}`);
 const form = document.getElementById(`form${grid.GridName}`);
 // ---------------------------------------------------------------------------- table start
@@ -125,7 +121,8 @@ function addFooter() {
     else { this.deleteTFoot(); TFoot = this.createTFoot(); }
     row = TFoot.insertRow(0); 
     row.id = 'footerRow';
-        row.dataset.currentpage = footer.activeBtn; // activeBtn
+        row.dataset.activebtn = footer.activeBtn; // activeBtn
+    row.dataset.firstbtn = footer.fRange[0] - 1; // footer first pager button
     let newCell = row.insertCell();
     newCell.colSpan = colsLength + 1;
     newCell.style = 'text-align:center;';
@@ -154,13 +151,15 @@ function addRow(data, position = -1){
     columns.map((col, i) => { 
         let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
         row.addCell(col, value);
+        if (col.KeyType == 'PK') { row.setAttribute('data-pk', value); }
     });
 }
 HTMLTableRowElement.prototype.addCell = addCell;
 function addCell(col, val = '') {
     let newCell = this.insertCell();
-    newCell.className = (col.ColName == 'msg' ? 'hideMsg' : (col.IsVisable === true ? 'ctrlView' : 'ctrlView hideCol'));
-    newCell.colSpan = (col.ColName == 'msg' ? colsLength : 0);
+    newCell.className = (col.HiddenClass == 'noHide' ? 'ctrlView' : `ctrlView ${col.HiddenClass}`);
+    if (col.ColName == 'msg') {newCell.setAttribute('colspan', colsLength);}
+    newCell.dataset.coltype = col.KeyType;
     newCell.dataset.col = col.ColName;
     newCell.innerHTML = cellContent(col, val, this.id);
 }
@@ -185,7 +184,7 @@ function emptyBody(){
 // ---------------------------------------------------------------------------- table Action start
 window.onload =  populateTable();
 function populateTable(){
-    colsLength = columns.filter(col => col.IsVisable === true).length - 1;
+    colsLength = columns.filter(col => col.IsVisable === true && col.KeyType == 'Normal').length;
     table.addHeader();
     rows.map(row => { table.addRow(row); });
     table.addFooter();
@@ -193,10 +192,11 @@ function populateTable(){
 function onSave(rowId){
     let row = document.getElementById(rowId);
     let footerRow = table.tFoot.rows[0];
-    let currentPage = footerRow.dataset.currentpage;
-    let formData = getFormData(row); 
-    
-    fetch(`${grid.OnSaveAction}?fotId=${currentPage}`, { method: 'POST', body: formData })
+    let activeBtn = footerRow.dataset.activebtn;
+    let firstBtn = footerRow.dataset.firstbtn;
+    let formData = getFormData(row);
+
+    fetch(`${grid.OnSaveAction}?activeBtn=${activeBtn}&firstBtn=${firstBtn}`, { method: 'POST', body: formData })
     .then((response) => response.json())
     .then((data) => { 
         if(rowId == 'headerRow'){
@@ -205,22 +205,25 @@ function onSave(rowId){
             table.addRow(data, row.rowIndex);
             table.deleteRow(row.rowIndex);
         }
+        alert('done successfully')
     })
     .catch((err) => { console.log(err) });
 }
 function onDelete(rowId){
     let footerRow = table.tFoot.rows[0];
-    let currentPage = footerRow.dataset.currentpage;
+    let activeBtn = footerRow.dataset.activebtn;
+    let firstBtn = footerRow.dataset.firstbtn;
+    let pk = document.getElementById(rowId).dataset.pk;
 
     const params = new URLSearchParams();
-    params.append('id', rowId);
-    params.append('fotId', currentPage);
+    params.append('id', pk);
+    params.append('activeBtn', activeBtn);
+    params.append('firstBtn', firstBtn);
 
     fetch(`${grid.OnDeleteAction}`, { method: 'POST', body: params })
     .then((response) => response.json())
-    .then((data) => { console.log(data); refreshGrid(JSON.parse(data)); })
+    .then((data) => { console.log(JSON.parse(data)); refreshGrid(JSON.parse(data)); })
     .catch((err) => { console.log(err) });
-
 }
 function getFormData(row){
     form.innerHTML = "";
@@ -230,21 +233,21 @@ function getFormData(row){
     form.innerHTML = "";
     return formData;
 }
-function onPaging(nav, fotId) {
-    const jsonObj = { nav: nav, fotId: fotId };
+function onPaging(nav, activeBtn) {
+    const jsonObj = { nav: nav, activeBtn: activeBtn, firstBtn: activeBtn };
     callAction(`${grid.OnPagingAction}`, jsonObj,
          (data)=> {
             data = JSON.parse(data);
         if (nav == 'page') {
             document.querySelector('.activePager').classList.remove('activePager');
-            document.querySelector(`[data-pager='${fotId}']`).classList.add('activePager');
+            document.querySelector(`[data-pager='${activeBtn}']`).classList.add('activePager');
             table.emptyBody(); 
             data.map(row => { table.addRow(row); }); 
         } else {
             refreshGrid(data);
         }
         let footerRow = table.tFoot.rows[0];
-        footerRow.dataset.currentpage = fotId;
+        footerRow.dataset.activebtn = activeBtn;
     } , 
     (err)=>{ alert('err'); console.log(err);} );
 }
@@ -260,8 +263,13 @@ function toggleConfirm(rowId){
         document.getElementById(`toggle${rowId}`).onclick = function () { toggleConfirm(rowId); };
         document.getElementById(`action${rowId}`).onclick = function () { onDelete(rowId); };
     [...row.cells].map(cell => {  
-      if (cell.dataset.col != 'ctrl') {cell.classList.toggle('hideMsg');}
-      else {cell.classList.toggle('ctrlView');cell.classList.toggle('ctrlEdit');}
+      if (cell.dataset.col != 'ctrl') {
+          cell.classList.toggle('msg');
+      }
+      else {
+          cell.classList.toggle('ctrlView');
+          cell.classList.toggle('ctrlEdit');
+      }
     });
 }
 function toggleRow(rowId) {
@@ -269,13 +277,12 @@ function toggleRow(rowId) {
     document.getElementById(`toggle${rowId}`).onclick = function() { toggleRow(rowId); };
     if (rowId != 'headerRow') { document.getElementById(`action${rowId}`).onclick = function () { onSave(rowId); } };
     [...row.cells].map(cell => {
-    cell.classList.toggle('ctrlEdit');
-    cell.classList.toggle('ctrlView');
+        cell.classList.toggle('ctrlEdit');
+        cell.classList.toggle('ctrlView');
     })
 }
 
 // ---------------------------------------------------------------------------- table Action end
-
 function callAction(url, dataJson, callbackOk, callbackErr){
 
     const params = new URLSearchParams();

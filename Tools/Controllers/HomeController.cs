@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
+using System;
 using Tools.Models;
 using Tools.Service.ServiceData;
 
@@ -22,20 +23,8 @@ namespace Tools.Controllers
             return View("Index", result);
         }
 
-        public JsonResult RefreshGrid(int fotId)
-        {
-            string refresh = JsonConvert.SerializeObject(
-               new
-               {
-                   rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
-                   footer = _customerService.getFooter(fotId)
-               }
-            );
-            return Json(refresh);
-        }
-
         [HttpPost]
-        public async Task<JsonResult> ManageAsync(CustomerDTO model, int fotId)
+        public async Task<JsonResult> ManageAsync(CustomerDTO model, int activeBtn, int firstBtn)
         {
             if (ModelState.IsValid)
             {
@@ -47,8 +36,8 @@ namespace Tools.Controllers
                         string refresh = JsonConvert.SerializeObject(
                         new
                         {
-                            rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
-                            footer = _customerService.getFooter(fotId)
+                            rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn)),
+                            footer = _customerService.getFooter(firstBtn, activeBtn)
                         });
                         return Json(refresh);
                     }
@@ -67,31 +56,30 @@ namespace Tools.Controllers
 
         // https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
         [HttpPost]
-        public IActionResult Paging(string nav,int fotId)
+        public IActionResult Paging(string nav,int activeBtn, int firstBtn)
         {
             if (nav == "page")
             {
-                return Json(_customerService.getRows(fotId));
+                return Json(_customerService.getRows(activeBtn));
             }
             string refresh = JsonConvert.SerializeObject(
                new
                {
-                   rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
-                   footer = _customerService.getFooter(fotId, nav)
+                   rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn)),
+                   footer = _customerService.getFooter(firstBtn, activeBtn, nav)
                }
             );
             return Json(refresh);
         }
 
-
-        public IActionResult Delete(int id, int fotId)
+        public IActionResult Delete(int id, int fotId, int firstBtn)
         {
             _customerService.Remove(id, fotId);
             string refresh = JsonConvert.SerializeObject(
             new
             {
                 rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
-                footer = _customerService.getFooter(fotId)
+                footer = _customerService.getFooter(firstBtn, fotId)
             });
             return Json(refresh);
         }

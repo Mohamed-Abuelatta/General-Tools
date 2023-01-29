@@ -14,6 +14,7 @@
             GetPageByPage,
             GetAll
         }
+        
 
 
         public enum inputType
@@ -32,11 +33,19 @@
             html,
             conditional // function
         }
+        public enum hideClass
+        {
+            msg,
+            noHide,
+            pk,
+            hide
+        }
         public enum keyType
         {
             PK,
             FK,
-            Sys,
+            msg,
+            ctrl,
             Normal
         }
 

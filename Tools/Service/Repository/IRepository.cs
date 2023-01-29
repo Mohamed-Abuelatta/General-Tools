@@ -19,13 +19,13 @@ namespace Services.DataServices.Repository
         TEntityDTO Update(TEntityDTO entity);
         IQueryable<TEntityDTO> Where(Expression<Func<TEntity, bool>> expression);
 
-        ResponseResult Remove(object id, int page);
+        TEntityDTO Remove(object id, int page);
         // -------------------------------------------------------------------------------
 
 
         GridSetting GetGrid();
         InitGrid InitGrid();
-        Footer getFooter(int PagerStart, string PageAction = "next");
+        Footer getFooter(int firstBtn, int activeBtn, string PageAction = "next");
         string getRows(int page);
     }
 }
