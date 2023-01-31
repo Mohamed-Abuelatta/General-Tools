@@ -66,7 +66,7 @@ namespace Tools.Controllers
                new
                {
                    rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn)),
-                   footer = _customerService.getFooter(firstBtn, activeBtn, nav)
+                   footer = _customerService.getFooter(firstBtn, activeBtn)
                }
             );
             return Json(refresh);

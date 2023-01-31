@@ -5,6 +5,10 @@
         public string isPrevDisabled { get; set; }
         public string isNextDisabled { get; set; }
         public int activeBtn { get; set; } = 1; 
-        public List<int> fRange { get; set; }
+        public int firstBtn { get; set; } = 1;
+        public int lastBtn { get; set; } 
+        public int nextBtn { get; set; }
+        public int prevBtn { get; set; }
+        public int pagerSize { get; set; } = 5;
     }
 }

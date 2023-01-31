@@ -103,7 +103,6 @@ namespace Services.DataServices.Repository
                 await _dbSet.AddAsync(model);
                 await _context.SaveChangesAsync();
                 result = _mapper.Map<TEntityDTO>(model);
-
                 //Dictionary<string, object> dicJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(result.ToJson());
             }
             catch 
@@ -184,31 +183,25 @@ namespace Services.DataServices.Repository
             return jsonRows;
         }
 
-        // remove PageAction 
-        // remove else if (PageAction == "prev") no need for it anymore 
+        // - remove PageAction 
+        // - remove else if (PageAction == "prev") no need for it anymore 
         // edit js (next and prev) onClikc to set only firstBtn & activeBtn
-        // you don't need PagerRange or fRange anymore
-        public Footer getFooter(int firstBtn = 1, int activeBtn = 1, string PageAction = "next")
+        // - you don't need PagerRange or fRange anymore
+        public Footer getFooter(int firstBtn = 1, int activeBtn = 1)
         { 
             GridSetting gridSetting = GetGrid();
             int tableCount = _dbSet.Count();
             decimal PagesCount = Math.Ceiling((decimal)((float)tableCount / gridSetting.ItemsPerPage));
-            List<int> TableRange = Enumerable.Range(1, (int)PagesCount).ToList();
-            List<int> PagerRange = new List<int>();
-            if (PageAction == "next")
-            {
-                PagerRange = TableRange.Skip(firstBtn - 1).Take(gridSetting.PagerSize).ToList();
-            }
-            else if (PageAction == "prev")
-            {
-                PagerRange = TableRange.Skip(firstBtn - gridSetting.PagerSize).Take(gridSetting.PagerSize).ToList();
-            }
+            List<int> TableRange = Enumerable.Range(firstBtn, (int)PagesCount).ToList();
+            List<int> PagerRange = TableRange.Skip(firstBtn - 1).Take(gridSetting.PagerSize).ToList();
 
             Footer footer = new Footer {
-                activeBtn = (PageAction == "next" ? PagerRange.Min() : activeBtn),
+                activeBtn = activeBtn,
+                firstBtn = firstBtn,
+                lastBtn = TableRange.Max(),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
-                fRange = PagerRange
+                pagerSize = gridSetting.PagerSize
             };
             return footer;
         }

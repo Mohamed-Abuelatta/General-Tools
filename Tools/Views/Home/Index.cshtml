@@ -115,26 +115,28 @@ let row; let colsLength;
 const table = document.getElementById(`table${grid.GridName}`);
 const form = document.getElementById(`form${grid.GridName}`);
 // ---------------------------------------------------------------------------- table start
-HTMLTableElement.prototype.addFooter = addFooter;
-function addFooter() {
-    let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
-    else { this.deleteTFoot(); TFoot = this.createTFoot(); }
-    row = TFoot.insertRow(0); 
-    row.id = 'footerRow';
-        row.dataset.activebtn = footer.activeBtn; // activeBtn
-    row.dataset.firstbtn = footer.fRange[0] - 1; // footer first pager button
-    let newCell = row.insertCell();
-    newCell.colSpan = colsLength + 1;
-    newCell.style = 'text-align:center;';
-    let prevMin = footer.fRange[0] - 1;
-    newCell.innerHTML = `<button data-pager='prev-${prevMin}' onclick="onPaging('prev', '${prevMin}')" ${footer.isPrevDisabled} class="bi bi-chevron-left"></button>`;
-    footer.fRange.map((fBtn) => {
-        var IsActive = (fBtn == footer.activeBtn ? "class='activePager'" : "");
-        newCell.innerHTML += `<button data-pager='${fBtn}' ${IsActive} onclick="onPaging('page', '${fBtn}')">${fBtn}</button>`;
-    });
-    let rangeMax = footer.fRange[footer.fRange.length - 1] + 1;
-    newCell.innerHTML += `<button data-pager='next-${rangeMax}' onclick="onPaging('next', '${rangeMax}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
-}
+//HTMLTableElement.prototype.addFooter = addFooter;
+//function addFooter() {
+//    let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
+//    else { this.deleteTFoot(); TFoot = this.createTFoot(); }
+//    row = TFoot.insertRow(0); 
+//    row.id = 'footerRow';
+//    row.dataset.activebtn = footer.activeBtn; // activeBtn
+//    row.dataset.firstbtn = footer.firstBtn; // footer first pager button
+//    let newCell = row.insertCell();
+//    newCell.colSpan = colsLength + 1;
+//    newCell.style = 'text-align:center;';
+//    let PrevFBtn = footer.firstBtn - (footer.pagerSize+1);
+//    let PrevABtn = PrevFBtn+1;
+//    newCell.innerHTML = `<button data-pager='prev${PrevFBtn}' onclick="onPaging( '${PrevFBtn}','${PrevABtn}')" ${footer.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+//    for (let i = footer.firstBtn; i < footer.pagerSize+1; i++) {
+//        var IsActive = (i == footer.activeBtn ? "class='activePager'" : "");
+//        newCell.innerHTML += `<button data-pager='${i}' ${IsActive} onclick="onPaging('page', '${i}')">${i}</button>`;
+//    }
+//    let nextFBtn = footer.pagerSize * 2;
+//    let nextABtn = footer.firstBtn + footer.pagerSize;
+//    newCell.innerHTML += `<button data-pager='next${nextFBtn}' onclick="onPaging('${nextFBtn}', '${next}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
+//}
 HTMLTableElement.prototype.addHeader = addHeader;
 function addHeader() {
     let THead; if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
@@ -233,8 +235,8 @@ function getFormData(row){
     form.innerHTML = "";
     return formData;
 }
-function onPaging(nav, activeBtn) {
-    const jsonObj = { nav: nav, activeBtn: activeBtn, firstBtn: activeBtn };
+function onPaging(firstBtn, activeBtn) {
+    const jsonObj = { activeBtn: activeBtn, firstBtn: activeBtn };
     callAction(`${grid.OnPagingAction}`, jsonObj,
          (data)=> {
             data = JSON.parse(data);

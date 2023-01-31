@@ -25,7 +25,7 @@ namespace Services.DataServices.Repository
 
         GridSetting GetGrid();
         InitGrid InitGrid();
-        Footer getFooter(int firstBtn, int activeBtn, string PageAction = "next");
+        Footer getFooter(int firstBtn = 1, int activeBtn = 1);
         string getRows(int page);
     }
 }
