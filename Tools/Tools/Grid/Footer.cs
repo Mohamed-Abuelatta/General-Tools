@@ -6,9 +6,9 @@
         public string isNextDisabled { get; set; }
         public int activeBtn { get; set; } = 1; 
         public int firstBtn { get; set; } = 1;
-        public int lastBtn { get; set; } 
-        public int nextBtn { get; set; }
-        public int prevBtn { get; set; }
-        public int pagerSize { get; set; } = 5;
+
+        public string nextBtnArgs { get; set; }
+        public string prevBtnArgs { get; set; }
+        public int pagerSize { get; set; }
     }
 }

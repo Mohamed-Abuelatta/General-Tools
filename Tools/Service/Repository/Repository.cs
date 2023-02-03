@@ -183,10 +183,6 @@ namespace Services.DataServices.Repository
             return jsonRows;
         }
 
-        // - remove PageAction 
-        // - remove else if (PageAction == "prev") no need for it anymore 
-        // edit js (next and prev) onClikc to set only firstBtn & activeBtn
-        // - you don't need PagerRange or fRange anymore
         public Footer getFooter(int firstBtn = 1, int activeBtn = 1)
         { 
             GridSetting gridSetting = GetGrid();
@@ -198,10 +194,12 @@ namespace Services.DataServices.Repository
             Footer footer = new Footer {
                 activeBtn = activeBtn,
                 firstBtn = firstBtn,
-                lastBtn = TableRange.Max(),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
-                pagerSize = gridSetting.PagerSize
+
+                prevBtnArgs = (firstBtn - (PagerRange.Count() + 1)).ToString() + "," + (firstBtn - 1).ToString(),
+                nextBtnArgs = (PagerRange.Count() + 1).ToString() + "," + (firstBtn + PagerRange.Count()).ToString(),
+                pagerSize = PagerRange.Count()
             };
             return footer;
         }
