@@ -115,28 +115,28 @@ let row; let colsLength;
 const table = document.getElementById(`table${grid.GridName}`);
 const form = document.getElementById(`form${grid.GridName}`);
 // ---------------------------------------------------------------------------- table start
-//HTMLTableElement.prototype.addFooter = addFooter;
-//function addFooter() {
-//    let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
-//    else { this.deleteTFoot(); TFoot = this.createTFoot(); }
-//    row = TFoot.insertRow(0); 
-//    row.id = 'footerRow';
-//    row.dataset.activebtn = footer.activeBtn; // activeBtn
-//    row.dataset.firstbtn = footer.firstBtn; // footer first pager button
-//    let newCell = row.insertCell();
-//    newCell.colSpan = colsLength + 1;
-//    newCell.style = 'text-align:center;';
-//    let PrevFBtn = footer.firstBtn - (footer.pagerSize+1);
-//    let PrevABtn = PrevFBtn+1;
-//    newCell.innerHTML = `<button data-pager='prev${PrevFBtn}' onclick="onPaging( '${PrevFBtn}','${PrevABtn}')" ${footer.isPrevDisabled} class="bi bi-chevron-left"></button>`;
-//    for (let i = footer.firstBtn; i < footer.pagerSize+1; i++) {
-//        var IsActive = (i == footer.activeBtn ? "class='activePager'" : "");
-//        newCell.innerHTML += `<button data-pager='${i}' ${IsActive} onclick="onPaging('page', '${i}')">${i}</button>`;
-//    }
-//    let nextFBtn = footer.pagerSize * 2;
-//    let nextABtn = footer.firstBtn + footer.pagerSize;
-//    newCell.innerHTML += `<button data-pager='next${nextFBtn}' onclick="onPaging('${nextFBtn}', '${next}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
-//}
+HTMLTableElement.prototype.addFooter = addFooter;
+function addFooter() {
+    let TFoot; if (this.tFoot === undefined || this.tFoot === null) { TFoot = this.createTFoot(); }
+    else { this.deleteTFoot(); TFoot = this.createTFoot(); }
+    row = TFoot.insertRow(0); 
+    row.id = 'footerRow';
+    row.dataset.activebtn = footer.activeBtn; // activeBtn
+    row.dataset.firstbtn = footer.firstBtn; // footer first pager button
+    let newCell = row.insertCell();
+    newCell.colSpan = colsLength + 1;
+    newCell.style = 'text-align:center;';
+    let PrevFBtn = footer.firstBtn - (footer.pagerSize+1);
+    let PrevABtn = footer.firstBtn - 1;
+    newCell.innerHTML = `<button data-pager='prev${PrevFBtn}' onclick="onPaging('${PrevFBtn}','${PrevABtn}')" ${footer.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+    for (let i = footer.firstBtn; i < footer.pagerSize+1; i++) {
+        var IsActive = (i == footer.activeBtn ? "class='activePager'" : "");
+        newCell.innerHTML += `<button data-pager='${i}' ${IsActive} onclick="onPaging(0, '${i}')">${i}</button>`;
+    }
+    let nextFBtn = footer.pagerSize + 1;
+    let nextABtn = footer.firstBtn + footer.pagerSize;
+    newCell.innerHTML += `<button data-pager='next${nextFBtn}' onclick="onPaging('${nextFBtn}', '${nextABtn}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
+}
 HTMLTableElement.prototype.addHeader = addHeader;
 function addHeader() {
     let THead; if (this.tHead===undefined||this.tHead===null){THead=this.createTHead();}else{return;}
@@ -235,23 +235,34 @@ function getFormData(row){
     form.innerHTML = "";
     return formData;
 }
-function onPaging(firstBtn, activeBtn) {
-    const jsonObj = { activeBtn: activeBtn, firstBtn: activeBtn };
-    callAction(`${grid.OnPagingAction}`, jsonObj,
-         (data)=> {
-            data = JSON.parse(data);
-        if (nav == 'page') {
+function onPaging(fBtn, aBtn) {
+
+    const params = new URLSearchParams();
+    params.append('activeBtn', aBtn);
+    params.append('firstBtn', fBtn);
+
+    var requestOptions = {
+      method: 'POST',
+      body: params
+    };
+
+    fetch(grid.OnPagingAction , requestOptions)
+    .then(response => response.json())
+    .then((data) => {
+        data = JSON.parse(data);
+        console.log(data);
+        if (fBtn == 0) {
             document.querySelector('.activePager').classList.remove('activePager');
-            document.querySelector(`[data-pager='${activeBtn}']`).classList.add('activePager');
-            table.emptyBody(); 
-            data.map(row => { table.addRow(row); }); 
+            document.querySelector(`[data-pager='${aBtn}']`).classList.add('activePager');
+            table.emptyBody();
+            data.map(row => { table.addRow(row); });
         } else {
             refreshGrid(data);
         }
         let footerRow = table.tFoot.rows[0];
-        footerRow.dataset.activebtn = activeBtn;
-    } , 
-    (err)=>{ alert('err'); console.log(err);} );
+        footerRow.dataset.activebtn = aBtn;
+    })
+    .catch((err)=>{ alert('err'); console.log(err);});
 }
 function refreshGrid(data){
         const getRows = data.rows;
@@ -285,21 +296,5 @@ function toggleRow(rowId) {
 }
 
 // ---------------------------------------------------------------------------- table Action end
-function callAction(url, dataJson, callbackOk, callbackErr){
-
-    const params = new URLSearchParams();
-    Object.entries(dataJson).map(([key, val]) => { params.append(key, val); });
-
-    var requestOptions = {
-      method: 'POST',
-      body: params
-    };
-
-    fetch(url, requestOptions)
-    .then(response => response.json())
-    .then(result => callbackOk(result))
-    .catch(err => callbackErr(err));
-}
- 
 
 </script>
