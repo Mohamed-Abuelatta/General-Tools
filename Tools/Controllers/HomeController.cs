@@ -56,9 +56,9 @@ namespace Tools.Controllers
 
         // https://stackoverflow.com/questions/42360139/asp-net-core-return-json-with-status-code
         [HttpPost]
-        public IActionResult Paging(string nav,int activeBtn, int firstBtn)
+        public IActionResult Paging(int firstBtn, int activeBtn)
         {
-            if (nav == "page")
+            if (firstBtn == 0)
             {
                 return Json(_customerService.getRows(activeBtn));
             }
