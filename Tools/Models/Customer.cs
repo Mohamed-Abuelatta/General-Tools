@@ -30,9 +30,9 @@ namespace Tools.Models
         public bool IsManager { get; set; }
 
         [ColumnSetting(3, "مدينة تواجد العميل")]
-        [ForeignKey("CityId")]
         public int CityId { get; set; }
-        public ICollection<City> cities { get; set; }
+        [ForeignKey("CityId")]
+        public City city { get; set; }
 
 
     }

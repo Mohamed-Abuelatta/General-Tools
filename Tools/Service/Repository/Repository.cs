@@ -17,6 +17,7 @@ using System.Text.Json;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Newtonsoft.Json.Linq;
 using Tools.Service;
+using System.Collections.Generic;
 
 namespace Services.DataServices.Repository
 {
@@ -88,10 +89,22 @@ namespace Services.DataServices.Repository
             return model;
         }
 
-        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, bool>> expression)
+        //public IEnumerable<TEntity> Include(params Expression<Func<TEntity, object>>[] includes)
+        //{
+        //    IEnumerable<TEntity> query = null;
+        //    foreach (var include in includes)
+        //    {
+        //        query = _dbSet.Include(include);
+        //    }
+
+        //    return query ?? _dbSet;
+        //}
+
+        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
         {
-            var model = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
-            return model;
+            var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
+            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
+            return x;
         }
 
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)

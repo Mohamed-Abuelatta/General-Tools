@@ -11,6 +11,6 @@ namespace Tools.Models
 
         public string CityName { get; set; }
 
-        public Customer customer { get; set; }
+        public List<Customer> customers { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace Services.DataServices.Repository
         IQueryable<TEntityDTO> GetAllAsQueryable();
         TEntityDTO GetById(object id);
         Task<TEntityDTO> GetByIdAsync(object id);
-        IQueryable<TEntityDTO> Include(Expression<Func<TEntity, bool>> expression);
+        IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression);
         Task<TEntityDTO> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         TEntityDTO Update(TEntityDTO entity);
         IQueryable<TEntityDTO> Where(Expression<Func<TEntity, bool>> expression);

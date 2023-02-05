@@ -232,6 +232,22 @@ namespace Tools.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Tools.Models.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CityName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("City");
+                });
+
             modelBuilder.Entity("Tools.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -240,10 +256,10 @@ namespace Tools.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("CustAge")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("CustCity")
+                    b.Property<string>("CustAge")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CustJobTitle")
@@ -252,7 +268,12 @@ namespace Tools.Migrations
                     b.Property<string>("CustName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsManager")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CityId");
 
                     b.ToTable("customers");
                 });
@@ -306,6 +327,22 @@ namespace Tools.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Tools.Models.Customer", b =>
+                {
+                    b.HasOne("Tools.Models.City", "city")
+                        .WithMany("customers")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("city");
+                });
+
+            modelBuilder.Entity("Tools.Models.City", b =>
+                {
+                    b.Navigation("customers");
                 });
 #pragma warning restore 612, 618
         }
