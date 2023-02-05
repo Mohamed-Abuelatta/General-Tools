@@ -194,12 +194,10 @@ namespace Services.DataServices.Repository
             Footer footer = new Footer {
                 activeBtn = activeBtn,
                 firstBtn = firstBtn,
+                lastBtn = (firstBtn + PagerRange.Count()),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
-
-                prevBtnArgs = (firstBtn - (PagerRange.Count() + 1)).ToString() + "," + (firstBtn - 1).ToString(),
-                nextBtnArgs = (PagerRange.Count() + 1).ToString() + "," + (firstBtn + PagerRange.Count()).ToString(),
-                pagerSize = PagerRange.Count()
+                prevBtn = firstBtn - gridSetting.PagerSize
             };
             return footer;
         }

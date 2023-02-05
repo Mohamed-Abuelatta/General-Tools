@@ -12,7 +12,6 @@
 
     td {
         width: 200px;
-        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==) repeat;
     }
 
     td, th {
@@ -48,8 +47,14 @@
         padding: 1px 5px 2px 5px;
         margin: 0 5px;
     }
+    tfoot > tr > td {
+        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==) repeat;
+    }
 
-    .activePager{background: white;}
+    .activePager {
+        background: #DCDCDC;
+        border-color: #808080;
+    }
 
     /* to toggle between (view and edit modes) of control box*/
     .ctrlView > div:first-child {
@@ -126,14 +131,15 @@ function addFooter() {
     let newCell = row.insertCell();
     newCell.colSpan = colsLength + 1;
     newCell.style = 'text-align:center;';
-    let firstPrevBtn = footer.prevBtnArgs.split(',')[0]; let activePrevBtn = footer.prevBtnArgs.split(',')[1];
-    newCell.innerHTML = `<button data-pager='prev${firstPrevBtn}' onclick="onPaging('${firstPrevBtn}','${activePrevBtn}')" ${footer.isPrevDisabled} class="bi bi-chevron-left"></button>`;
-    for (let i = footer.firstBtn; i < (footer.firstBtn + footer.pagerSize); i++) {
+    let prev = footer.prevBtn;
+    let first = footer.firstBtn;
+    let last = footer.lastBtn;
+    newCell.innerHTML = `<button data-pager='prev${prev}' onclick="onPaging('${prev}','${prev}')" ${footer.isPrevDisabled} class="bi bi-chevron-left"></button>`;
+    for (let i = first; i < last; i++) {
         var IsActive = (i == footer.activeBtn ? "class='activePager'" : "");
         newCell.innerHTML += `<button data-pager='${i}' ${IsActive} onclick="onPaging(0, '${i}')">${i}</button>`;
     }
-    let firstNextBtn = footer.nextBtnArgs.split(',')[0]; let activeNextBtn = footer.nextBtnArgs.split(',')[1];
-    newCell.innerHTML += `<button data-pager='next${firstNextBtn}' onclick="onPaging('${firstNextBtn}','${activeNextBtn}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
+    newCell.innerHTML += `<button data-pager='next${last}' onclick="onPaging('${last}','${last}')" ${footer.isNextDisabled} class="bi bi-chevron-right"></button>`;
 }
 HTMLTableElement.prototype.addHeader = addHeader;
 function addHeader() {
