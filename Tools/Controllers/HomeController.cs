@@ -20,8 +20,7 @@ namespace Tools.Controllers
 
         public IActionResult Index()
         {
-            var x = _customerService.Include(i => i.city);
-
+            //var x = _customerService.getRowsWithInclude(i => i.city , 0);
             var result = _customerService.InitGrid();
             return View("Index", result);
         }

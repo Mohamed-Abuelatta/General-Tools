@@ -27,5 +27,6 @@ namespace Services.DataServices.Repository
         InitGrid InitGrid();
         Footer getFooter(int firstBtn = 1, int activeBtn = 1);
         string getRows(int page);
+        string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0);
     }
 }

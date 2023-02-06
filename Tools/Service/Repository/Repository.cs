@@ -89,17 +89,6 @@ namespace Services.DataServices.Repository
             return model;
         }
 
-        //public IEnumerable<TEntity> Include(params Expression<Func<TEntity, object>>[] includes)
-        //{
-        //    IEnumerable<TEntity> query = null;
-        //    foreach (var include in includes)
-        //    {
-        //        query = _dbSet.Include(include);
-        //    }
-
-        //    return query ?? _dbSet;
-        //}
-
         public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
         {
             var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
@@ -187,13 +176,24 @@ namespace Services.DataServices.Repository
             return grid;
         }
 
-        // rows + footer header
         public string getRows(int page = 0)
         {
             GridSetting gridSetting = GetGrid();
             List<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList();
             string jsonRows = rows.ToJson();
             return jsonRows;
+        }
+
+        public string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0)
+        {
+            GridSetting gridSetting = GetGrid();
+            var model = _dbSet
+                .Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage)
+                .Take(gridSetting.ItemsPerPage).Include(expression)
+                .AsQueryable()
+                .AsNoTracking()
+                .ToList().ToJson();
+            return model;
         }
 
         public Footer getFooter(int firstBtn = 1, int activeBtn = 1)

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Tools.Tools.CustomAttributes;
 
 namespace Tools.Models
@@ -8,15 +9,12 @@ namespace Tools.Models
     {
 
         public int Id { get; set; }
-        [Display(Name = "اسم العميل", Order = 0)]
         public string CustName { get; set; }
-        [Display(Name = "الوظيفة", Order = 2)]
         public string CustJobTitle { get; set; }
-        [Display(Name = "المدينة", Order = 1)]
-        public string CustCity { get; set; }
-        [Display(Name = "العمر", Order = 3)]
         public string CustAge { get; set; }
-        //[Display(Name = "مدير", Order = 4)]
-        //public bool IsManager { get; set; }
+        public bool IsManager { get; set; }
+        public int CityId { get; set; }
+        public City city { get; set; }
+
     }
 }

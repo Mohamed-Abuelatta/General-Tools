@@ -26,7 +26,7 @@ namespace Tools.Models
         [ColumnSetting(4, "عمر العميل")]
         public string CustAge { get; set; }
 
-        [Display(Name = "مدير")]
+        [ColumnSetting(4, "هل مدير")]
         public bool IsManager { get; set; }
 
         [ColumnSetting(3, "مدينة تواجد العميل")]
