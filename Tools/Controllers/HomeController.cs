@@ -18,9 +18,13 @@ namespace Tools.Controllers
             _customerService = customerService;
         }
 
+        // maybe would like to read this
+        // https://www.c-sharpcorner.com/article/generic-repository-pattern-in-asp-net-core/
+        // https://appetere.com/blog/passing-include-statements-into-a-repository
         public IActionResult Index()
         {
-            //var x = _customerService.getRowsWithInclude(i => i.city , 0);
+            var x = _customerService.getRowsWithInclude(i => i.city ,0);
+            //_customerService.getRowsWithIncludes(o => o.Customer, o => o.LineItems);
             var result = _customerService.InitGrid();
             return View("Index", result);
         }
