@@ -17,6 +17,7 @@ using System.Text.Json;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Newtonsoft.Json.Linq;
 using Tools.Service;
+using System.Collections.Generic;
 
 namespace Services.DataServices.Repository
 {
@@ -88,10 +89,11 @@ namespace Services.DataServices.Repository
             return model;
         }
 
-        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, bool>> expression)
+        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
         {
-            var model = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
-            return model;
+            var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
+            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
+            return x;
         }
 
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
@@ -174,13 +176,24 @@ namespace Services.DataServices.Repository
             return grid;
         }
 
-        // rows + footer header
         public string getRows(int page = 0)
         {
             GridSetting gridSetting = GetGrid();
             List<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList();
             string jsonRows = rows.ToJson();
             return jsonRows;
+        }
+
+        public string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0)
+        {
+            GridSetting gridSetting = GetGrid();
+            var model = _dbSet
+                .Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage)
+                .Take(gridSetting.ItemsPerPage).Include(expression)
+                .AsQueryable()
+                .AsNoTracking()
+                .ToList().ToJson();
+            return model;
         }
 
         public Footer getFooter(int firstBtn = 1, int activeBtn = 1)
@@ -194,12 +207,10 @@ namespace Services.DataServices.Repository
             Footer footer = new Footer {
                 activeBtn = activeBtn,
                 firstBtn = firstBtn,
+                lastBtn = (firstBtn + PagerRange.Count()),
                 isNextDisabled = TableRange.Max() == PagerRange.Max() ? "disabled" : "",
                 isPrevDisabled = PagerRange.Min() == 1 ? "disabled" : "",
-
-                prevBtnArgs = (firstBtn - (PagerRange.Count() + 1)).ToString() + "," + (firstBtn - 1).ToString(),
-                nextBtnArgs = (PagerRange.Count() + 1).ToString() + "," + (firstBtn + PagerRange.Count()).ToString(),
-                pagerSize = PagerRange.Count()
+                prevBtn = firstBtn - gridSetting.PagerSize
             };
             return footer;
         }

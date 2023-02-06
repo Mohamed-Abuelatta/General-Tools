@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\My Folder\\General-Tools\\Tools\\Tools.csproj": {}
+    "D:\\General-Tools\\Tools\\Tools.csproj": {}
   },
   "projects": {
-    "D:\\My Folder\\General-Tools\\Tools\\Tools.csproj": {
+    "D:\\General-Tools\\Tools\\Tools.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\My Folder\\General-Tools\\Tools\\Tools.csproj",
+        "projectUniqueName": "D:\\General-Tools\\Tools\\Tools.csproj",
         "projectName": "Tools",
-        "projectPath": "D:\\My Folder\\General-Tools\\Tools\\Tools.csproj",
-        "packagesPath": "C:\\Users\\mrmoh\\.nuget\\packages\\",
-        "outputPath": "D:\\My Folder\\General-Tools\\Tools\\obj\\",
+        "projectPath": "D:\\General-Tools\\Tools\\Tools.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "D:\\General-Tools\\Tools\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\mrmoh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -104,7 +105,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using Tools.Models;
@@ -19,6 +20,7 @@ namespace Tools.Controllers
 
         public IActionResult Index()
         {
+            //var x = _customerService.getRowsWithInclude(i => i.city , 0);
             var result = _customerService.InitGrid();
             return View("Index", result);
         }
