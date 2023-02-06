@@ -18,6 +18,9 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Newtonsoft.Json.Linq;
 using Tools.Service;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Routing.Matching;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace Services.DataServices.Repository
 {
@@ -52,7 +55,6 @@ namespace Services.DataServices.Repository
         {
             try
             {
-
                 TEntity model = _dbSet.Find(id);
                 _context.Entry(model).State = EntityState.Detached;
                 TEntityDTO result = _mapper.Map<TEntityDTO>(model);
@@ -68,7 +70,6 @@ namespace Services.DataServices.Repository
         {
             var model = _mapper.Map<IEnumerable<TEntityDTO>>(await _dbSet.ToListAsync());
             return model;
-
         }
 
         public IQueryable<TEntityDTO> GetAllAsQueryable()
@@ -95,6 +96,15 @@ namespace Services.DataServices.Repository
             var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
             return x;
         }
+
+        //public IQueryable<TEntityDTO> IncludeMultiple<T>(this IQueryable<TEntityDTO> query, params Expression<Func<TEntity, object>>[] includes)
+        //{
+        //    if (includes != null)
+        //    {
+        //        query = includes.Aggregate(query,(current, include) => current.Include(include));
+        //    }
+        //    return query;
+        //}
 
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
