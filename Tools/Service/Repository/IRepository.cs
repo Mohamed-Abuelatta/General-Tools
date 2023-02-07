@@ -28,5 +28,6 @@ namespace Services.DataServices.Repository
         Footer getFooter(int firstBtn = 1, int activeBtn = 1);
         string getRows(int page);
         string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0);
+        IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntityDTO> query, params Expression<Func<TEntityDTO, object>>[] includes);
     }
 }

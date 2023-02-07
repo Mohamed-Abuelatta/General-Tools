@@ -24,6 +24,9 @@ namespace Tools.Controllers
         public IActionResult Index()
         {
             var x = _customerService.getRowsWithInclude(i => i.city ,0);
+
+            var xxx = _customerService.IncludeMultiple(_customerService.GetAllAsQueryable(), i => i.city);
+
             //_customerService.getRowsWithIncludes(o => o.Customer, o => o.LineItems);
             var result = _customerService.InitGrid();
             return View("Index", result);

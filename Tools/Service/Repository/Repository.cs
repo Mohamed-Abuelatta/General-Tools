@@ -97,14 +97,14 @@ namespace Services.DataServices.Repository
             return x;
         }
 
-        //public IQueryable<TEntityDTO> IncludeMultiple<T>(this IQueryable<TEntityDTO> query, params Expression<Func<TEntity, object>>[] includes)
-        //{
-        //    if (includes != null)
-        //    {
-        //        query = includes.Aggregate(query,(current, include) => current.Include(include));
-        //    }
-        //    return query;
-        //}
+        public IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntityDTO> query, params Expression<Func<TEntityDTO, object>>[] includes)
+        {
+            if (includes != null)
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+            return query;
+        }
 
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
