@@ -194,6 +194,17 @@ namespace Services.DataServices.Repository
             return jsonRows;
         }
 
+        public IQueryable<TEntityDTO> getRowsWithIncludeMultiple(int page = 0, params Expression<Func<TEntityDTO, object>>[] includes)
+        {
+            GridSetting gs = GetGrid();
+            var rows = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage));
+            if (includes != null)
+            {
+                rows = includes.Aggregate(rows, (current, include) => current.Include(include));
+            }
+            return rows;
+        }
+
         public string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0)
         {
             GridSetting gridSetting = GetGrid();

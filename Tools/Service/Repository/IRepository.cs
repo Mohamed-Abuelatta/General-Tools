@@ -29,5 +29,6 @@ namespace Services.DataServices.Repository
         string getRows(int page);
         string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0);
         IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntityDTO> query, params Expression<Func<TEntityDTO, object>>[] includes);
+        IQueryable<TEntityDTO> getRowsWithIncludeMultiple(int page = 0, params Expression<Func<TEntityDTO, object>>[] includes);
     }
 }
