@@ -90,22 +90,6 @@ namespace Services.DataServices.Repository
             return model;
         }
 
-        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
-        {
-            var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
-            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
-            return x;
-        }
-
-        public IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntityDTO> query, params Expression<Func<TEntityDTO, object>>[] includes)
-        {
-            if (includes != null)
-            {
-                query = includes.Aggregate(query, (current, include) => current.Include(include));
-            }
-            return query;
-        }
-
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
             TEntityDTO result = null;
@@ -134,20 +118,11 @@ namespace Services.DataServices.Repository
 
         }
 
-        public TEntityDTO Update(TEntityDTO entity)
+        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
         {
-            try
-            {
-                TEntity result = _mapper.Map<TEntity>(entity);
-                _dbSet.Update(result);
-                _context.SaveChangesAsync();
-                entity = _mapper.Map<TEntityDTO>(result);
-            }
-            catch
-            {
-                return entity;
-            }
-            return entity;
+            var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
+            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
+            return x;
         }
 
         public TEntityDTO Remove(object id, int page)
@@ -166,6 +141,33 @@ namespace Services.DataServices.Repository
             }
             return result;
         }
+
+        public IQueryable<TEntityDTO> IncludeMultiple(params Expression<Func<TEntityDTO, object>>[] includes)
+        {
+            var query = GetAllAsQueryable();
+            if (includes != null)
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+            return query;
+        }
+
+        public TEntityDTO Update(TEntityDTO entity)
+        {
+            try
+            {
+                TEntity result = _mapper.Map<TEntity>(entity);
+                _dbSet.Update(result);
+                _context.SaveChangesAsync();
+                entity = _mapper.Map<TEntityDTO>(result);
+            }
+            catch
+            {
+                return entity;
+            }
+            return entity;
+        }
+
 
         public GridSetting GetGrid()
         {
@@ -197,11 +199,17 @@ namespace Services.DataServices.Repository
         public IQueryable<TEntityDTO> getRowsWithIncludeMultiple(int page = 0, params Expression<Func<TEntityDTO, object>>[] includes)
         {
             GridSetting gs = GetGrid();
-            var rows = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage));
-            if (includes != null)
-            {
-                rows = includes.Aggregate(rows, (current, include) => current.Include(include));
+            IEnumerable<TEntity> getPage = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage);
+            IQueryable<TEntityDTO> rows = _mapper.Map<IEnumerable<TEntityDTO>>(getPage).AsQueryable();
+
+            //if (includes != null) 
+            //{ rows = includes.Aggregate(rows, (current, include) => current.Include(include).AsQueryable().AsNoTracking()); }
+
+            foreach (var include in includes)
+            { 
+                rows = rows.Include(include); 
             }
+
             return rows;
         }
 

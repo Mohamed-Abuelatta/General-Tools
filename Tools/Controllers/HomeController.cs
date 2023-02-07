@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
+using System.Linq.Expressions;
 using Tools.Models;
 using Tools.Service.ServiceData;
 
@@ -23,10 +24,11 @@ namespace Tools.Controllers
         // https://appetere.com/blog/passing-include-statements-into-a-repository
         public IActionResult Index()
         {
-            var x = _customerService.getRowsWithInclude(i => i.city ,0);
+            var x = _customerService.Include(i => i.city);
 
-            var xxx = _customerService.IncludeMultiple(_customerService.GetAllAsQueryable(), i => i.city);
-
+            // Expression<Func<TEntityDTO, object>>[] myObjArray = { i => i.city, i => i.age };
+            var xxx = _customerService.getRowsWithIncludeMultiple(page: 0, i => i.cityDTO, i => i.ageDTO);
+          
             //_customerService.getRowsWithIncludes(o => o.Customer, o => o.LineItems);
             var result = _customerService.InitGrid();
             return View("Index", result);
