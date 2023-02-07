@@ -121,7 +121,7 @@ namespace Services.DataServices.Repository
         public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
         {
             var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
-            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
+            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression));
             return x;
         }
 
