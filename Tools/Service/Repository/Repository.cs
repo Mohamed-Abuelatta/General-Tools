@@ -120,23 +120,21 @@ namespace Services.DataServices.Repository
 
         }
 
-        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
+        public IEnumerable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
         {
             var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
-            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression));
-            return x;
+            return _mapper.Map<IEnumerable<TEntityDTO>>(model);
         }
 
-        public IQueryable<TEntityDTO> IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes)
+        public IEnumerable<TEntityDTO> IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes)
         {
             GridSetting gs = GetGrid();
-            IQueryable<TEntity> getPage = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage).AsQueryable();
+            IQueryable<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage).AsQueryable();
 
             if (includes != null)
-            { getPage = includes.Aggregate(getPage, (current, include) => current.Include(include).AsQueryable().AsNoTracking()); }
+            { rows = includes.Aggregate(rows, (current, include) => current.Include(include).AsQueryable().AsNoTracking()); }
 
-            IQueryable<TEntityDTO> rows = _mapper.Map<IEnumerable<TEntityDTO>>(getPage).AsQueryable();
-            return rows;
+            return _mapper.Map<IEnumerable<TEntityDTO>>(rows).AsQueryable();
         }
 
         public TEntityDTO Remove(object id, int page)
@@ -187,29 +185,16 @@ namespace Services.DataServices.Repository
             InitGrid grid = new InitGrid();
             grid.grid = GetGrid();
             grid.columns = getColumns();
-            grid.rows = JsonConvert.DeserializeObject(getRows());
+            grid.rows = JsonConvert.DeserializeObject(getRows().ToJson());
             grid.footer = getFooter();
             return grid;
         }
 
-        public string getRows(int page = 0)
+        public IEnumerable<TEntityDTO> getRows(int page = 0)
         {
             GridSetting gridSetting = GetGrid();
-            List<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList();
-            string jsonRows = rows.ToJson();
-            return jsonRows;
-        }
-
-        public string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0)
-        {
-            GridSetting gridSetting = GetGrid();
-            var model = _dbSet
-                .Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage)
-                .Take(gridSetting.ItemsPerPage).Include(expression)
-                .AsQueryable()
-                .AsNoTracking()
-                .ToList().ToJson();
-            return model;
+            IQueryable<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).AsQueryable();
+            return _mapper.Map<IEnumerable<TEntityDTO>>(rows);
         }
 
         public Footer getFooter(int firstBtn = 1, int activeBtn = 1)

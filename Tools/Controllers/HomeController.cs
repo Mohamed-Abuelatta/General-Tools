@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using NuGet.Protocol;
 using System;
 using System.Linq.Expressions;
 using Tools.Models;
@@ -43,7 +44,7 @@ namespace Tools.Controllers
                         string refresh = JsonConvert.SerializeObject(
                         new
                         {
-                            rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn)),
+                            rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn).ToJson()),
                             footer = _customerService.getFooter(firstBtn, activeBtn)
                         });
                         return Json(refresh);
@@ -72,7 +73,7 @@ namespace Tools.Controllers
             string refresh = JsonConvert.SerializeObject(
                new
                {
-                   rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn)),
+                   rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn).ToJson()),
                    footer = _customerService.getFooter(firstBtn, activeBtn)
                }
             );
@@ -85,7 +86,7 @@ namespace Tools.Controllers
             string refresh = JsonConvert.SerializeObject(
             new
             {
-                rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
+                rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId).ToJson()),
                 footer = _customerService.getFooter(firstBtn, fotId)
             });
             return Json(refresh);
