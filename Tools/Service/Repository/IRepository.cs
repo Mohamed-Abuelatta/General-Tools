@@ -27,7 +27,7 @@ namespace Services.DataServices.Repository
         Footer getFooter(int firstBtn = 1, int activeBtn = 1);
         string getRows(int page);
         string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0);
-        IQueryable<TEntityDTO> IncludeMultiple(params Expression<Func<TEntityDTO, object>>[] includes);
-        IQueryable<TEntityDTO> getRowsWithIncludeMultiple(int page = 0, params Expression<Func<TEntityDTO, object>>[] includes);
+        IQueryable<TEntityDTO> IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes);
+        //IQueryable<TEntityDTO> getRowsWithIncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes);
     }
 }

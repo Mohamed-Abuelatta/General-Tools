@@ -24,12 +24,8 @@ namespace Tools.Controllers
         // https://appetere.com/blog/passing-include-statements-into-a-repository
         public IActionResult Index()
         {
-            var x = _customerService.Include(i => i.city);
+            var xxx = _customerService.IncludeMultiple(page: 0, i => i.city, i => i.age);
 
-            // Expression<Func<TEntityDTO, object>>[] myObjArray = { i => i.city, i => i.age };
-            var xxx = _customerService.getRowsWithIncludeMultiple(page: 0, i => i.cityDTO, i => i.ageDTO);
-          
-            //_customerService.getRowsWithIncludes(o => o.Customer, o => o.LineItems);
             var result = _customerService.InitGrid();
             return View("Index", result);
         }

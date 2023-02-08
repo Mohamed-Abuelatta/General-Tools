@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Services.DataServices.Repository
 {
@@ -125,6 +127,18 @@ namespace Services.DataServices.Repository
             return x;
         }
 
+        public IQueryable<TEntityDTO> IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes)
+        {
+            GridSetting gs = GetGrid();
+            IQueryable<TEntity> getPage = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage).AsQueryable();
+
+            if (includes != null)
+            { getPage = includes.Aggregate(getPage, (current, include) => current.Include(include).AsQueryable().AsNoTracking()); }
+
+            IQueryable<TEntityDTO> rows = _mapper.Map<IEnumerable<TEntityDTO>>(getPage).AsQueryable();
+            return rows;
+        }
+
         public TEntityDTO Remove(object id, int page)
         {
             TEntityDTO result = null;
@@ -140,16 +154,6 @@ namespace Services.DataServices.Repository
                 return result;
             }
             return result;
-        }
-
-        public IQueryable<TEntityDTO> IncludeMultiple(params Expression<Func<TEntityDTO, object>>[] includes)
-        {
-            var query = GetAllAsQueryable();
-            if (includes != null)
-            {
-                query = includes.Aggregate(query, (current, include) => current.Include(include));
-            }
-            return query;
         }
 
         public TEntityDTO Update(TEntityDTO entity)
@@ -194,23 +198,6 @@ namespace Services.DataServices.Repository
             List<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gridSetting.ItemsPerPage).Take(gridSetting.ItemsPerPage).ToList();
             string jsonRows = rows.ToJson();
             return jsonRows;
-        }
-
-        public IQueryable<TEntityDTO> getRowsWithIncludeMultiple(int page = 0, params Expression<Func<TEntityDTO, object>>[] includes)
-        {
-            GridSetting gs = GetGrid();
-            IEnumerable<TEntity> getPage = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage);
-            IQueryable<TEntityDTO> rows = _mapper.Map<IEnumerable<TEntityDTO>>(getPage).AsQueryable();
-
-            //if (includes != null) 
-            //{ rows = includes.Aggregate(rows, (current, include) => current.Include(include).AsQueryable().AsNoTracking()); }
-
-            foreach (var include in includes)
-            { 
-                rows = rows.Include(include); 
-            }
-
-            return rows;
         }
 
         public string getRowsWithInclude(Expression<Func<TEntity, object>> expression, int page = 0)
