@@ -192,6 +192,7 @@ window.onload =  populateTable();
 function populateTable(){
     colsLength = columns.filter(col => col.IsVisable === true && (col.KeyType == 'Normal' || col.KeyType == 'FK')).length;
     table.addHeader();
+    //console.log(rows);
     rows.map(row => { table.addRow(row); });
     table.addFooter();
 }

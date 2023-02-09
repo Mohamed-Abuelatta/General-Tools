@@ -25,9 +25,8 @@ namespace Tools.Controllers
         // https://appetere.com/blog/passing-include-statements-into-a-repository
         public IActionResult Index()
         {
-            var xxx = _customerService.IncludeMultiple(page: 0, i => i.city, i => i.age);
-
-            var result = _customerService.InitGrid();
+            CustomerDTO customerDTO = new CustomerDTO();
+            var result = _customerService.InitGrid(customerDTO, _customerService.getRowsWithFK());
             return View("Index", result);
         }
 
@@ -44,7 +43,7 @@ namespace Tools.Controllers
                         string refresh = JsonConvert.SerializeObject(
                         new
                         {
-                            rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn).ToJson()),
+                            rows = JsonConvert.DeserializeObject(_customerService.getRowsWithFK(activeBtn).ToJson()),
                             footer = _customerService.getFooter(firstBtn, activeBtn)
                         });
                         return Json(refresh);
@@ -73,7 +72,7 @@ namespace Tools.Controllers
             string refresh = JsonConvert.SerializeObject(
                new
                {
-                   rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn).ToJson()),
+                   rows = JsonConvert.DeserializeObject(_customerService.getRowsWithFK(activeBtn).ToJson()),
                    footer = _customerService.getFooter(firstBtn, activeBtn)
                }
             );
@@ -86,7 +85,7 @@ namespace Tools.Controllers
             string refresh = JsonConvert.SerializeObject(
             new
             {
-                rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId).ToJson()),
+                rows = JsonConvert.DeserializeObject(_customerService.getRowsWithFK(fotId).ToJson()),
                 footer = _customerService.getFooter(firstBtn, fotId)
             });
             return Json(refresh);

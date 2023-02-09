@@ -180,12 +180,12 @@ namespace Services.DataServices.Repository
             return gridSetting;
         }
 
-        public InitGrid InitGrid()
+        public InitGrid InitGrid(TEntityDTO entityDTO, object rows)
         {
             InitGrid grid = new InitGrid();
             grid.grid = GetGrid();
-            grid.columns = getColumns();
-            grid.rows = JsonConvert.DeserializeObject(getRows().ToJson());
+            grid.columns = getColumns(entityDTO);
+            grid.rows = rows;  /*JsonConvert.DeserializeObject(getRows().ToJson());*/
             grid.footer = getFooter();
             return grid;
         }
@@ -216,10 +216,12 @@ namespace Services.DataServices.Repository
             return footer;
         }
 
-        private List<ColumnSetting> getColumns()
+        private List<ColumnSetting> getColumns(TEntityDTO entityDTO)
         {
             List<ColumnSetting> columns = new List<ColumnSetting>();
             IEnumerable<IProperty> tableProperties = _dbSet.EntityType.GetProperties();
+
+            var xx = entityDTO.GetType().GetProperties();
 
             foreach (var item in tableProperties)
             {
