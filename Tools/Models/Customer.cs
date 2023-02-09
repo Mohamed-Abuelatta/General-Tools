@@ -22,12 +22,13 @@ namespace Tools.Models
 
         [ColumnSetting(2, "المسمى الوظيفى للعميل")]
         public string CustJobTitle { get; set; }
-
-        [ColumnSetting(4, "عمر العميل")]
-        public string CustAge { get; set; }
-
         [ColumnSetting(4, "هل مدير")]
         public bool IsManager { get; set; }
+
+        [ColumnSetting(4, "عمر العميل")]
+        public int AgeId { get; set; }
+        [ForeignKey("AgeId")]
+        public Age age { get; set; }
 
         [ColumnSetting(3, "مدينة تواجد العميل")]
         public int CityId { get; set; }

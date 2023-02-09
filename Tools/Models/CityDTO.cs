@@ -6,9 +6,7 @@ namespace Tools.Models
     public class CityDTO
     {
         public int Id { get; set; }
-
         public string CityName { get; set; }
-
-        public List<Customer> customers { get; set; }
+        public List<CustomerDTO> customerDTO { get; set; }
     }
 }

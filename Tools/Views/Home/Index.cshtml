@@ -190,8 +190,9 @@ function emptyBody(){
 // ---------------------------------------------------------------------------- table Action start
 window.onload =  populateTable();
 function populateTable(){
-    colsLength = columns.filter(col => col.IsVisable === true && col.KeyType == 'Normal').length;
+    colsLength = columns.filter(col => col.IsVisable === true && (col.KeyType == 'Normal' || col.KeyType == 'FK')).length;
     table.addHeader();
+    //console.log(rows);
     rows.map(row => { table.addRow(row); });
     table.addFooter();
 }
@@ -206,6 +207,7 @@ function onSave(rowId){
     .then((response) => response.json())
     .then((data) => { 
         if(rowId == 'headerRow'){
+            console.log(data);
             refreshGrid(JSON.parse(data));
         }else{
             table.addRow(data, row.rowIndex);

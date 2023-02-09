@@ -232,6 +232,22 @@ namespace Tools.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Tools.Models.Age", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("AgeName")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Age");
+                });
+
             modelBuilder.Entity("Tools.Models.City", b =>
                 {
                     b.Property<int>("Id")
@@ -256,11 +272,11 @@ namespace Tools.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CityId")
+                    b.Property<int>("AgeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CustAge")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CustJobTitle")
                         .HasColumnType("nvarchar(max)");
@@ -272,6 +288,8 @@ namespace Tools.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AgeId");
 
                     b.HasIndex("CityId");
 
@@ -331,18 +349,21 @@ namespace Tools.Migrations
 
             modelBuilder.Entity("Tools.Models.Customer", b =>
                 {
+                    b.HasOne("Tools.Models.Age", "age")
+                        .WithMany()
+                        .HasForeignKey("AgeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Tools.Models.City", "city")
-                        .WithMany("customers")
+                        .WithMany()
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("city");
-                });
+                    b.Navigation("age");
 
-            modelBuilder.Entity("Tools.Models.City", b =>
-                {
-                    b.Navigation("customers");
+                    b.Navigation("city");
                 });
 #pragma warning restore 612, 618
         }

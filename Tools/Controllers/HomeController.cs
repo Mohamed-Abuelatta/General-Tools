@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using NuGet.Protocol;
 using System;
+using System.Linq.Expressions;
 using Tools.Models;
 using Tools.Service.ServiceData;
 
@@ -23,9 +25,7 @@ namespace Tools.Controllers
         // https://appetere.com/blog/passing-include-statements-into-a-repository
         public IActionResult Index()
         {
-            var x = _customerService.getRowsWithInclude(i => i.city ,0);
-            //_customerService.getRowsWithIncludes(o => o.Customer, o => o.LineItems);
-            var result = _customerService.InitGrid();
+            var result = _customerService.InitGrid(new CustomerDTO(), _customerService.getRowsWithFK());
             return View("Index", result);
         }
 
@@ -42,7 +42,7 @@ namespace Tools.Controllers
                         string refresh = JsonConvert.SerializeObject(
                         new
                         {
-                            rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn)),
+                            rows = JsonConvert.DeserializeObject(_customerService.getRowsWithFK(activeBtn).ToJson()),
                             footer = _customerService.getFooter(firstBtn, activeBtn)
                         });
                         return Json(refresh);
@@ -71,7 +71,7 @@ namespace Tools.Controllers
             string refresh = JsonConvert.SerializeObject(
                new
                {
-                   rows = JsonConvert.DeserializeObject(_customerService.getRows(activeBtn)),
+                   rows = JsonConvert.DeserializeObject(_customerService.getRowsWithFK(activeBtn).ToJson()),
                    footer = _customerService.getFooter(firstBtn, activeBtn)
                }
             );
@@ -84,7 +84,7 @@ namespace Tools.Controllers
             string refresh = JsonConvert.SerializeObject(
             new
             {
-                rows = JsonConvert.DeserializeObject(_customerService.getRows(fotId)),
+                rows = JsonConvert.DeserializeObject(_customerService.getRowsWithFK(fotId).ToJson()),
                 footer = _customerService.getFooter(firstBtn, fotId)
             });
             return Json(refresh);

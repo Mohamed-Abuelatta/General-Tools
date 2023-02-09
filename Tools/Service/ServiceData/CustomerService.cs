@@ -9,5 +9,10 @@ namespace Tools.Service.ServiceData
     public class CustomerService : Repository<Customer, CustomerDTO>, ICustomerService
     {
         public CustomerService(AppDbContext db, IMapper mapper) : base(db, mapper) { }
+
+        public IEnumerable<CustomerDTO> getRowsWithFK(int page = 0)
+        {
+            return IncludeMultiple(page, i => i.city, i => i.age);
+        }
     }
 }

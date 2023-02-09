@@ -9,8 +9,9 @@ namespace Tools.Models
         [ColumnSetting(0, "رقم المدينة")]
         public int Id { get; set; }
 
+        [ColumnSetting(1, "اسم المدينة")]
         public string CityName { get; set; }
 
-        //public List<Customer> customers { get; set; }
+        public List<Customer> customers { get; set; }
     }
 }
