@@ -14,13 +14,15 @@ namespace Services.DataServices.Repository
         IQueryable<TEntityDTO> GetAllAsQueryable();
         TEntityDTO GetById(object id);
         Task<TEntityDTO> GetByIdAsync(object id);
-        IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression);
         Task<TEntityDTO> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         TEntityDTO Update(TEntityDTO entity);
         IQueryable<TEntityDTO> Where(Expression<Func<TEntity, bool>> expression);
 
         TEntityDTO Remove(object id, int page);
         // -------------------------------------------------------------------------------
+
+        //IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression);
+        IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes);
 
 
         GridSetting GetGrid();

@@ -1,9 +1,7 @@
 ﻿
-
 using AutoMapper;
 using Data.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
 using NuGet.Protocol;
 using System.Data;
@@ -21,6 +19,8 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq;
 
 namespace Services.DataServices.Repository
 {
@@ -97,14 +97,16 @@ namespace Services.DataServices.Repository
             return x;
         }
 
-        //public IQueryable<TEntityDTO> IncludeMultiple<T>(this IQueryable<TEntityDTO> query, params Expression<Func<TEntity, object>>[] includes)
-        //{
-        //    if (includes != null)
-        //    {
-        //        query = includes.Aggregate(query,(current, include) => current.Include(include));
-        //    }
-        //    return query;
-        //}
+        public IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes)
+        {
+            if (includes != null)
+            {
+                query = includes.Aggregate(query, (current, inc) => current.Include(inc));
+            }
+            return _mapper.Map<IQueryable<TEntityDTO>>(query);
+        }
+
+
 
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
