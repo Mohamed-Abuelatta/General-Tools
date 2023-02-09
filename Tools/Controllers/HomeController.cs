@@ -25,8 +25,7 @@ namespace Tools.Controllers
         // https://appetere.com/blog/passing-include-statements-into-a-repository
         public IActionResult Index()
         {
-            CustomerDTO customerDTO = new CustomerDTO();
-            var result = _customerService.InitGrid(customerDTO, _customerService.getRowsWithFK());
+            var result = _customerService.InitGrid(new CustomerDTO(), _customerService.getRowsWithFK());
             return View("Index", result);
         }
 
