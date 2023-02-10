@@ -10,7 +10,7 @@ namespace Tools.Service.ServiceData
     {
         public CustomerService(AppDbContext db, IMapper mapper) : base(db, mapper) { }
 
-        public IEnumerable<CustomerDTO> getRowsWithFK(int page = 0)
+        public IEnumerable<CustomerDTO> getRowsWithIncludes(int page = 0)
         {
             return IncludeMultiple(page, i => i.city, i => i.age);
         }

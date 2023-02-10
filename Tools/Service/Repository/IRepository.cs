@@ -23,7 +23,7 @@ namespace Services.DataServices.Repository
         // -------------------------------------------------------------------------------
 
         GridSetting GetGrid();
-        InitGrid InitGrid(TEntityDTO entityDTO, object rows);
+        List<ColumnSetting> getColumns(TEntityDTO entityDTO);
         Footer getFooter(int firstBtn = 1, int activeBtn = 1);
 
         IEnumerable<TEntityDTO> getRows(int page);

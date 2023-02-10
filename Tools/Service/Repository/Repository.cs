@@ -185,16 +185,6 @@ namespace Services.DataServices.Repository
             return gridSetting;
         }
 
-        public InitGrid InitGrid(TEntityDTO entityDTO, object rows)
-        {
-            InitGrid grid = new InitGrid();
-            grid.grid = GetGrid();
-            grid.columns = getColumns(entityDTO);
-            grid.rows = rows;  /*JsonConvert.DeserializeObject(getRows().ToJson());*/
-            grid.footer = getFooter();
-            return grid;
-        }
-
         public IEnumerable<TEntityDTO> getRows(int page = 0)
         {
             GridSetting gridSetting = GetGrid();
@@ -221,18 +211,20 @@ namespace Services.DataServices.Repository
             return footer;
         }
 
-        private List<ColumnSetting> getColumns(TEntityDTO entityDTO)
+        public List<ColumnSetting> getColumns(TEntityDTO entityDTO)
         {
             List<ColumnSetting> columns = new List<ColumnSetting>();
             IEnumerable<IProperty> tableProperties = _dbSet.EntityType.GetProperties();
+            string PkName = tableProperties.FirstOrDefault(i => i.IsPrimaryKey()).Name;
+            IEnumerable<string> FkNames = tableProperties.Where(i => i.IsForeignKey()).Select(s => s.Name);
 
-            PropertyInfo[] propsInfo = entityDTO.GetType().GetProperties();
+            PropertyInfo[] propsInfos = entityDTO.GetType().GetProperties();
 
-            foreach (var item in propsInfo)
+            foreach (var item in propsInfos)
             {
                 ColumnSetting column = (ColumnSetting)item.GetCustomAttribute(typeof(ColumnSetting));
                 column.ColName = item.Name;
-                //column.KeyType = column.IsPrimaryKey() ? Enum.GetName(keyType.PK) : item.IsForeignKey() ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
+                column.KeyType = item.Name == PkName ? Enum.GetName(keyType.PK) : FkNames.Contains(item.Name) ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
                 column.HiddenClass = column.KeyType == Enum.GetName(keyType.PK) ? Enum.GetName(hideClass.pk) : column.HiddenClass;
                 switch (item.PropertyType.Name)
                 {
@@ -251,42 +243,13 @@ namespace Services.DataServices.Repository
                         column.InputType = Enum.GetName(inputType.checkbox);
                         break;
                     default:
-                        column.InputType = Enum.GetName(inputType.text);
+                       column.InputType = (column.KeyType == Enum.GetName(keyType.FK)) ?
+                         Enum.GetName(inputType.dropDownList) :
+                         Enum.GetName(inputType.text);
                         break;
                 }
                 columns.Add(column);
             }
-
-
-            //foreach (var item in tableProperties)
-            //{
-            //    PropertyInfo propInfo = item.PropertyInfo; 
-            //    ColumnSetting column = (ColumnSetting)propInfo.GetCustomAttribute(typeof(ColumnSetting));
-            //    column.ColName = propInfo.Name;
-            //    column.KeyType = item.IsPrimaryKey() ? Enum.GetName(keyType.PK) : item.IsForeignKey() ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
-            //    column.HiddenClass = item.IsPrimaryKey() ? Enum.GetName(hideClass.pk) : column.HiddenClass;
-            //    switch (propInfo.PropertyType.Name)
-            //    {
-            //        case "string":
-            //            column.InputType = Enum.GetName(inputType.text);
-            //            break;
-            //        case "Int32":
-            //        case "Decimal":
-            //        case "Float":
-            //            column.InputType = Enum.GetName(inputType.number);
-            //            break;
-            //        case "DateTime":
-            //            column.InputType = Enum.GetName(inputType.date);
-            //            break;
-            //        case "Boolean":
-            //            column.InputType = Enum.GetName(inputType.checkbox);
-            //            break;
-            //        default:
-            //            column.InputType = Enum.GetName(inputType.text);
-            //            break;
-            //    }
-            //    columns.Add(column);
-            //}
 
             columns.Add(new ColumnSetting { ColName= "msg", KeyType= Enum.GetName(keyType.msg), HiddenClass = Enum.GetName(hideClass.msg) });
             columns.Add(new ColumnSetting { ColName= "ctrl", KeyType= Enum.GetName(keyType.ctrl) });

@@ -23,7 +23,7 @@
             textaria,
             wysiwyg,
             link,
-            dropdownList,
+            dropDownList,
             number,
             date,
             checkbox,
