@@ -22,13 +22,6 @@ namespace Services.DataServices.Repository
         TEntityDTO Remove(object id, int page);
         // -------------------------------------------------------------------------------
 
-<<<<<<< HEAD
-        //IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression);
-        IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes);
-
-
-=======
->>>>>>> 98e4d85700e2fab3d03505c6f9ecd0d1d5886854
         GridSetting GetGrid();
         InitGrid InitGrid(TEntityDTO entityDTO, object rows);
         Footer getFooter(int firstBtn = 1, int activeBtn = 1);

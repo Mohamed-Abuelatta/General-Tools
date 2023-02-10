@@ -2,8 +2,6 @@
 using AutoMapper;
 using Data.Contexts;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using NuGet.Protocol;
 using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,21 +9,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Tools.Tools.CustomAttributes;
 using static Tools.Tools.CustomAttributes.AttrEnum;
 using Tools.Tools.Grid;
-using System.Text.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Newtonsoft.Json.Linq;
-using Tools.Service;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Routing.Matching;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-<<<<<<< HEAD
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Linq;
-=======
-using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
->>>>>>> 98e4d85700e2fab3d03505c6f9ecd0d1d5886854
+
 
 namespace Services.DataServices.Repository
 {
@@ -95,27 +79,24 @@ namespace Services.DataServices.Repository
             return model;
         }
 
-<<<<<<< HEAD
-        public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
-        {
-            var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
-            var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
-            return x;
-        }
 
-        public IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes)
-        {
-            if (includes != null)
-            {
-                query = includes.Aggregate(query, (current, inc) => current.Include(inc));
-            }
-            return _mapper.Map<IQueryable<TEntityDTO>>(query);
-        }
+        //public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
+        //{
+        //    var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
+        //    var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
+        //    return x;
+        //}
+
+        //public IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes)
+        //{
+        //    if (includes != null)
+        //    {
+        //        query = includes.Aggregate(query, (current, inc) => current.Include(inc));
+        //    }
+        //    return _mapper.Map<IQueryable<TEntityDTO>>(query);
+        //}
 
 
-
-=======
->>>>>>> 98e4d85700e2fab3d03505c6f9ecd0d1d5886854
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
             TEntityDTO result = null;
@@ -156,9 +137,9 @@ namespace Services.DataServices.Repository
             IQueryable<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage).AsQueryable();
 
             if (includes != null)
-            { rows = includes.Aggregate(rows, (current, include) => current.Include(include).AsQueryable().AsNoTracking()); }
+            { rows = includes.Aggregate(rows, (current, include) => current.Include(include)); }
 
-            return _mapper.Map<IEnumerable<TEntityDTO>>(rows).AsQueryable();
+            return _mapper.Map<IEnumerable<TEntityDTO>>(rows).AsQueryable().AsNoTracking();
         }
 
         public TEntityDTO Remove(object id, int page)
@@ -245,16 +226,15 @@ namespace Services.DataServices.Repository
             List<ColumnSetting> columns = new List<ColumnSetting>();
             IEnumerable<IProperty> tableProperties = _dbSet.EntityType.GetProperties();
 
-            var xx = entityDTO.GetType().GetProperties();
+            PropertyInfo[] propsInfo = entityDTO.GetType().GetProperties();
 
-            foreach (var item in tableProperties)
+            foreach (var item in propsInfo)
             {
-                PropertyInfo propInfo = item.PropertyInfo; 
-                ColumnSetting column = (ColumnSetting)propInfo.GetCustomAttribute(typeof(ColumnSetting));
-                column.ColName = propInfo.Name;
-                column.KeyType = item.IsPrimaryKey() ? Enum.GetName(keyType.PK) : item.IsForeignKey() ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
-                column.HiddenClass = item.IsPrimaryKey() ? Enum.GetName(hideClass.pk) : column.HiddenClass;
-                switch (propInfo.PropertyType.Name)
+                ColumnSetting column = (ColumnSetting)item.GetCustomAttribute(typeof(ColumnSetting));
+                column.ColName = item.Name;
+                //column.KeyType = column.IsPrimaryKey() ? Enum.GetName(keyType.PK) : item.IsForeignKey() ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
+                column.HiddenClass = column.KeyType == Enum.GetName(keyType.PK) ? Enum.GetName(hideClass.pk) : column.HiddenClass;
+                switch (item.PropertyType.Name)
                 {
                     case "string":
                         column.InputType = Enum.GetName(inputType.text);
@@ -276,6 +256,38 @@ namespace Services.DataServices.Repository
                 }
                 columns.Add(column);
             }
+
+
+            //foreach (var item in tableProperties)
+            //{
+            //    PropertyInfo propInfo = item.PropertyInfo; 
+            //    ColumnSetting column = (ColumnSetting)propInfo.GetCustomAttribute(typeof(ColumnSetting));
+            //    column.ColName = propInfo.Name;
+            //    column.KeyType = item.IsPrimaryKey() ? Enum.GetName(keyType.PK) : item.IsForeignKey() ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
+            //    column.HiddenClass = item.IsPrimaryKey() ? Enum.GetName(hideClass.pk) : column.HiddenClass;
+            //    switch (propInfo.PropertyType.Name)
+            //    {
+            //        case "string":
+            //            column.InputType = Enum.GetName(inputType.text);
+            //            break;
+            //        case "Int32":
+            //        case "Decimal":
+            //        case "Float":
+            //            column.InputType = Enum.GetName(inputType.number);
+            //            break;
+            //        case "DateTime":
+            //            column.InputType = Enum.GetName(inputType.date);
+            //            break;
+            //        case "Boolean":
+            //            column.InputType = Enum.GetName(inputType.checkbox);
+            //            break;
+            //        default:
+            //            column.InputType = Enum.GetName(inputType.text);
+            //            break;
+            //    }
+            //    columns.Add(column);
+            //}
+
             columns.Add(new ColumnSetting { ColName= "msg", KeyType= Enum.GetName(keyType.msg), HiddenClass = Enum.GetName(hideClass.msg) });
             columns.Add(new ColumnSetting { ColName= "ctrl", KeyType= Enum.GetName(keyType.ctrl) });
             return columns;
