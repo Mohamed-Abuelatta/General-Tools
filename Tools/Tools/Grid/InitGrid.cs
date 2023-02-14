@@ -8,8 +8,9 @@ namespace Tools.Tools.Grid
     {
         public GridSetting grid { get; set; }
         public List<ColumnSetting> columns { get; set; }
-        public object rows { get; set; }
+        public dynamic rows { get; set; }
         public Footer footer { get; set; }
-        public JObject Enums { get; set; } 
+        public JObject enums { get; set; } 
+        public dynamic assets { get; set; } 
     }
 }

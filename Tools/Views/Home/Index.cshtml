@@ -110,7 +110,8 @@
     string columns = JsonConvert.SerializeObject(Model.columns);
     object rows = JsonConvert.SerializeObject(Model.rows);
     string footer = JsonConvert.SerializeObject(Model.footer);
-    string enums = JsonConvert.SerializeObject(Model.Enums);
+    string enums = JsonConvert.SerializeObject(Model.enums);
+    string assets = JsonConvert.SerializeObject(Model.assets);
 }
 
 <script type="text/javascript">
@@ -121,8 +122,6 @@ let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 let enums = @Html.Raw(enums);
 const InputType = JSON.parse(enums.InputType);
-//const KeyType = JSON.parse(enums.KeyType);
-//const HiddenClass = JSON.parse(enums.HiddenClass);
 
 let row; let colsLength;
 const table = document.getElementById(`table${grid.GridName}`);
@@ -165,11 +164,10 @@ function addRow(data, position = -1){
     columns.map((col, i) => { 
     let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
     row.addCell(col, value);
-        //if (col.KeyType == 'PK') { row.setAttribute('data-pk', value); }
     });
 }
 HTMLTableRowElement.prototype.addCell = addCell;
-function addCell(col, val = '') { 
+    function addCell(col, val = '') {
     let newCell = this.insertCell();
     newCell.className = (col.HiddenClass == 'noHide' ? 'ctrlView' : `ctrlView ${col.HiddenClass}`);
     if (col.ColName == 'msg') {newCell.setAttribute('colspan', colsLength);}
@@ -189,10 +187,16 @@ function addCell(col, val = '') {
          
     }
 }
+// Function to get the key/val from the object by index
+Object.prototype.getByIndex = function(index) {
+  return this[Object.keys(this)[index]];
+};
 function setElement(elmType,col,val, callBack){
+        
     let result; 
         switch (elmType) {
-            case 'dropDownList': console.log(val.AgeName); result = 'dropDownList'; break;
+            case 'dropDownList': /*console.log(col.ColTitle + '  -  ' + val.getByIndex(1));*/
+            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<select><option disabled>Please Select</option></select></div>`; break;
             case 'checkbox': val = val === true ? 'checked' : ''; 
             result = `<div><input disabled data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div>`; break;
             //case 'ImgPath': break;

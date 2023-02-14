@@ -25,7 +25,9 @@ namespace Services.DataServices.Repository
 
         IEnumerable<TEntityDTO> test(string sqlExpression);
 
+        JObject getAssets(params Type[] assets);
         JObject getEnums(params Type[] enums);
+
         GridSetting GetGrid();
         List<ColumnSetting> getColumns(TEntityDTO entityDTO);
         Footer getFooter(int firstBtn = 1, int activeBtn = 1);

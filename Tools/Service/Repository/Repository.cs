@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using NuGet.Protocol;
+using AutoMapper.QueryableExtensions;
 
 namespace Services.DataServices.Repository
 {
@@ -95,6 +96,19 @@ namespace Services.DataServices.Repository
             return records;
         }
 
+        public JObject getAssets(params Type[] assets)
+        {
+            var records = new JObject();
+            foreach (var item in assets)
+            {
+                IEntityType entity = _context.Model.FindEntityType(item);
+                Type model = entity.Model.GetType();
+                //TEntityDTO dto = _mapper.Map<TEntityDTO>(model.GetType());
+                records.Add(item.GetType().Name, JsonConvert.SerializeObject(model.ToJson()));
+            }
+            return records;
+        }
+
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
             TEntityDTO result = null;
@@ -135,8 +149,10 @@ namespace Services.DataServices.Repository
             if (includes != null)
             { rows = includes.Aggregate(rows, (current, include) => current.Include(include)); }
 
-            string result = 
-            JsonConvert.SerializeObject(rows, Formatting.None, new JsonSerializerSettings() {  ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            IEnumerable<TEntityDTO> rowsDTO = _mapper.Map<IEnumerable<TEntityDTO>>(rows);
+
+            string result =
+            JsonConvert.SerializeObject(rowsDTO, Formatting.None, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
 
             return result;
         }
