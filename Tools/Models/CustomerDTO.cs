@@ -21,11 +21,6 @@ namespace Tools.Models
         public bool IsManager { get; set; }
 
         [ColumnSetting(5, "عمر العميل", inputType: InputType.dropDownList)]
-        public List<string,string,bool> age { get; set; }
-        [ColumnSetting(3, "مدينة تواجد العميل", inputType: InputType.dropDownList)]
-        public string city { get; set; }
-
-        [ColumnSetting(5, "عمر العميل", inputType: InputType.dropDownList)]
         public AgeDTO ageDto { get; set; }
         [ColumnSetting(3, "مدينة تواجد العميل", inputType: InputType.dropDownList)]
         public CityDTO cityDto { get; set; }

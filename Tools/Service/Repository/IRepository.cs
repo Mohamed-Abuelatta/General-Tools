@@ -23,6 +23,8 @@ namespace Services.DataServices.Repository
         TEntityDTO Remove(object id, int page);
         // -------------------------------------------------------------------------------
 
+        IEnumerable<TEntityDTO> test(string sqlExpression);
+
         JObject getEnums(params Type[] enums);
         GridSetting GetGrid();
         List<ColumnSetting> getColumns(TEntityDTO entityDTO);

@@ -120,9 +120,7 @@ namespace Services.DataServices.Repository
             await _context.SaveChangesAsync();
             var result = _mapper.Map<IEnumerable<TEntityDTO>>(model);
             return result;
-
         }
-
         public IEnumerable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
         {
             var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
@@ -136,8 +134,10 @@ namespace Services.DataServices.Repository
 
             if (includes != null)
             { rows = includes.Aggregate(rows, (current, include) => current.Include(include)); }
+
             string result = 
-            JsonConvert.SerializeObject(rows, Formatting.Indented, new JsonSerializerSettings() {  ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            JsonConvert.SerializeObject(rows, Formatting.None, new JsonSerializerSettings() {  ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
             return result;
         }
 
@@ -191,6 +191,16 @@ namespace Services.DataServices.Repository
             return _mapper.Map<IEnumerable<TEntityDTO>>(rows);
         }
 
+        // sooooooooooooooooo important 
+        // https://www.entityframeworktutorial.net/
+        // sooooooooooooooooo important 
+        // https://www.entityframeworktutorial.net/EntityFramework4.3/raw-sql-query-in-entity-framework.aspx
+        public IEnumerable<TEntityDTO> test(string sqlExpression)
+        {
+            var model = _dbSet.FromSqlRaw(sqlExpression).AsQueryable().AsNoTracking();
+            return _mapper.Map<IEnumerable<TEntityDTO>>(model);
+        }
+        
         public Footer getFooter(int firstBtn = 1, int activeBtn = 1)
         { 
             GridSetting gridSetting = GetGrid();

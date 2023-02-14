@@ -182,8 +182,7 @@ function addCell(col, val = '') {
         return col.KeyType == 'PK' ? '' : col.ColName == 'ctrl' ? 
         /*header ctrl*/ `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`:
         /*header norm*/ `<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`;
-    } else {
-         //console.log(InputType[col.inputType]);
+    } else {   
         return col.ColName == 'ctrl' ? 
         /*row ctrl*/ `<div><a href='#' class='bi bi-pencil-square' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-trash3' onclick="toggleConfirm('${rowId}')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-check' id='action${rowId}' onclick="actionRow('${rowId}')"></a></div>`:
         /*row norm*/ setElement(InputType[col.inputType],col,val);
@@ -191,10 +190,9 @@ function addCell(col, val = '') {
     }
 }
 function setElement(elmType,col,val, callBack){
-    console.log(val);
     let result; 
         switch (elmType) {
-            case 'dropDownList': result = 'dropDownList'; break;
+            case 'dropDownList': console.log(val.AgeName); result = 'dropDownList'; break;
             case 'checkbox': val = val === true ? 'checked' : ''; 
             result = `<div><input disabled data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div>`; break;
             //case 'ImgPath': break;
@@ -206,6 +204,7 @@ function setElement(elmType,col,val, callBack){
             case 'conditional': () =>{ result = callBack }; break;
             default: result = `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' value='${val}'></div>`;
     };
+
     return result;
 }
 HTMLTableElement.prototype.emptyBody = emptyBody;
