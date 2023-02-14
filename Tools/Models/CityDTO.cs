@@ -7,6 +7,5 @@ namespace Tools.Models
     {
         public int Id { get; set; }
         public string CityName { get; set; }
-        public List<CustomerDTO> customerDTO { get; set; }
     }
 }

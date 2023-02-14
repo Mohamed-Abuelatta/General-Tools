@@ -1,23 +1,27 @@
-﻿namespace Tools.Tools.CustomAttributes
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace Tools.Tools.CustomAttributes
 {
     public class AttrEnum
     {
 
+        //this.GetType().GetProperties().Where(w => w.ReflectedType == typeof(Enum));
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum GridTypeEnum
         {
             InlineGrid,
             PopUpGrid,
             FormAndList
         }
+        [JsonConverter(typeof(StringEnumConverter))]
         public enum PaginationTypeEnum
         {
             GetPageByPage,
             GetAll
         }
-        
 
-
-        public enum inputType
+        public enum InputType
         {
             text,
             textaria,
@@ -33,14 +37,16 @@
             html,
             conditional // function
         }
-        public enum hideClass
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum HiddenClass
         {
             msg,
             noHide,
             pk,
             hide
         }
-        public enum keyType
+        [JsonConverter(typeof(StringEnumConverter))]
+        public enum KeyType
         {
             PK,
             FK,

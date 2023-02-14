@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using Tools.Models;
 using Tools.Service.ServiceData;
 using Tools.Tools.Grid;
+using static Tools.Tools.CustomAttributes.AttrEnum;
 
 namespace Tools.Controllers
 {
@@ -29,10 +30,9 @@ namespace Tools.Controllers
             InitGrid grid = new InitGrid();
             grid.grid = _customerService.GetGrid();
             grid.columns = _customerService.getColumns(new CustomerDTO());
-            grid.rows = _customerService.getRowsWithIncludes();
+            grid.rows = JsonConvert.DeserializeObject(_customerService.getRowsWithIncludes());
             grid.footer = _customerService.getFooter();
-
-
+            grid.Enums = _customerService.getEnums(typeof(InputType), typeof(KeyType), typeof(HiddenClass));
             return View("Index", grid);
         }
 

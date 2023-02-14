@@ -1,4 +1,5 @@
 ﻿
+using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
 using Tools.Service;
 using Tools.Tools.CustomAttributes;
@@ -22,12 +23,13 @@ namespace Services.DataServices.Repository
         TEntityDTO Remove(object id, int page);
         // -------------------------------------------------------------------------------
 
+        JObject getEnums(params Type[] enums);
         GridSetting GetGrid();
         List<ColumnSetting> getColumns(TEntityDTO entityDTO);
         Footer getFooter(int firstBtn = 1, int activeBtn = 1);
 
         IEnumerable<TEntityDTO> getRows(int page);
         IEnumerable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression);
-        IEnumerable<TEntityDTO> IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes);
+        string IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes);
     }
 }

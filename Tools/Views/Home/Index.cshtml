@@ -1,7 +1,10 @@
 ﻿@using System.Data;
 @using Newtonsoft.Json;
 @using System.Web;
+@using System.Text.Json.Serialization;
 @using Tools.Tools.Grid;
+@using Tools.Tools.CustomAttributes
+@using static Tools.Tools.CustomAttributes.AttrEnum
 @model InitGrid
 
 <style type="text/css">
@@ -107,6 +110,7 @@
     string columns = JsonConvert.SerializeObject(Model.columns);
     object rows = JsonConvert.SerializeObject(Model.rows);
     string footer = JsonConvert.SerializeObject(Model.footer);
+    string enums = JsonConvert.SerializeObject(Model.Enums);
 }
 
 <script type="text/javascript">
@@ -115,6 +119,10 @@ const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
 const columns = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(columns)')));
 let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
+let enums = @Html.Raw(enums);
+const InputType = JSON.parse(enums.InputType);
+//const KeyType = JSON.parse(enums.KeyType);
+//const HiddenClass = JSON.parse(enums.HiddenClass);
 
 let row; let colsLength;
 const table = document.getElementById(`table${grid.GridName}`);
@@ -155,13 +163,13 @@ function addRow(data, position = -1){
     row.id = rowId; row.className = 'tr';
     let rowObj = Object.entries(data); 
     columns.map((col, i) => { 
-        let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
-        row.addCell(col, value);
-        if (col.KeyType == 'PK') { row.setAttribute('data-pk', value); }
+    let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
+    row.addCell(col, value);
+        //if (col.KeyType == 'PK') { row.setAttribute('data-pk', value); }
     });
 }
 HTMLTableRowElement.prototype.addCell = addCell;
-function addCell(col, val = '') {
+function addCell(col, val = '') { 
     let newCell = this.insertCell();
     newCell.className = (col.HiddenClass == 'noHide' ? 'ctrlView' : `ctrlView ${col.HiddenClass}`);
     if (col.ColName == 'msg') {newCell.setAttribute('colspan', colsLength);}
@@ -169,16 +177,36 @@ function addCell(col, val = '') {
     newCell.dataset.col = col.ColName;
     newCell.innerHTML = cellContent(col, val, this.id);
 }
-function cellContent(col, val, rowId){
+    function cellContent(col, val, rowId) {
     if (rowId == "headerRow") {
         return col.KeyType == 'PK' ? '' : col.ColName == 'ctrl' ? 
         /*header ctrl*/ `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`:
         /*header norm*/ `<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`;
     } else {
+         //console.log(InputType[col.inputType]);
         return col.ColName == 'ctrl' ? 
         /*row ctrl*/ `<div><a href='#' class='bi bi-pencil-square' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-trash3' onclick="toggleConfirm('${rowId}')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('${rowId}')"></a><a href='#' class='bi bi-check' id='action${rowId}' onclick="actionRow('${rowId}')"></a></div>`:
-        /*row norm*/ `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`; 
+        /*row norm*/ setElement(InputType[col.inputType],col,val);
+         
     }
+}
+function setElement(elmType,col,val, callBack){
+    console.log(val);
+    let result; 
+        switch (elmType) {
+            case 'dropDownList': result = 'dropDownList'; break;
+            case 'checkbox': val = val === true ? 'checked' : ''; 
+            result = `<div><input disabled data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div>`; break;
+            //case 'ImgPath': break;
+            //case 'textaria': break;
+            //case 'link': break;
+            //case 'wysiwyg': break;
+            //case 'chart': break;
+            //case 'html':  break;
+            case 'conditional': () =>{ result = callBack }; break;
+            default: result = `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' value='${val}'></div>`;
+    };
+    return result;
 }
 HTMLTableElement.prototype.emptyBody = emptyBody;
 function emptyBody(){
@@ -192,8 +220,7 @@ window.onload =  populateTable();
 function populateTable(){
     colsLength = columns.filter(col => col.IsVisable === true && (col.KeyType == 'Normal' || col.KeyType == 'FK')).length;
     table.addHeader();
-    //console.log(rows);
-    rows.map(row => { table.addRow(row); });
+    rows.map(rowData => { table.addRow(rowData); });
     table.addFooter();
 }
 function onSave(rowId){
@@ -230,7 +257,7 @@ function onDelete(rowId){
 
     fetch(`${grid.OnDeleteAction}`, { method: 'POST', body: params })
     .then((response) => response.json())
-    .then((data) => { console.log(JSON.parse(data)); refreshGrid(JSON.parse(data)); })
+    .then((data) => { refreshGrid(JSON.parse(data)); })
     .catch((err) => { console.log(err) });
 }
 function getFormData(row){
@@ -272,8 +299,6 @@ function onPaging(fBtn, aBtn) {
 function refreshGrid(data){
         rows = data.rows;
         footer = data.footer;
-        console.log(rows)
-        console.log(footer)
         table.emptyBody();
         rows.map((row) => { table.addRow(row); });
         table.addFooter(footer);
@@ -303,5 +328,6 @@ function toggleRow(rowId) {
 }
 
 // ---------------------------------------------------------------------------- table Action end
+
 
 </script>

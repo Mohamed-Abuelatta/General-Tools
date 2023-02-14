@@ -8,7 +8,8 @@ namespace Tools.Tools.CustomAttributes
     public class GridSetting : Attribute
     {
 
-        public GridSetting(string GridTitle, string GridName, string OnSaveAction, string OnDeleteAction, string OnPagingAction, 
+        public GridSetting(string GridTitle, string GridName, 
+            string OnSaveAction, string OnDeleteAction, string OnPagingAction, 
             int DefaultColumnWidth, int DefaultCtrlColumnWidth, int PagerSize, int ItemsPerPage, 
             PaginationTypeEnum PaginationType, GridTypeEnum GridType)
         {

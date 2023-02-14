@@ -9,7 +9,10 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Tools.Tools.CustomAttributes;
 using static Tools.Tools.CustomAttributes.AttrEnum;
 using Tools.Tools.Grid;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
+using NuGet.Protocol;
 
 namespace Services.DataServices.Repository
 {
@@ -80,22 +83,17 @@ namespace Services.DataServices.Repository
         }
 
 
-        //public IQueryable<TEntityDTO> Include(Expression<Func<TEntity, object>> expression)
-        //{
-        //    var model = _dbSet.Include(expression).AsQueryable().AsNoTracking();
-        //    var x = _mapper.Map<IQueryable<TEntityDTO>>(_dbSet.Include(expression).AsQueryable().AsNoTracking());
-        //    return x;
-        //}
-
-        //public IQueryable<TEntityDTO> IncludeMultiple(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes)
-        //{
-        //    if (includes != null)
-        //    {
-        //        query = includes.Aggregate(query, (current, inc) => current.Include(inc));
-        //    }
-        //    return _mapper.Map<IQueryable<TEntityDTO>>(query);
-        //}
-
+        public JObject getEnums(params Type[] enums)
+        {
+            var records = new JObject();
+            foreach (var item in enums)
+            {
+                //var values = Enum.GetValues(item).Cast<int>();
+                //var enumDictionary = values.ToDictionary(value => Enum.GetName(item, value));
+                records.Add(item.Name, JsonConvert.SerializeObject(Enum.GetNames(item)));
+            }
+            return records;
+        }
 
         public async Task<TEntityDTO> AddAsync(TEntityDTO entity)
         {
@@ -131,15 +129,16 @@ namespace Services.DataServices.Repository
             return _mapper.Map<IEnumerable<TEntityDTO>>(model);
         }
 
-        public IEnumerable<TEntityDTO> IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes)
+        public string IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes)
         {
             GridSetting gs = GetGrid();
             IQueryable<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage).AsQueryable();
 
             if (includes != null)
             { rows = includes.Aggregate(rows, (current, include) => current.Include(include)); }
-
-            return _mapper.Map<IEnumerable<TEntityDTO>>(rows).AsQueryable().AsNoTracking();
+            string result = 
+            JsonConvert.SerializeObject(rows, Formatting.Indented, new JsonSerializerSettings() {  ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            return result;
         }
 
         public TEntityDTO Remove(object id, int page)
@@ -224,35 +223,13 @@ namespace Services.DataServices.Repository
             {
                 ColumnSetting column = (ColumnSetting)item.GetCustomAttribute(typeof(ColumnSetting));
                 column.ColName = item.Name;
-                column.KeyType = item.Name == PkName ? Enum.GetName(keyType.PK) : FkNames.Contains(item.Name) ? Enum.GetName(keyType.FK) : Enum.GetName(keyType.Normal);
-                column.HiddenClass = column.KeyType == Enum.GetName(keyType.PK) ? Enum.GetName(hideClass.pk) : column.HiddenClass;
-                switch (item.PropertyType.Name)
-                {
-                    case "string":
-                        column.InputType = Enum.GetName(inputType.text);
-                        break;
-                    case "Int32":
-                    case "Decimal":
-                    case "Float":
-                        column.InputType = Enum.GetName(inputType.number);
-                        break;
-                    case "DateTime":
-                        column.InputType = Enum.GetName(inputType.date);
-                        break;
-                    case "Boolean":
-                        column.InputType = Enum.GetName(inputType.checkbox);
-                        break;
-                    default:
-                       column.InputType = (column.KeyType == Enum.GetName(keyType.FK)) ?
-                         Enum.GetName(inputType.dropDownList) :
-                         Enum.GetName(inputType.text);
-                        break;
-                }
+                column.keyType = item.Name == PkName ? KeyType.PK : FkNames.Contains(item.Name) ? KeyType.FK : KeyType.Normal;
+                column.HiddenClass = column.keyType == KeyType.PK ? HiddenClass.pk : column.HiddenClass;
                 columns.Add(column);
             }
 
-            columns.Add(new ColumnSetting { ColName= "msg", KeyType= Enum.GetName(keyType.msg), HiddenClass = Enum.GetName(hideClass.msg) });
-            columns.Add(new ColumnSetting { ColName= "ctrl", KeyType= Enum.GetName(keyType.ctrl) });
+            columns.Add(new ColumnSetting { ColName= "msg", keyType= KeyType.msg, HiddenClass = HiddenClass.msg });
+            columns.Add(new ColumnSetting { ColName= "ctrl", keyType= KeyType.ctrl });
             return columns;
         }
 

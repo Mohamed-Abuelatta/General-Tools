@@ -1,23 +1,33 @@
 ﻿
 using Tools.Tools.CustomAttributes;
+using static Tools.Tools.CustomAttributes.AttrEnum;
 
 namespace Tools.Models
 {
-    //[GridSetting("جدول العملاء", "Home/Manage", "Home/Delete", "Home/Pager")]
+    [GridSetting(
+        "جدول العملاء", "Customer",
+        "Home/Manage", "Home/Delete", "Home/Paging",
+        200, 100, 5, 10,
+        PaginationTypeEnum.GetPageByPage, GridTypeEnum.InlineGrid)]
     public class CustomerDTO
     {
-        [ColumnSetting(0, "رقم العميل")]
+        [ColumnSetting(0, "رقم العميل", inputType: InputType.number )]
         public int Id { get; set; }
-        [ColumnSetting(1, "اسم العميل")]
+        [ColumnSetting(1, "اسم العميل", inputType: InputType.text)]
         public string CustName { get; set; }
-        [ColumnSetting(2, "المسمى الوظيفى للعميل")]
+        [ColumnSetting(2, "المسمى الوظيفى للعميل", inputType: InputType.text)]
         public string CustJobTitle { get; set; }
-        [ColumnSetting(4, "هل مدير")]
+        [ColumnSetting(4, "هل مدير", inputType: InputType.checkbox)]
         public bool IsManager { get; set; }
 
-        [ColumnSetting(4, "عمر العميل")]
+        [ColumnSetting(5, "عمر العميل", inputType: InputType.dropDownList)]
+        public List<string,string,bool> age { get; set; }
+        [ColumnSetting(3, "مدينة تواجد العميل", inputType: InputType.dropDownList)]
+        public string city { get; set; }
+
+        [ColumnSetting(5, "عمر العميل", inputType: InputType.dropDownList)]
         public AgeDTO ageDto { get; set; }
-        [ColumnSetting(3, "مدينة تواجد العميل")]
+        [ColumnSetting(3, "مدينة تواجد العميل", inputType: InputType.dropDownList)]
         public CityDTO cityDto { get; set; }
     }
 }
