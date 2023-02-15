@@ -122,6 +122,8 @@ let footer = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(footer)')));
 let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 let enums = @Html.Raw(enums);
 const InputType = JSON.parse(enums.InputType);
+let ddls = @Html.Raw(ddls);
+// console.log(ddls.Age);
 
 let row; let colsLength;
 const table = document.getElementById(`table${grid.GridName}`);
@@ -195,11 +197,14 @@ function setElement(elmType,col,val, callBack){
         
     let result; 
         switch (elmType) {
-            case 'dropDownList': /*console.log(col.ColTitle + '  -  ' + val.getByIndex(1));*/
-            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<select><option disabled>Please Select</option></select></div>`; break;
+            case 'dropDownList': 
+            let ddl;
+            let getDDL = JSON.parse(ddls[col.ColName]);
+                getDDL.forEach((item) => { ddl += `<option value="${item.getByIndex(0)}">${item.getByIndex(1)}</option>`;
+            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<select><option disabled>Please Select</option>${ddl}</select></div>`; break;
             case 'checkbox': val = val === true ? 'checked' : ''; 
             result = `<div><input disabled data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div>`; break;
-            //case 'ImgPath': break;
+            case 'ImgPath': result = `<img src='${val}' style='width:100px;height:100px;' />` break;
             //case 'textaria': break;
             //case 'link': break;
             //case 'wysiwyg': break;

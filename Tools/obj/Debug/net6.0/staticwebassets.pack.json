@@ -245,6 +245,26 @@
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
     },
     {
+      "Id": "D:\\My Folder\\General-Tools\\Tools\\wwwroot\\users\\1.png",
+      "PackagePath": "staticwebassets\\users\\1.png"
+    },
+    {
+      "Id": "D:\\My Folder\\General-Tools\\Tools\\wwwroot\\users\\2.png",
+      "PackagePath": "staticwebassets\\users\\2.png"
+    },
+    {
+      "Id": "D:\\My Folder\\General-Tools\\Tools\\wwwroot\\users\\3.png",
+      "PackagePath": "staticwebassets\\users\\3.png"
+    },
+    {
+      "Id": "D:\\My Folder\\General-Tools\\Tools\\wwwroot\\users\\4.jpg",
+      "PackagePath": "staticwebassets\\users\\4.jpg"
+    },
+    {
+      "Id": "D:\\My Folder\\General-Tools\\Tools\\wwwroot\\users\\5.jpg",
+      "PackagePath": "staticwebassets\\users\\5.jpg"
+    },
+    {
       "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.Tools.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

@@ -14,23 +14,18 @@ namespace Tools.Models
     public class Customer
     {
         [Key]
-        [ColumnSetting(0 ,"رقم العميل")]
         public int Id { get; set; }
 
-        [ColumnSetting(1, "اسم العميل")]
         public string CustName { get; set; }
 
-        [ColumnSetting(2, "المسمى الوظيفى للعميل")]
+        public string CustPic { get; set; }
+
         public string CustJobTitle { get; set; }
-        [ColumnSetting(4, "هل مدير")]
+
         public bool IsManager { get; set; }
 
-        [ColumnSetting(4, "عمر العميل")]
-        public int AgeId { get; set; }
-        [ForeignKey("AgeId")]
-        public Age age { get; set; }
+        public int age { get; set; }
 
-        [ColumnSetting(3, "مدينة تواجد العميل")]
         public int CityId { get; set; }
         [ForeignKey("CityId")]
         public City city { get; set; }

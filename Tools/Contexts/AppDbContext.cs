@@ -22,6 +22,7 @@ namespace Data.Contexts
 
         #region Student
         public DbSet<Customer> customers { get; set; }
+        public DbSet<City> cities { get; set; }
         #endregion
 
         

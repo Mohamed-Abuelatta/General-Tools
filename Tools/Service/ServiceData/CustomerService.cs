@@ -12,7 +12,7 @@ namespace Tools.Service.ServiceData
 
         public string getRowsWithIncludes(int page = 0)
         {
-            return IncludeMultiple(page, i => i.city, i => i.age);
+            return IncludeMultiple(page, i => i.city);
         }
     }
 }

@@ -8,7 +8,6 @@ namespace Academy.Extensions
         public MappingProfile()
         {
             CreateMap<Customer, CustomerDTO>().ReverseMap();
-            CreateMap<Age, AgeDTO>().ReverseMap();
             CreateMap<City, CityDTO>().ReverseMap();
         }
     }

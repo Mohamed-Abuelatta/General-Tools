@@ -26,7 +26,7 @@ namespace Services.DataServices.Repository
 
         Task<DataTable> sqlCmdReadAsync(string tableName);
 
-        Task<JObject> getDDLsAsync(params Type[] DDLs);
+        JObject getDDLs(params Type[] DDLs);
         JObject getEnums(params Type[] enums);
 
         GridSetting GetGrid();

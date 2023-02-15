@@ -22,6 +22,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data.Common;
 using Pal.Data;
+using Tools.Models;
 
 namespace Services.DataServices.Repository
 {
@@ -104,15 +105,15 @@ namespace Services.DataServices.Repository
             return records;
         }
 
-        public async Task<JObject> getDDLsAsync(params Type[] DDLs)
+        public JObject getDDLs(params Type[] DDLs)
         {
             var records = new JObject();
             foreach (var item in DDLs)
             {
                 IEntityType modelType = _context.Model.GetEntityTypes().FirstOrDefault(w => w.ClrType == item)!;
                 var tableName = modelType.GetTableName();
-                var sql = await sqlCmdReadAsync(tableName);
-                records.Add(item.ShortDisplayName(), JsonConvert.SerializeObject(sql));
+                var sql = sqlCmdReadAsync(tableName).Result;
+                records.Add(item.ShortDisplayName().ToLower(), JsonConvert.SerializeObject(sql));
             }
             return records;
         }

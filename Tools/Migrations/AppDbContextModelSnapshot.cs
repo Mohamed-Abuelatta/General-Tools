@@ -232,22 +232,6 @@ namespace Tools.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Tools.Models.Age", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("AgeName")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Age");
-                });
-
             modelBuilder.Entity("Tools.Models.City", b =>
                 {
                     b.Property<int>("Id")
@@ -261,7 +245,7 @@ namespace Tools.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("City");
+                    b.ToTable("cities");
                 });
 
             modelBuilder.Entity("Tools.Models.Customer", b =>
@@ -272,9 +256,6 @@ namespace Tools.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AgeId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CityId")
                         .HasColumnType("int");
 
@@ -284,12 +265,16 @@ namespace Tools.Migrations
                     b.Property<string>("CustName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CustPic")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsManager")
                         .HasColumnType("bit");
 
-                    b.HasKey("Id");
+                    b.Property<int>("age")
+                        .HasColumnType("int");
 
-                    b.HasIndex("AgeId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CityId");
 
@@ -349,21 +334,18 @@ namespace Tools.Migrations
 
             modelBuilder.Entity("Tools.Models.Customer", b =>
                 {
-                    b.HasOne("Tools.Models.Age", "age")
-                        .WithMany()
-                        .HasForeignKey("AgeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Tools.Models.City", "city")
-                        .WithMany()
+                        .WithMany("customers")
                         .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("age");
-
                     b.Navigation("city");
+                });
+
+            modelBuilder.Entity("Tools.Models.City", b =>
+                {
+                    b.Navigation("customers");
                 });
 #pragma warning restore 612, 618
         }
