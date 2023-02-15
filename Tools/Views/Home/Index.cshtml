@@ -245,7 +245,6 @@ function onSave(rowId){
     .then((response) => response.json())
     .then((data) => { 
         if(rowId == 'headerRow'){
-            console.log(data);
             refreshGrid(JSON.parse(data));
         }else{
             table.addRow(data, row.rowIndex);
