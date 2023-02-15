@@ -11,6 +11,6 @@ namespace Tools.Tools.Grid
         public dynamic rows { get; set; }
         public Footer footer { get; set; }
         public JObject enums { get; set; } 
-        public dynamic assets { get; set; } 
+        public dynamic ddls { get; set; } 
     }
 }

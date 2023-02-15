@@ -1,5 +1,6 @@
 ﻿
 using Newtonsoft.Json.Linq;
+using System.Data;
 using System.Linq.Expressions;
 using Tools.Service;
 using Tools.Tools.CustomAttributes;
@@ -23,9 +24,9 @@ namespace Services.DataServices.Repository
         TEntityDTO Remove(object id, int page);
         // -------------------------------------------------------------------------------
 
-        IEnumerable<TEntityDTO> test(string sqlExpression);
+        Task<DataTable> sqlCmdReadAsync(string tableName);
 
-        JObject getAssets(params Type[] assets);
+        Task<JObject> getDDLsAsync(params Type[] DDLs);
         JObject getEnums(params Type[] enums);
 
         GridSetting GetGrid();

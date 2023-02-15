@@ -29,7 +29,7 @@ namespace Tools.Controllers
             grid.rows = JsonConvert.DeserializeObject(_customerService.getRowsWithIncludes());
             grid.footer = _customerService.getFooter();
             grid.enums = _customerService.getEnums(typeof(InputType), typeof(KeyType), typeof(HiddenClass));
-            grid.assets = _customerService.getAssets(typeof(City), typeof(Age));
+            grid.ddls = _customerService.getDDLsAsync(typeof(City), typeof(Age));
             return View("Index", grid);
         }
 

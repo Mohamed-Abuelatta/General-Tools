@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Pal.Data;
 using Tools.Models;
 
 namespace Data.Contexts
@@ -24,7 +25,7 @@ namespace Data.Contexts
         #endregion
 
         
-        private string dbConn = "Server=.;Database=MyTool;Trusted_Connection=True;TrustServerCertificate=True;";
+        private string dbConn = ConnectionStrings.AppConnectionString;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -43,7 +44,7 @@ namespace Data.Contexts
 
         public class SystemDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
         {
-            private string dbConn = "Server=.;Database=MyTool;Trusted_Connection=True;TrustServerCertificate=True;";
+            private string dbConn = ConnectionStrings.AppConnectionString;
             public AppDbContext CreateDbContext(string[] args)
             {
                 var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();

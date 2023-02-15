@@ -14,6 +14,14 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using NuGet.Protocol;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using NuGet.Protocol.Core.Types;
+using static System.Net.Mime.MediaTypeNames;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Data.Common;
+using Pal.Data;
 
 namespace Services.DataServices.Repository
 {
@@ -96,15 +104,15 @@ namespace Services.DataServices.Repository
             return records;
         }
 
-        public JObject getAssets(params Type[] assets)
+        public async Task<JObject> getDDLsAsync(params Type[] DDLs)
         {
             var records = new JObject();
-            foreach (var item in assets)
+            foreach (var item in DDLs)
             {
-                IEntityType entity = _context.Model.FindEntityType(item);
-                Type model = entity.Model.GetType();
-                //TEntityDTO dto = _mapper.Map<TEntityDTO>(model.GetType());
-                records.Add(item.GetType().Name, JsonConvert.SerializeObject(model.ToJson()));
+                IEntityType modelType = _context.Model.GetEntityTypes().FirstOrDefault(w => w.ClrType == item)!;
+                var tableName = modelType.GetTableName();
+                var sql = await sqlCmdReadAsync(tableName);
+                records.Add(item.ShortDisplayName(), JsonConvert.SerializeObject(sql));
             }
             return records;
         }
@@ -211,10 +219,19 @@ namespace Services.DataServices.Repository
         // https://www.entityframeworktutorial.net/
         // sooooooooooooooooo important 
         // https://www.entityframeworktutorial.net/EntityFramework4.3/raw-sql-query-in-entity-framework.aspx
-        public IEnumerable<TEntityDTO> test(string sqlExpression)
+        public async Task<DataTable> sqlCmdReadAsync(string tableName)
         {
-            var model = _dbSet.FromSqlRaw(sqlExpression).AsQueryable().AsNoTracking();
-            return _mapper.Map<IEnumerable<TEntityDTO>>(model);
+            var connection = new SqlConnection(ConnectionStrings.AppConnectionString);
+            string execSQL = string.Format($"select * from {tableName}");
+            var command = new SqlCommand(execSQL, connection);
+            DataTable DT = new DataTable();
+            await connection.OpenAsync();
+            using (SqlDataReader DR = await command.ExecuteReaderAsync())
+            {
+                DT.Load(DR);
+            }
+            await connection.CloseAsync();
+            return DT;
         }
         
         public Footer getFooter(int firstBtn = 1, int activeBtn = 1)
