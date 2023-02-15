@@ -17,7 +17,7 @@ namespace Tools.Models
         [ColumnSetting(1, "اسم العميل", inputType: InputType.text)]
         public string CustName { get; set; }
 
-        [ColumnSetting(1, "اسم العميل", inputType: InputType.ImgPath)]
+        [ColumnSetting(1, "صورة العميل", inputType: InputType.ImgPath)]
         public string CustPic { get; set; }
 
         [ColumnSetting(2, "المسمى الوظيفى للعميل", inputType: InputType.text)]

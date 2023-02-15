@@ -123,7 +123,7 @@ let rows = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(rows)')));
 let enums = @Html.Raw(enums);
 const InputType = JSON.parse(enums.InputType);
 let ddls = @Html.Raw(ddls);
-// console.log(ddls.Age);
+ console.log(ddls.Age);
 
 let row; let colsLength;
 const table = document.getElementById(`table${grid.GridName}`);
@@ -195,22 +195,25 @@ Object.prototype.getByIndex = function(index) {
 };
 function setElement(elmType,col,val, callBack){
         
-    let result; 
+    let result; let ddl; 
         switch (elmType) {
-            case 'dropDownList': 
-            let ddl;
-            let getDDL = JSON.parse(ddls[col.ColName]);
-                getDDL.forEach((item) => { ddl += `<option value="${item.getByIndex(0)}">${item.getByIndex(1)}</option>`;
-            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<select><option disabled>Please Select</option>${ddl}</select></div>`; break;
-            case 'checkbox': val = val === true ? 'checked' : ''; 
-            result = `<div><input disabled data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div>`; break;
-            case 'ImgPath': result = `<img src='${val}' style='width:100px;height:100px;' />` break;
+            case 'dropDownList':
+            JSON.parse(ddls[col.ColName]).forEach((item) => { ddl += `<option value="${item.getByIndex(0)}">${item.getByIndex(1)}</option>` });
+            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<select><option disabled>Please Select</option>${ddl}</select></div>`; 
+            break;
+            case 'checkbox': 
+            val = val === true ? 'checked' : '';
+            result = `<div><input disabled data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' ${val}></div>`; 
+            break;
+            case 'ImgPath': result = `<img src='${val}' style='width:100px;height:100px;' />`; 
+            break;
             //case 'textaria': break;
             //case 'link': break;
             //case 'wysiwyg': break;
             //case 'chart': break;
             //case 'html':  break;
-            case 'conditional': () =>{ result = callBack }; break;
+            case 'conditional': () =>{ result = callBack }; 
+            break;
             default: result = `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' value='${val}'></div>`;
     };
 
