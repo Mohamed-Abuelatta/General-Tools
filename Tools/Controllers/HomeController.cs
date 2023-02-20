@@ -28,7 +28,7 @@ namespace Tools.Controllers
             grid.columns = _customerService.getColumns(new CustomerDTO());
             grid.rows = JsonConvert.DeserializeObject(_customerService.getRowsWithIncludes());
             grid.footer = _customerService.getFooter();
-            grid.enums = _customerService.getEnums(typeof(InputType), typeof(KeyType), typeof(HiddenClass));
+            grid.enums = _customerService.getEnums(typeof(InputType), typeof(KeyType));
             grid.ddls = _customerService.getDDLs(typeof(City));
             return View("Index", grid);
         }

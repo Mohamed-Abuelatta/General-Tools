@@ -5,8 +5,6 @@ namespace Tools.Tools.CustomAttributes
 {
     public class AttrEnum
     {
-
-        //this.GetType().GetProperties().Where(w => w.ReflectedType == typeof(Enum));
         [JsonConverter(typeof(StringEnumConverter))]
         public enum GridTypeEnum
         {
@@ -36,14 +34,6 @@ namespace Tools.Tools.CustomAttributes
             chart,
             html,
             conditional // function
-        }
-        [JsonConverter(typeof(StringEnumConverter))]
-        public enum HiddenClass
-        {
-            msg,
-            noHide,
-            pk,
-            hide
         }
         [JsonConverter(typeof(StringEnumConverter))]
         public enum KeyType

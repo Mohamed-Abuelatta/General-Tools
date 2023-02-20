@@ -268,12 +268,12 @@ namespace Services.DataServices.Repository
                 ColumnSetting column = (ColumnSetting)item.GetCustomAttribute(typeof(ColumnSetting));
                 column.ColName = item.Name;
                 column.keyType = item.Name == PkName ? KeyType.PK : FkNames.Contains(item.Name) ? KeyType.FK : KeyType.Normal;
-                column.HiddenClass = column.keyType == KeyType.PK ? HiddenClass.pk : column.HiddenClass;
+                column.isvisible = column.keyType == KeyType.PK ? false : true;
                 columns.Add(column);
             }
 
-            columns.Add(new ColumnSetting { ColName= "msg", keyType= KeyType.msg, HiddenClass = HiddenClass.msg });
-            columns.Add(new ColumnSetting { ColName= "ctrl", keyType= KeyType.ctrl });
+            columns.Add(new ColumnSetting { ColName= "msg", keyType= KeyType.msg, isvisible = false });
+            columns.Add(new ColumnSetting { ColName= "ctrl", keyType= KeyType.ctrl, isvisible = true });
             return columns;
         }
 
