@@ -3,16 +3,14 @@ ddlTemplate.innerHTML = `
 <style>
 /********************************************************************* details summary */
 .my-ddl{
-display: inline-block;
-}
+  position: relative;
+  height: 50px;
+  }
 .ddlWrapper{
-  height: 55px;
   width: fit-content;
   block-size: fit-content;
   overflow: visible;
-  position: relative;
 }
-/*.ddlBinder{display:none;}*/
 .ddl {
   background-color: white;
   border: 1px solid #aaa;
@@ -26,16 +24,14 @@ display: inline-block;
     padding: 0.5em 0.5em;
 }
 .ddl>summary {
+  text-align: left;
   font-weight: bold;
   margin: -0.5em -0.5em 0;
-  padding: 1em;
+  padding: 10px;
 }
 .ddl>summary:hover {
   background-color: #ddd;
 }
-/*details > summary {
-  list-style: none;
-}*/
 details[open] summary {
     border-bottom: 1px solid #aaa;
     margin-bottom: 0.5em;
@@ -51,7 +47,7 @@ details[open] summary {
   display: flex;
   justify-content: space-between;  
   align-items: center;
-  padding: 0.5em;
+  padding: 8px;
   margin-right: 7px;
   cursor: pointer;
   border-bottom: 1px solid #ddd;
@@ -119,20 +115,23 @@ details[open] summary {
 .dllList::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
+.clear{clear: both;}
 </style>
+
 <div class="my-ddl">
-<div class="ddlWrapper">
+<span class="ddlWrapper">
 <details class="ddl">
   <summary>
     <span class="ddlBtn">please Select</span> <img class="addIco"/>
   </summary>
   <div class="dllList"> </div>
 </details>
-</div>
-<div>
+</span>
+<span>
+<span calss='clear'></span>
 `;
 
-let ddlSetting; let ddlData;
+let ddlSetting; let ddlData; let selectedKey;
 class MyDdl extends HTMLElement {
     constructor() {
         super();
@@ -146,12 +145,13 @@ class MyDdl extends HTMLElement {
         ddlData = this.getAttribute('ddlData');
         ddlSetting = JSON.parse(ddlSetting);
         ddlData = JSON.parse(ddlData);
+        selectedKey = this.getAttribute('selectedKey');
     }
 
-    ddlItem(val, txt) {
+    ddlItem(val, txt, selected) {
         if (ddlSetting.mode == "edit") {
-            return `<data value="${val}"> ${txt} <span class="ddlCtrl"> <img onclick="${setting.onDelete}" class="deleteIco" />  <img onclick="${setting.onSave}" class="editIco" /> </span> </data>`;
-        } else { return `<data value="${val}"> ${txt} </data>`; };
+            return `<data value="${val}" ${selected}>${txt}<span class="ddlCtrl"> <img onclick="${ddlSetting.onDelete}" class="deleteIco"/> <img onclick="${ddlSetting.onSave}" class="editIco" /></span> </data>`;
+        } else { return `<data value="${val}" ${selected}> ${txt} </data>`; };
     };
 
 
@@ -159,7 +159,8 @@ class MyDdl extends HTMLElement {
 
         if (ddlSetting.mode == 'read') { this.shadowRoot.querySelector(".addIco").remove(); }
         ddlData.forEach((itm) => {
-            this.shadowRoot.querySelector(".dllList").innerHTML += this.ddlItem(itm.val, itm.txt);
+            let selected = selectedKey == itm.getByIndex(0) ? 'selected' : '';
+            this.shadowRoot.querySelector(".dllList").innerHTML += this.ddlItem(itm.getByIndex(0), itm.getByIndex(1), selected);
         })
 
         this.shadowRoot.querySelector(".ddl").addEventListener("click", (e) => {
@@ -178,4 +179,12 @@ class MyDdl extends HTMLElement {
 
 }
 
+Object.prototype.getByIndex = function (index) {
+    return this[Object.keys(this)[index]];
+};
+
 window.customElements.define('my-ddl', MyDdl);
+
+
+// usage
+// <my-ddl ddlSetting='{"mode":"read", "onSave":"Controller/onSave", "onDelete":"Controller/onDelete"}' ddlData='[{"key": "1", "val": "val 1"},  {"key": "2", "val": "val 2"},  {"key": "3", "val": "val 3"}]' selectedKey="3"></my-ddl>

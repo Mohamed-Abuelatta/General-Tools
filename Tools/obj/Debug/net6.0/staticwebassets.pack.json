@@ -5,12 +5,8 @@
       "PackagePath": "staticwebassets\\Tools.bundle.scp.css"
     },
     {
-      "Id": "D:\\General-Tools\\Tools\\wwwroot\\Tools\\ChickBox\\checkbox-checked.svg",
-      "PackagePath": "staticwebassets\\Tools\\ChickBox\\checkbox-checked.svg"
-    },
-    {
-      "Id": "D:\\General-Tools\\Tools\\wwwroot\\Tools\\ChickBox\\checkbox-unchecked.svg",
-      "PackagePath": "staticwebassets\\Tools\\ChickBox\\checkbox-unchecked.svg"
+      "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-chekbox.js",
+      "PackagePath": "staticwebassets\\WebComponent\\wc-chekbox.js"
     },
     {
       "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-ddl.js",

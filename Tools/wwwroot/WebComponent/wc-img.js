@@ -8,7 +8,6 @@ display: inline-block;
   position: relative;
   width: fit-content;
   block-size: fit-content;
-  margin: 50px auto;
   width: fit-content;
   block-size: fit-content;
   display: flex;
@@ -49,7 +48,7 @@ display: inline-block;
 <div id="imgContainer">
   <img id="imagePreview" src="" />
   <button id="imgButton"></button>
-  <input id="imgUploader" type="file" hidden />
+  <input id="imgUploader" name="" type="file" hidden />
 </div>
 </div>
 `;
@@ -67,6 +66,7 @@ class MyImg extends HTMLElement {
         this.shadowRoot.querySelector('#imagePreview').width = width;
         noImgSize = this.hasAttribute('noImgSize') ? this.getAttribute('noImgSize') == '' ? 200 : this.getAttribute('noImgSize') : 200;
         this.shadowRoot.querySelector('#imagePreview').onerror = this.noImg(noImgSize);
+        this.shadowRoot.querySelector("#imgUploader").name = this.getAttribute('name');
     }
 
     noImg(errSize) {
@@ -99,3 +99,8 @@ class MyImg extends HTMLElement {
 }
 
 window.customElements.define('my-img', MyImg);
+
+
+
+// usage
+// <my-img src="/myimg/img.png" name='IFormFile' width="100" noImgSize="100"></my-img>

@@ -83,29 +83,10 @@
     .bg{
         background-color: yellow;
     }
-    [disabled] {
-        background-color: #cccccc;
-        color: #666666;
-        cursor: no-drop;
-    }
     [selected]{
         background-color: #F0F0F0;
     }
 
-    .checked {
-        width: 30px; 
-        height: 30px; 
-        content: url('/Tools/ChickBox/checkbox-checked.svg');
-    }
-
-    .unchecked {
-        width: 30px;
-        height: 30px;
-        content: url('/Tools/ChickBox/checkbox-unchecked.svg');
-    }
-    .checked:hover, .unchecked:hover {
-        transform:scale(1.1);
-    }
     
 </style>
 <div class='container mt-5 p-3'>
@@ -124,6 +105,9 @@
 
 <script src="~/WebComponent/wc-ddl.js"></script>
 <script src="~/WebComponent/wc-img.js"></script>
+<script src="~/WebComponent/wc-chekbox.js"></script>
+
+
 <script type="text/javascript">
 
 const grid = JSON.parse(JSON.parse(JSON.stringify('@Html.Raw(grid)')));
@@ -210,17 +194,13 @@ function setElement(elmType,col,val, callBack){
     let result; let ddl; 
         switch (elmType) {
             case 'dropDownList':
-            JSON.parse(ddls[col.ColName]).forEach((item) => { 
-                let selected = val.getByIndex(0) == item.getByIndex(0) ? 'selected' : ''; 
-                ddl += `<option value="${item.getByIndex(0)}" ${selected}>${item.getByIndex(1)}</option>`; 
-            });
-            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<select><option disabled>Please Select</option>${ddl}</select></div>`; 
+            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<my-ddl ddlSetting='{"mode":"read"}' ddlData='${ddls[col.ColName]}' selectedKey='${val.getByIndex(0)}'></my-ddl></div>`;
             break;
             case 'checkbox':
-            val = val === true ? `class='checked'` : `class='unchecked'`;
-            result = `<div><img data-rinput='${col.ColName}' ${val} /></div><div>${col.ColTitle}<img onclick='this.classList.toggle("checked");this.classList.toggle("unchecked");' data-rinput='${col.ColName}' ${val} /></div>`;
+            result = `<div><my-checkbox checked='${val}' name='${col.ColName}' disabled='true'></my-checkbox></div><div>${col.ColTitle}<my-checkbox checked='${val}' name='${col.ColName}' disabled='false'></my-checkbox> </div>`;
             break;
-            case 'ImgPath': result = `<div><img src='${val}' style='width:100px;height:100px;' /></div><div><my-img src="${val}" width="100" noImgSize="100"></my-img></div>`; 
+            case 'ImgPath': 
+            result = `<div><img src='${val}' style='width:100px;' /></div><div><my-img src="${val}" name='${col.ColName}' width="100" noImgSize="100"></my-img></div>`;
             break;
             //case 'textaria': break;
             //case 'link': break;

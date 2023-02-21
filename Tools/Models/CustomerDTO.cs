@@ -1,4 +1,5 @@
 ﻿
+using System.ComponentModel.DataAnnotations.Schema;
 using Tools.Tools.CustomAttributes;
 using static Tools.Tools.CustomAttributes.AttrEnum;
 
@@ -17,6 +18,8 @@ namespace Tools.Models
         [ColumnSetting(1, "اسم العميل", inputType: InputType.text)]
         public string CustName { get; set; }
 
+        //[NotMapped]
+        //public IFormFile ICustPic { get; set; }
         [ColumnSetting(1, "صورة العميل", inputType: InputType.ImgPath)]
         public string CustPic { get; set; }
 
