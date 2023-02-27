@@ -45,10 +45,10 @@ display: inline-block;
 }
 </style>
 <div id="my-img">
+  <input id="imgUploader" name="" type="file" hidden />
 <div id="imgContainer">
   <img id="imagePreview" src="" />
   <button id="imgButton"></button>
-  <input id="imgUploader" name="" type="file" hidden />
 </div>
 </div>
 `;
@@ -93,8 +93,8 @@ class MyImg extends HTMLElement {
     }
 
     disconnectedCallback() {
-        this.shadowRoot.querySelector("#imgButton").removeEventListener();
-        this.shadowRoot.querySelector("#imgUploader").removeEventListener();
+        this.shadowRoot.querySelector("#imgButton").removeEventListener('click', null);
+        this.shadowRoot.querySelector("#imgUploader").removeEventListener('change', null);
     }
 }
 

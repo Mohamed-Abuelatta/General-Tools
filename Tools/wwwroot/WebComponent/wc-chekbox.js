@@ -56,7 +56,7 @@ class MyCheckbox extends HTMLElement {
     }
 
     disconnectedCallback() {
-        this.shadowRoot.querySelector("#checkBox").removeEventListener();
+        this.shadowRoot.querySelector("#checkBox").removeEventListener('click', null);
     }
 }
 

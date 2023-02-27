@@ -12,25 +12,27 @@ ddlTemplate.innerHTML = `
   overflow: visible;
 }
 .ddl {
+  color: black;
   background-color: white;
   border: 1px solid #aaa;
   border-radius: 4px;
   padding: 0.5em 0.5em 0;
-  width: 300px;
+  width: 200px;
   /* pointer-events: none;  prevents click events */ 
   user-select: none; /* prevents text selection */  
 }
 .ddl[open] {
-    padding: 0.5em 0.5em;
+    padding: 0.4em 0.4em;
 }
 .ddl>summary {
   text-align: left;
   font-weight: bold;
   margin: -0.5em -0.5em 0;
-  padding: 10px;
+  padding: 7px 10px;
 }
 .ddl>summary:hover {
   background-color: #ddd;
+  border: 1px solid #9999;
 }
 details[open] summary {
     border-bottom: 1px solid #aaa;
@@ -38,7 +40,6 @@ details[open] summary {
 }
 /********************************************************************* ul li */
 .dllList{
-  min-height: 5opx;
   max-height: 350px;
   overflow:hidden; 
   overflow-y:scroll;
@@ -47,7 +48,7 @@ details[open] summary {
   display: flex;
   justify-content: space-between;  
   align-items: center;
-  padding: 8px;
+  padding: 0 5px 5px 10px;
   margin-right: 7px;
   cursor: pointer;
   border-bottom: 1px solid #ddd;
@@ -62,7 +63,7 @@ details[open] summary {
 .dllList>data:hover:not([selected]){
   background-color: #ddd;
 }
-/*********************************** Ctrl Buttons */
+/*********************************** Ctrl Btn Icons */
 .editIco{
   float:right;
   margin: 2px;
@@ -115,23 +116,29 @@ details[open] summary {
 .dllList::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
-.clear{clear: both;}
+
 </style>
 
-<div class="my-ddl">
-<span class="ddlWrapper">
-<details class="ddl">
-  <summary>
-    <span class="ddlBtn">please Select</span> <img class="addIco"/>
-  </summary>
-  <div class="dllList"> </div>
-</details>
-</span>
+<span class="my-ddl">
+    <span class="ddlWrapper">
+        <details class="ddl">
+          <summary>
+            <span class="ddlBtn">please Select</span> <img class="addIco"/>
+          </summary>
+          <div class="dllList"> </div>
+        </details>
+    </span>
 <span>
-<span calss='clear'></span>
 `;
 
 let ddlSetting; let ddlData; let selectedKey;
+
+function ddlItem(val, txt, selected) {
+    if (ddlSetting.mode == "edit") {
+        return `<data value="${val}" ${selected}>${txt}<span class="ddlCtrl"> <img onclick="${ddlSetting.onDelete}" class="deleteIco"/> <img onclick="${ddlSetting.onSave}" class="editIco" /></span> </data>`;
+    } else { return `<data value="${val}" ${selected}> ${txt} </data>`; };
+};
+
 class MyDdl extends HTMLElement {
     constructor() {
         super();
@@ -146,35 +153,39 @@ class MyDdl extends HTMLElement {
         ddlSetting = JSON.parse(ddlSetting);
         ddlData = JSON.parse(ddlData);
         selectedKey = this.getAttribute('selectedKey');
-    }
-
-    ddlItem(val, txt, selected) {
-        if (ddlSetting.mode == "edit") {
-            return `<data value="${val}" ${selected}>${txt}<span class="ddlCtrl"> <img onclick="${ddlSetting.onDelete}" class="deleteIco"/> <img onclick="${ddlSetting.onSave}" class="editIco" /></span> </data>`;
-        } else { return `<data value="${val}" ${selected}> ${txt} </data>`; };
-    };
-
-
-    connectedCallback() {
 
         if (ddlSetting.mode == 'read') { this.shadowRoot.querySelector(".addIco").remove(); }
         ddlData.forEach((itm) => {
             let selected = selectedKey == itm.getByIndex(0) ? 'selected' : '';
-            this.shadowRoot.querySelector(".dllList").innerHTML += this.ddlItem(itm.getByIndex(0), itm.getByIndex(1), selected);
+            this.shadowRoot.querySelector(".dllList").innerHTML += ddlItem(itm.getByIndex(0), itm.getByIndex(1), selected);
         })
+
+        var inputToBind = document.createElement('input');
+        let name = this.getAttribute('name');
+        inputToBind.setAttribute('name', name);
+        inputToBind.setAttribute('value', selectedKey);
+        this.innerHTML = '';
+        this.appendChild(inputToBind);
+    }
+
+
+    connectedCallback() {
 
         this.shadowRoot.querySelector(".ddl").addEventListener("click", (e) => {
             if (e.target.tagName == "DATA") {
                 if (this.shadowRoot.querySelector('.dllList>data[selected]') != null) { this.shadowRoot.querySelector('.dllList>data[selected]').removeAttribute('selected'); }
                 e.target.setAttribute('selected', '');
                 this.shadowRoot.querySelector(".ddlBtn").innerText = e.target.innerText;
+                this.querySelector('input').value = e.target.value;
+                console.log(e.target.value);
+                console.log('input name ' + this.querySelector('input').name);
             }
         });
 
     }
 
     disconnectedCallback() {
-        this.shadowRoot.querySelector(".ddl").removeEventListener();
+        this.shadowRoot.querySelector(".ddl").removeEventListener('click', null);
     }
 
 }

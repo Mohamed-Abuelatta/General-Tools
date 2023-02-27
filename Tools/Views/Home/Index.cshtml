@@ -83,10 +83,10 @@
     .bg{
         background-color: yellow;
     }
-    [selected]{
+/*    [selected]{
         background-color: #F0F0F0;
     }
-
+*/
     
 </style>
 <div class='container mt-5 p-3'>
@@ -176,8 +176,9 @@ HTMLTableRowElement.prototype.addCell = addCell;
         return col.keyType == 'PK' ? '' : col.ColName == 'ctrl' ? 
         /*header ctrl*/ 
         `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`:
-        /*header norm*/ 
-        `<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`;
+        /*header norm*/ //setElement(InputType[col.inputType], col, val);
+        //`<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`;
+                setElement(InputType[col.inputType], col, val, true);
     } else {   
         return col.ColName == 'ctrl' ? 
         /*row ctrl*/ 
@@ -189,31 +190,36 @@ HTMLTableRowElement.prototype.addCell = addCell;
 Object.prototype.getByIndex = function(index) {
   return this[Object.keys(this)[index]];
 };
-function setElement(elmType,col,val, callBack){
-        
-    let result; let ddl; 
-        switch (elmType) {
-            case 'dropDownList':
-            result = `<div>${val.getByIndex(1)}</div><div>${col.ColTitle}<my-ddl ddlSetting='{"mode":"read"}' ddlData='${ddls[col.ColName]}' selectedKey='${val.getByIndex(0)}'></my-ddl></div>`;
-            break;
-            case 'checkbox':
-            result = `<div><my-checkbox checked='${val}' name='${col.ColName}' disabled='true'></my-checkbox></div><div>${col.ColTitle}<my-checkbox checked='${val}' name='${col.ColName}' disabled='false'></my-checkbox> </div>`;
-            break;
-            case 'ImgPath': 
-            result = `<div><img src='${val}' style='width:100px;' /></div><div><my-img src="${val}" name='${col.ColName}' width="100" noImgSize="100"></my-img></div>`;
-            break;
-            //case 'textaria': break;
-            //case 'link': break;
-            //case 'wysiwyg': break;
-            //case 'chart': break;
-            //case 'html':  break;
-            case 'conditional': () =>{ result = callBack }; 
-            break;
-            default: result = `<div>${val}</div><div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' value='${val}'></div>`;
+function setElement(elmType, col, val, isHeader = false){
+    let result; let readSection;  let editSection; 
+    switch (elmType) {
+        case 'dropDownList':
+            readSection = isHeader === true ? `<div>${col.ColTitle}</div>` : `<div>${val.getByIndex(1)}</div>`;
+                editSection = `<div>${col.ColTitle}<my-ddl name='${col.ColName}' ddlSetting='{"mode":"read"}' ddlData='${ddls[col.ColName]}' selectedKey='${val.getByIndex(0)}'></my-ddl></div>`;
+        break;
+        case 'checkbox':
+            readSection = isHeader === true ? `<div>${col.ColTitle}</div>` : `<div><my-checkbox checked='${val}' name='${col.ColName}' disabled='true'></my-checkbox></div>`;
+            editSection = `<div>${col.ColTitle}<my-checkbox checked='${val}' name='${col.ColName}' disabled='false'></my-checkbox> </div>`;
+        break;
+        case 'ImgPath':
+            readSection = isHeader === true ? `<div>${col.ColTitle}</div>` : `<div><img src='${val}' style='width:100px;' /></div>`;
+            editSection = `<div><my-img src="${val}" name='${col.ColName}' width="100" noImgSize="100"></my-img></div>`;
+        break;
+        //case 'textaria': break;
+        //case 'link': break;
+        //case 'wysiwyg': break;
+        //case 'chart': break;
+        //case 'html':  break;
+        //case 'conditional': () =>{ result = callBack }; 
+        break;
+        default:
+            readSection = isHeader === true ? `<div>${col.ColTitle}</div>` : `<div>${val}</div>`;
+            editSection = `<div>${col.ColTitle}<input data-rinput='${col.ColName}' type='${elmType}' name='${col.ColName}' value='${val}'></div>`;
     };
-
+    result = readSection + editSection;
     return result;
 }
+
 HTMLTableElement.prototype.emptyBody = emptyBody;
 function emptyBody(){
     this.tBodies[0].remove();
@@ -235,6 +241,8 @@ function onSave(rowId){
     let activeBtn = footerRow.dataset.activebtn;
     let firstBtn = footerRow.dataset.firstbtn;
     let formData = getFormData(row);
+
+    return;
 
     fetch(`${grid.OnSaveAction}?activeBtn=${activeBtn}&firstBtn=${firstBtn}`, { method: 'POST', body: formData })
     .then((response) => response.json())
@@ -266,11 +274,14 @@ function onDelete(rowId){
     .catch((err) => { console.log(err) });
 }
 function getFormData(row){
+    form.appendChild(row);
+    console.log(form.city);
     form.innerHTML = "";
     let clonedRow = row.cloneNode(true)
     form.appendChild(clonedRow);
     let formData = new FormData(form);
-    form.innerHTML = "";
+    console.log(form.city)
+    // form.innerHTML = "";
     return formData;
 }
 function onPaging(fBtn, aBtn) {
