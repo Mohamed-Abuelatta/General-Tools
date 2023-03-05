@@ -18,10 +18,11 @@ namespace Tools.Models
         [ColumnSetting(1, "اسم العميل", inputType: InputType.text)]
         public string CustName { get; set; }
 
-        [NotMapped]
-        public IFormFile ICustPic { get; set; }
+        //[NotMapped]
+        //public IFormFile ICustPic { get; set; }
         [ColumnSetting(1, "صورة العميل", inputType: InputType.ImgPath)]
-        public string CustPic { get; set; }
+        //public string CustPic { get; set; }
+        public Dictionary<string,IFormFile> CustPic { get; set; }
 
         [ColumnSetting(2, "المسمى الوظيفى للعميل", inputType: InputType.text)]
         public string CustJobTitle { get; set; }
