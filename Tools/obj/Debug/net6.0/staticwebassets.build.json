@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "bK1zd63/HYUSLP+hNuNShTSyGa+SWqby0QBolS8DiZI=",
+  "Hash": "/uabJR71N07JmCYTOH4b337kR6M99iXbcGbVYeOTfhU=",
   "Source": "Tools",
   "BasePath": "_content/Tools",
   "Mode": "Default",
@@ -1156,12 +1156,12 @@
       "OriginalItemSpec": "wwwroot\\users\\5.jpg"
     },
     {
-      "Identity": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-chekbox.js",
+      "Identity": "D:\\General-Tools\\Tools\\wwwroot\\WebComponents\\wc-chekbox.js",
       "SourceId": "Tools",
       "SourceType": "Discovered",
       "ContentRoot": "D:\\General-Tools\\Tools\\wwwroot\\",
       "BasePath": "_content/Tools",
-      "RelativePath": "WebComponent/wc-chekbox.js",
+      "RelativePath": "WebComponents/wc-chekbox.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -1170,15 +1170,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\WebComponent\\wc-chekbox.js"
+      "OriginalItemSpec": "wwwroot\\WebComponents\\wc-chekbox.js"
     },
     {
-      "Identity": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-ddl.js",
+      "Identity": "D:\\General-Tools\\Tools\\wwwroot\\WebComponents\\wc-ddl.js",
       "SourceId": "Tools",
       "SourceType": "Discovered",
       "ContentRoot": "D:\\General-Tools\\Tools\\wwwroot\\",
       "BasePath": "_content/Tools",
-      "RelativePath": "WebComponent/wc-ddl.js",
+      "RelativePath": "WebComponents/wc-ddl.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -1187,15 +1187,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\WebComponent\\wc-ddl.js"
+      "OriginalItemSpec": "wwwroot\\WebComponents\\wc-ddl.js"
     },
     {
-      "Identity": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-img.js",
+      "Identity": "D:\\General-Tools\\Tools\\wwwroot\\WebComponents\\wc-img.js",
       "SourceId": "Tools",
       "SourceType": "Discovered",
       "ContentRoot": "D:\\General-Tools\\Tools\\wwwroot\\",
       "BasePath": "_content/Tools",
-      "RelativePath": "WebComponent/wc-img.js",
+      "RelativePath": "WebComponents/wc-img.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -1204,7 +1204,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\WebComponent\\wc-img.js"
+      "OriginalItemSpec": "wwwroot\\WebComponents\\wc-img.js"
     }
   ]
 }

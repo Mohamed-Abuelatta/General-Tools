@@ -1,38 +1,34 @@
-﻿const ddlTemplate = document.createElement('template');
-ddlTemplate.innerHTML = `
+﻿
+const templateDdl = document.createElement('template');
+templateDdl.innerHTML = `
 <style>
 /********************************************************************* details summary */
-.my-ddl{
-  position: relative;
-  height: 50px;
-  }
+
 .ddlWrapper{
-  width: fit-content;
-  block-size: fit-content;
+  position: relative;
   overflow: visible;
 }
 .ddl {
-  color: black;
+  position: absolute;
   background-color: white;
   border: 1px solid #aaa;
   border-radius: 4px;
   padding: 0.5em 0.5em 0;
-  width: 200px;
+  width: 230px;
   /* pointer-events: none;  prevents click events */ 
   user-select: none; /* prevents text selection */  
 }
 .ddl[open] {
-    padding: 0.4em 0.4em;
+    padding: 0.5em 0.5em;
 }
 .ddl>summary {
   text-align: left;
   font-weight: bold;
   margin: -0.5em -0.5em 0;
-  padding: 7px 10px;
+  padding: 10px;
 }
 .ddl>summary:hover {
   background-color: #ddd;
-  border: 1px solid #9999;
 }
 details[open] summary {
     border-bottom: 1px solid #aaa;
@@ -40,6 +36,7 @@ details[open] summary {
 }
 /********************************************************************* ul li */
 .dllList{
+  min-height: 5opx;
   max-height: 350px;
   overflow:hidden; 
   overflow-y:scroll;
@@ -48,7 +45,7 @@ details[open] summary {
   display: flex;
   justify-content: space-between;  
   align-items: center;
-  padding: 0 5px 5px 10px;
+  padding: 5px;
   margin-right: 7px;
   cursor: pointer;
   border-bottom: 1px solid #ddd;
@@ -63,7 +60,7 @@ details[open] summary {
 .dllList>data:hover:not([selected]){
   background-color: #ddd;
 }
-/*********************************** Ctrl Btn Icons */
+/*********************************** Ctrl Buttons */
 .editIco{
   float:right;
   margin: 2px;
@@ -95,18 +92,14 @@ details[open] summary {
   content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='red' class='bi bi-plus-circle' viewBox='0 0 16 16'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3Cpath d='M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z'/%3E%3C/svg%3E");
 }
 /***************************************** Scrolling Style */
-
-
 /* width */
 .dllList::-webkit-scrollbar {
   width: 5px;
 }
-
 /* Track */
 .dllList::-webkit-scrollbar-track {
   background: #f1f1f1; 
 }
- 
 /* Handle */
 .dllList::-webkit-scrollbar-thumb {
   background: #888; 
@@ -116,23 +109,22 @@ details[open] summary {
 .dllList::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
-
+.clear{clear: both;}
 </style>
-
-<span class="my-ddl">
-    <span class="ddlWrapper">
-        <details class="ddl">
-          <summary>
-            <span class="ddlBtn">please Select</span> <img class="addIco"/>
-          </summary>
-          <div class="dllList"> </div>
-        </details>
-    </span>
-<span>
+<div class="my-ddl">
+<div class="ddlWrapper">
+<details class="ddl">
+  <summary>
+    <span class="ddlBtn">please Select</span> <img class="addIco"/>
+  </summary>
+  <div class="dllList"> </div>
+</details>
+</div>
+<div>
+<span calss='clear'></span>
 `;
 
 let ddlSetting; let ddlData; let selectedKey;
-
 function ddlItem(val, txt, selected) {
     if (ddlSetting.mode == "edit") {
         return `<data value="${val}" ${selected}>${txt}<span class="ddlCtrl"> <img onclick="${ddlSetting.onDelete}" class="deleteIco"/> <img onclick="${ddlSetting.onSave}" class="editIco" /></span> </data>`;
@@ -146,7 +138,7 @@ class MyDdl extends HTMLElement {
         this.showInfo = true;
 
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(ddlTemplate.content.cloneNode(true));
+        this.shadowRoot.appendChild(templateDdl.content.cloneNode(true));
 
         ddlSetting = this.getAttribute('ddlSetting');
         ddlData = this.getAttribute('ddlData');
@@ -160,34 +152,25 @@ class MyDdl extends HTMLElement {
             this.shadowRoot.querySelector(".dllList").innerHTML += ddlItem(itm.getByIndex(0), itm.getByIndex(1), selected);
         })
 
+        // ------------------------------------- bind Name and Value
         var inputToBind = document.createElement('input');
         let name = this.getAttribute('name');
         inputToBind.setAttribute('name', name);
         inputToBind.setAttribute('value', selectedKey);
-        this.innerHTML = '';
         this.appendChild(inputToBind);
-    }
+        // ------------------------------------- bind Name and Value
 
-
-    connectedCallback() {
-
-        this.shadowRoot.querySelector(".ddl").addEventListener("click", (e) => {
-            if (e.target.tagName == "DATA") {
+        const opts = this.shadowRoot.querySelectorAll(".dllList>data");
+        opts.forEach(option => {
+            option.addEventListener('click', (e) => {
                 if (this.shadowRoot.querySelector('.dllList>data[selected]') != null) { this.shadowRoot.querySelector('.dllList>data[selected]').removeAttribute('selected'); }
                 e.target.setAttribute('selected', '');
                 this.shadowRoot.querySelector(".ddlBtn").innerText = e.target.innerText;
                 this.querySelector('input').value = e.target.value;
-                console.log(e.target.value);
-                console.log('input name ' + this.querySelector('input').name);
-            }
-        });
-
+                this.shadowRoot.querySelector(".ddl").open = false;
+            });
+        })
     }
-
-    disconnectedCallback() {
-        this.shadowRoot.querySelector(".ddl").removeEventListener('click', null);
-    }
-
 }
 
 Object.prototype.getByIndex = function (index) {
@@ -195,7 +178,6 @@ Object.prototype.getByIndex = function (index) {
 };
 
 window.customElements.define('my-ddl', MyDdl);
-
 
 // usage
 // <my-ddl ddlSetting='{"mode":"read", "onSave":"Controller/onSave", "onDelete":"Controller/onDelete"}' ddlData='[{"key": "1", "val": "val 1"},  {"key": "2", "val": "val 2"},  {"key": "3", "val": "val 3"}]' selectedKey="3"></my-ddl>

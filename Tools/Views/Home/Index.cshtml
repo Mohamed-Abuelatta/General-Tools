@@ -89,6 +89,7 @@
 */
     
 </style>
+
 <div class='container mt-5 p-3'>
     <table id="table@(Model.grid.GridName)"></table>
     <form id="form@(Model.grid.GridName)"></form>
@@ -103,9 +104,10 @@
     string ddls = JsonConvert.SerializeObject(Model.ddls);
 }
 
-<script src="~/WebComponent/wc-ddl.js"></script>
-<script src="~/WebComponent/wc-img.js"></script>
-<script src="~/WebComponent/wc-chekbox.js"></script>
+
+<script src="~/WebComponents/wc-ddl.js"></script>
+<script src="~/WebComponents/wc-img.js"></script>
+<script src="~/WebComponents/wc-chekbox.js"></script>
 
 
 <script type="text/javascript">
@@ -198,8 +200,8 @@ function setElement(elmType, col, val, isHeader = false){
                 editSection = `<div>${col.ColTitle}<my-ddl name='${col.ColName}' ddlSetting='{"mode":"read"}' ddlData='${ddls[col.ColName]}' selectedKey='${val.getByIndex(0)}'></my-ddl></div>`;
         break;
         case 'checkbox':
-            readSection = isHeader === true ? `<div>${col.ColTitle}</div>` : `<div><my-checkbox checked='${val}' name='${col.ColName}' disabled='true'></my-checkbox></div>`;
-            editSection = `<div>${col.ColTitle}<my-checkbox checked='${val}' name='${col.ColName}' disabled='false'></my-checkbox> </div>`;
+            readSection = isHeader === true ? `<div>${col.ColTitle}</div>` : `<div><my-checkbox checked='${val}' name='${col.ColName}' disabled></my-checkbox></div>`;
+            editSection = `<div>${col.ColTitle}<my-checkbox checked='${val}' name='${col.ColName}'></my-checkbox> </div>`;
         break;
         case 'ImgPath':
             readSection = isHeader === true ? `<div>${col.ColTitle}</div>` : `<div><img src='${val}' style='width:100px;' /></div>`;
@@ -242,8 +244,6 @@ function onSave(rowId){
     let firstBtn = footerRow.dataset.firstbtn;
     let formData = getFormData(row);
 
-    return;
-
     fetch(`${grid.OnSaveAction}?activeBtn=${activeBtn}&firstBtn=${firstBtn}`, { method: 'POST', body: formData })
     .then((response) => response.json())
     .then((data) => { 
@@ -275,13 +275,11 @@ function onDelete(rowId){
 }
 function getFormData(row){
     form.appendChild(row);
-    console.log(form.city);
     form.innerHTML = "";
     let clonedRow = row.cloneNode(true)
     form.appendChild(clonedRow);
     let formData = new FormData(form);
-    console.log(form.city)
-    // form.innerHTML = "";
+     form.innerHTML = "";
     return formData;
 }
 function onPaging(fBtn, aBtn) {

@@ -5,16 +5,16 @@
       "PackagePath": "staticwebassets\\Tools.bundle.scp.css"
     },
     {
-      "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-chekbox.js",
-      "PackagePath": "staticwebassets\\WebComponent\\wc-chekbox.js"
+      "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponents\\wc-chekbox.js",
+      "PackagePath": "staticwebassets\\WebComponents\\wc-chekbox.js"
     },
     {
-      "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-ddl.js",
-      "PackagePath": "staticwebassets\\WebComponent\\wc-ddl.js"
+      "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponents\\wc-ddl.js",
+      "PackagePath": "staticwebassets\\WebComponents\\wc-ddl.js"
     },
     {
-      "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponent\\wc-img.js",
-      "PackagePath": "staticwebassets\\WebComponent\\wc-img.js"
+      "Id": "D:\\General-Tools\\Tools\\wwwroot\\WebComponents\\wc-img.js",
+      "PackagePath": "staticwebassets\\WebComponents\\wc-img.js"
     },
     {
       "Id": "D:\\General-Tools\\Tools\\wwwroot\\css\\site.css",

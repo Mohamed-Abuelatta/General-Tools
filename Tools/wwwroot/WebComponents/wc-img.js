@@ -1,5 +1,6 @@
-﻿const imgTemplate = document.createElement('template');
-imgTemplate.innerHTML = `
+﻿
+const templateImg = document.createElement('template');
+templateImg.innerHTML = `
 <style>
 #my-img{
 display: inline-block;
@@ -44,40 +45,57 @@ display: inline-block;
   opacity: 0.6;
 }
 </style>
-<div id="my-img">
-  <input id="imgUploader" name="" type="file" hidden />
-<div id="imgContainer">
-  <img id="imagePreview" src="" />
-  <button id="imgButton"></button>
-</div>
-</div>
 `;
 
-let noImgSize; let width;
 class MyImg extends HTMLElement {
     constructor() {
         super();
-        this.showInfo = true;
-
         this.attachShadow({ mode: 'open' });
-        this.shadowRoot.appendChild(imgTemplate.content.cloneNode(true));
-        this.shadowRoot.querySelector('#imagePreview').src = this.getAttribute('src');
-        width = this.hasAttribute('width') ? this.getAttribute('width') == '' ? 200 : this.getAttribute('width') : 200;
-        this.shadowRoot.querySelector('#imagePreview').width = width;
-        noImgSize = this.hasAttribute('noImgSize') ? this.getAttribute('noImgSize') == '' ? 200 : this.getAttribute('noImgSize') : 200;
-        this.shadowRoot.querySelector('#imagePreview').onerror = this.noImg(noImgSize);
-        this.shadowRoot.querySelector("#imgUploader").name = this.getAttribute('name');
+        this.shadowRoot.appendChild(templateImg.content.cloneNode(true));
+
+        this.img = document.createElement('img');
+        this.button = document.createElement('button');
+        this.file = document.createElement('input');
+        this.div = document.createElement('div');
+        // ----------------------------------------- img
+        this.img.id = 'imagePreview';
+        // ----------------------------------------- button
+        this.button.id = 'imgButton';
+        // ----------------------------------------- input
+        this.file.id = 'imgUploader';
+        this.file.setAttribute('type', 'file');
+        this.file.setAttribute('hidden', '');
+        this.file.name = this.getAttribute('name');
+
+        this.div.id = 'imgContainer';
+        this.div.appendChild(this.img);
+        this.div.appendChild(this.button);
+        this.div.appendChild(this.file);
+        if (!this.hasAttribute('disabled')) { this.shadowRoot.appendChild(this.div); }
+        else { this.shadowRoot.appendChild(this.img); }
+
+        this.img.src = this.getAttribute('src');
+        this.img.width = this.hasAttribute('width') ? this.getAttribute('width') == '' ? 200 : this.getAttribute('width') : 200;
+        let noImgSize = this.hasAttribute('noImgSize') ? this.getAttribute('noImgSize') == '' ? 200 : this.getAttribute('noImgSize') : 200;
+        this.img.onerror = () => { this.img.height = noImgSize; this.img.width = noImgSize; };
+        this.file.name = this.getAttribute('name');
+
+
+        this._form = null;
+        this._handleFormData = this.handleFormData.bind(this);
     }
 
-    noImg(errSize) {
-        this.shadowRoot.querySelector('#imagePreview').height = errSize;
-        this.shadowRoot.querySelector('#imagePreview').width = errSize;
+    handleFormData({ formData }) {
+        if (!this.file.disabled) {
+            if (!this.hasAttribute('name')) { return; }
+            formData.append(this.file.name, this.file.files[0]);
+        }
     }
 
     connectedCallback() {
-        let imagePreview = this.shadowRoot.querySelector('#imagePreview');
-        let imgButton = this.shadowRoot.querySelector("#imgButton");
-        let imgUploader = this.shadowRoot.querySelector("#imgUploader");
+        let imagePreview = this.img;
+        let imgButton = this.button;
+        let imgUploader = this.file;
 
         imgButton.addEventListener('click', () => {
             imgUploader.click();
@@ -90,17 +108,33 @@ class MyImg extends HTMLElement {
                 imagePreview.src = reader.result;
             }
         });
+
+        this._form = this.findContainingForm();
+        if (this._form) {
+            this._form.addEventListener('formdata', this._handleFormData);
+        }
+    }
+    // remove the `formdata` listener if we're removed
+    disconnectedCallback() {
+        if (this._form) {
+            this._form.removeEventListener('formdata', this._handleFormData);
+            this._form = null;
+        }
+
+        this.button.removeEventListener('click', null);
+        this.file.removeEventListener('change', null);
     }
 
-    disconnectedCallback() {
-        this.shadowRoot.querySelector("#imgButton").removeEventListener('click', null);
-        this.shadowRoot.querySelector("#imgUploader").removeEventListener('change', null);
+    findContainingForm() {
+        // can only be in a form in the same "scope", ShadowRoot or Document
+        const root = this.getRootNode();
+        const forms = Array.from(root.querySelectorAll('form'));
+        // we can only be in one <form>, so the first one to contain us is the correct one
+        return forms.find((form) => form.contains(this)) || null;
     }
 }
 
 window.customElements.define('my-img', MyImg);
-
-
 
 // usage
 // <my-img src="/myimg/img.png" name='IFormFile' width="100" noImgSize="100"></my-img>

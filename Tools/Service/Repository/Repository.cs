@@ -152,16 +152,19 @@ namespace Services.DataServices.Repository
 
         public string IncludeMultiple(int page = 0, params Expression<Func<TEntity, object>>[] includes)
         {
+
             GridSetting gs = GetGrid();
             IQueryable<TEntity> rows = _dbSet.Skip((page == 0 ? page : page - 1) * gs.ItemsPerPage).Take(gs.ItemsPerPage).AsQueryable();
-
+            
             if (includes != null)
             { rows = includes.Aggregate(rows, (current, include) => current.Include(include)); }
-
+            
             IEnumerable<TEntityDTO> rowsDTO = _mapper.Map<IEnumerable<TEntityDTO>>(rows);
 
             string result =
             JsonConvert.SerializeObject(rowsDTO, Formatting.None, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+
+            var x = result.ToJson(Formatting.Indented).Where(key => key.ToString() != "ICustPic");
 
             return result;
         }
@@ -261,15 +264,16 @@ namespace Services.DataServices.Repository
             string PkName = tableProperties.FirstOrDefault(i => i.IsPrimaryKey()).Name;
             IEnumerable<string> FkNames = tableProperties.Where(i => i.IsForeignKey()).Select(s => s.Name);
 
-            PropertyInfo[] propsInfos = entityDTO.GetType().GetProperties();
+            PropertyInfo[] propsInfos = entityDTO.GetType().GetProperties().Where(w => w.GetCustomAttribute(typeof(ColumnSetting)) != null).ToArray();
 
             foreach (var item in propsInfos)
             {
                 ColumnSetting column = (ColumnSetting)item.GetCustomAttribute(typeof(ColumnSetting));
-                column.ColName = item.Name;
-                column.keyType = item.Name == PkName ? KeyType.PK : FkNames.Contains(item.Name) ? KeyType.FK : KeyType.Normal;
-                column.isvisible = column.keyType == KeyType.PK ? false : true;
-                columns.Add(column);
+                    column.ColName = item.Name;
+                    column.keyType = item.Name == PkName ? KeyType.PK : FkNames.Contains(item.Name) ? KeyType.FK : KeyType.Normal;
+                    column.isvisible = column.keyType == KeyType.PK ? false : true;
+                    columns.Add(column);
+                
             }
 
             columns.Add(new ColumnSetting { ColName= "msg", keyType= KeyType.msg, isvisible = false });

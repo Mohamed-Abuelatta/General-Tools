@@ -283,14 +283,13 @@ D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\scopedcss\projectbundle\Tools.
 D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.csproj.CopyComplete
 D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\Tools.genruntimeconfig.cache
 D:\My Folder\General-Tools\Tools\obj\Debug\net6.0\ref\Tools.dll
+D:\General-Tools\Tools\bin\Debug\net6.0\Tools.dll
 D:\General-Tools\Tools\bin\Debug\net6.0\appsettings.Development.json
 D:\General-Tools\Tools\bin\Debug\net6.0\appsettings.json
 D:\General-Tools\Tools\bin\Debug\net6.0\Tools.staticwebassets.runtime.json
 D:\General-Tools\Tools\bin\Debug\net6.0\Tools.exe
 D:\General-Tools\Tools\bin\Debug\net6.0\Tools.deps.json
 D:\General-Tools\Tools\bin\Debug\net6.0\Tools.runtimeconfig.json
-D:\General-Tools\Tools\bin\Debug\net6.0\Tools.dll
-D:\General-Tools\Tools\bin\Debug\net6.0\Tools.pdb
 D:\General-Tools\Tools\bin\Debug\net6.0\AutoMapper.dll
 D:\General-Tools\Tools\bin\Debug\net6.0\Azure.Core.dll
 D:\General-Tools\Tools\bin\Debug\net6.0\Azure.Identity.dll
@@ -567,4 +566,5 @@ D:\General-Tools\Tools\obj\Debug\net6.0\Tools.dll
 D:\General-Tools\Tools\obj\Debug\net6.0\refint\Tools.dll
 D:\General-Tools\Tools\obj\Debug\net6.0\Tools.pdb
 D:\General-Tools\Tools\obj\Debug\net6.0\Tools.genruntimeconfig.cache
+D:\General-Tools\Tools\bin\Debug\net6.0\Tools.pdb
 D:\General-Tools\Tools\obj\Debug\net6.0\ref\Tools.dll
