@@ -162,7 +162,10 @@ namespace Services.DataServices.Repository
             IEnumerable<TEntityDTO> rowsDTO = _mapper.Map<IEnumerable<TEntityDTO>>(rows);
 
             string result =
-            JsonConvert.SerializeObject(rowsDTO, Formatting.None, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
+            JsonConvert.SerializeObject(rowsDTO, Formatting.None, new JsonSerializerSettings() { 
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore ,
+                
+            });
 
             var x = result.ToJson(Formatting.Indented).Where(key => key.ToString() != "ICustPic");
 
