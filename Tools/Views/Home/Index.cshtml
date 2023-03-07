@@ -157,10 +157,10 @@ function addRow(data, position = -1){
     let TBody = ((this.tBodies.length == 0)? this.createTBody() : this.tBodies[0]);
     row = TBody.insertRow(position); 
     row.id = rowId; row.className = 'tr';
-    let rowObj = Object.entries(data); 
-    columns.map((col, i) => { 
-    let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : rowObj[i][1]));
-    row.addCell(col, value);
+    //let rowObj = Object.entries(data);
+    columns.map((col, i) => {
+        let value = (col.ColName == 'msg' ? '<b>هل انت متاكد من الحذف !</b>' : (col.ColName == 'ctrl' ? rowId : data[col.ColName]));
+        row.addCell(col, value);
     });
 }
 HTMLTableRowElement.prototype.addCell = addCell;
@@ -178,9 +178,7 @@ HTMLTableRowElement.prototype.addCell = addCell;
         return col.keyType == 'PK' ? '' : col.ColName == 'ctrl' ? 
         /*header ctrl*/ 
         `<div><a href='#' class='bi bi-plus' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-caret-down' onclick="alert('DDL')"></a></div><div><a href='#' class='bi bi-x' id='toggle${rowId}' onclick="toggleRow('headerRow')"></a><a href='#' class='bi bi-check' onclick="onSave('headerRow')"></a></div>`:
-        /*header norm*/ //setElement(InputType[col.inputType], col, val);
-        //`<div>${col.ColTitle}</div><div>${col.ColTitle}<input data-hinput='${col.ColName}' type='${col.InputType}' name='${col.ColName}' value='${val}'></div>`;
-                setElement(InputType[col.inputType], col, val, true);
+        /*header norm*/ setElement(InputType[col.inputType], col, val, true);
     } else {   
         return col.ColName == 'ctrl' ? 
         /*row ctrl*/ 
@@ -279,7 +277,13 @@ function getFormData(row){
     let clonedRow = row.cloneNode(true)
     form.appendChild(clonedRow);
     let formData = new FormData(form);
-     form.innerHTML = "";
+
+        // Display the key/value pairs
+        for (const pair of formData.entries()) {
+            console.log(`${pair[0]}, ${pair[1]}`);
+        }
+        return;
+     //form.innerHTML = "";
     return formData;
 }
 function onPaging(fBtn, aBtn) {

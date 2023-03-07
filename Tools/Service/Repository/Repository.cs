@@ -158,7 +158,9 @@ namespace Services.DataServices.Repository
             
             if (includes != null)
             { rows = includes.Aggregate(rows, (current, include) => current.Include(include)); }
-            
+
+            //DataTable dt = (DataTable)JsonConvert.DeserializeObject(rows.ToJson(), (typeof(DataTable)));
+
             IEnumerable<TEntityDTO> rowsDTO = _mapper.Map<IEnumerable<TEntityDTO>>(rows);
 
             string result =
@@ -272,11 +274,11 @@ namespace Services.DataServices.Repository
             foreach (var item in propsInfos)
             {
                 ColumnSetting column = (ColumnSetting)item.GetCustomAttribute(typeof(ColumnSetting));
-                    column.ColName = item.Name;
-                    column.keyType = item.Name == PkName ? KeyType.PK : FkNames.Contains(item.Name) ? KeyType.FK : KeyType.Normal;
-                    column.isvisible = column.keyType == KeyType.PK ? false : true;
-                    columns.Add(column);
-                
+                //if (column == null) { column.isincluded = false; break; } else { column.isincluded = true; }
+                column.ColName = item.Name;
+                column.keyType = item.Name == PkName ? KeyType.PK : FkNames.Contains(item.Name) ? KeyType.FK : KeyType.Normal;
+                column.isvisible = column.keyType == KeyType.PK ? false : true;
+                columns.Add(column);
             }
 
             columns.Add(new ColumnSetting { ColName= "msg", keyType= KeyType.msg, isvisible = false });

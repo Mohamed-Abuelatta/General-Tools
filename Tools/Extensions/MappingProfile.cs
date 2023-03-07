@@ -7,7 +7,7 @@ namespace Academy.Extensions
     {
         public MappingProfile()
         {
-            CreateMap<Customer, CustomerDTO>().ReverseMap().ForMember(member => member.CustPic, option => option.Condition(x => x.CustPic.Keys.Count() == 20));
+            CreateMap<Customer, CustomerDTO>().ReverseMap();
             CreateMap<City, CityDTO>().ReverseMap();
         }
     }

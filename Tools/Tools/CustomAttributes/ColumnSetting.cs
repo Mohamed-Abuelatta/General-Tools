@@ -11,7 +11,7 @@ namespace Tools.Tools.CustomAttributes
     {
 
         public ColumnSetting(int ColIndex = 0, string ColTitle = "", string ColName = "",
-            int ColWidth = 200, bool IsVisible = true, InputType inputType = InputType.text, KeyType keyType = KeyType.Normal)
+            int ColWidth = 200, bool IsVisible = true, bool IsIncluded = true, InputType inputType = InputType.text, KeyType keyType = KeyType.Normal)
         {
             this.ColName = ColName;
             this.ColTitle = ColTitle;
@@ -20,6 +20,7 @@ namespace Tools.Tools.CustomAttributes
             this.keyType = keyType;
             this.ColWidth = ColWidth;
             this.isvisible = IsVisible;
+            this.isincluded = IsIncluded;
         }
 
         public string ColName { get; set; }
@@ -28,6 +29,7 @@ namespace Tools.Tools.CustomAttributes
         public int ColWidth { get; set; }
 
         public bool isvisible { get; set; } 
+        public bool isincluded { get; set; } 
         public InputType inputType { get; set; }
         public KeyType keyType { get; set; } 
 
