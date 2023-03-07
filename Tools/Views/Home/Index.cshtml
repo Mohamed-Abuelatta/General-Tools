@@ -278,12 +278,14 @@ function getFormData(row){
     form.appendChild(clonedRow);
     let formData = new FormData(form);
 
+        // lastWork
         // Display the key/value pairs
         for (const pair of formData.entries()) {
             console.log(`${pair[0]}, ${pair[1]}`);
         }
         return;
      //form.innerHTML = "";
+
     return formData;
 }
 function onPaging(fBtn, aBtn) {
