@@ -240,20 +240,21 @@ function onSave(rowId){
     let footerRow = table.tFoot.rows[0];
     let activeBtn = footerRow.dataset.activebtn;
     let firstBtn = footerRow.dataset.firstbtn;
-    let formData = getFormData(row);
+    //let formData = getFormData(row);
+    getFormData(row);
 
-    fetch(`${grid.OnSaveAction}?activeBtn=${activeBtn}&firstBtn=${firstBtn}`, { method: 'POST', body: formData })
-    .then((response) => response.json())
-    .then((data) => { 
-        if(rowId == 'headerRow'){
-            refreshGrid(JSON.parse(data));
-        }else{
-            table.addRow(data, row.rowIndex);
-            table.deleteRow(row.rowIndex);
-        }
-        alert('done successfully')
-    })
-    .catch((err) => { console.log(err) });
+    //fetch(`${grid.OnSaveAction}?activeBtn=${activeBtn}&firstBtn=${firstBtn}`, { method: 'POST', body: formData })
+    //.then((response) => response.json())
+    //.then((data) => { 
+    //    if(rowId == 'headerRow'){
+    //        refreshGrid(JSON.parse(data));
+    //    }else{
+    //        table.addRow(data, row.rowIndex);
+    //        table.deleteRow(row.rowIndex);
+    //    }
+    //    alert('done successfully')
+    //})
+    //.catch((err) => { console.log(err) });
 }
 function onDelete(rowId){
     let footerRow = table.tFoot.rows[0];
@@ -271,22 +272,18 @@ function onDelete(rowId){
     .then((data) => { refreshGrid(JSON.parse(data)); })
     .catch((err) => { console.log(err) });
 }
+// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 function getFormData(row){
-    form.appendChild(row);
-    form.innerHTML = "";
-    let clonedRow = row.cloneNode(true)
-    form.appendChild(clonedRow);
-    let formData = new FormData(form);
+    const params = {};
+    let clone = row.cloneNode(true);
+    //    let formData = new FormData(clone);
+    //for (const pair of formData.entries()) {
+    //    params[pair[0]] = pair[1];
+    //}
 
-        // lastWork
-        // Display the key/value pairs
-        for (const pair of formData.entries()) {
-            console.log(`${pair[0]}, ${pair[1]}`);
-        }
-        return;
-     //form.innerHTML = "";
+    console.log(clone);
 
-    return formData;
+    return;
 }
 function onPaging(fBtn, aBtn) {
 
